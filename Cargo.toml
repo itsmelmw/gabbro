@@ -4,6 +4,10 @@ version = "0.1.0"
 authors = ["Lars de Jong <itsmelmw@gmail.com>"]
 license = "GPL-3.0-or-later"
 description = "A Game Boy emulator written in Rust"
+readme = "README.md"
+repository = "https://github.com/itsmelmw/gabbro"
+keywords = ["gameboy", "emulator"]
+categories = ["emulators"]
 edition = "2021"
 
 [dependencies]
