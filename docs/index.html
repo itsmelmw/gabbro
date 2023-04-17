@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Game Boy Emulator</title>
+</head>
+
+<body>
+    <div style="display: flex; justify-content: center;">
+        <div style="display: flex; flex-direction: column; align-items: center;">
+            <h1>Game Boy Emulator</h1>
+            <p>Select a valid Game Boy ROM:</p>
+            <input id="rom" type="file" />
+            <canvas id="lcd" width="640" height="576"></canvas>
+        </div>
+    </div>
+
+    <script src="./pkg/gabbro_web.js"></script>
+    <script src="./index.js"></script>
+</body>
+
+</html>

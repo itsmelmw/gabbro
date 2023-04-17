@@ -1,0 +1,34 @@
+[package]
+name = "gabbro-web"
+authors = ["Lars de Jong <itsmelmw@gmail.com>"]
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+console_error_panic_hook = "0.1.7"
+js-sys = "0.3.60"
+gabbro = { version = "0.1.0", path = "../../" }
+wasm-bindgen = "0.2.83"
+wasm-bindgen-futures = "0.4.33"
+
+[dependencies.web-sys]
+features = [
+    "CanvasRenderingContext2d",
+    "Document",
+    "HtmlCanvasElement",
+    "Window",
+    "ImageData",
+    "Worker",
+    "HtmlInputElement",
+    "FileList",
+    "File",
+    "FileReader",
+    "Event",
+    "InputEvent",
+    "MessageEvent",
+    "DedicatedWorkerGlobalScope",
+    "KeyboardEvent",
+]
