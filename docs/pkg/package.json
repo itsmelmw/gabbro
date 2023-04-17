@@ -1,0 +1,14 @@
+{
+  "name": "gabbro-web",
+  "collaborators": [
+    "Lars de Jong <itsmelmw@gmail.com>"
+  ],
+  "version": "0.1.0",
+  "files": [
+    "gabbro_web_bg.wasm",
+    "gabbro_web.js",
+    "gabbro_web.d.ts"
+  ],
+  "browser": "gabbro_web.js",
+  "types": "gabbro_web.d.ts"
+}
