@@ -71,7 +71,7 @@ impl Cpu {
     fn execute(&mut self, instrs: InstrSet) {
         let opcode = self.fetch_byte();
         let instr = &instrs[opcode as usize];
-        log::trace!("CPU: Executing {}", instr.mnemonic);
+        // log::trace!("CPU: Executing {}", instr.mnemonic);
         (instr.operation)(self);
     }
 

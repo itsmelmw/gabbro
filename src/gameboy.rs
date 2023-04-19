@@ -12,18 +12,6 @@ pub struct Gameboy {
 }
 
 impl Gameboy {
-    /// Initializes a new Game Boy.
-    pub fn new(
-        rom: Vec<u8>,
-        lcd: Box<dyn GameboyLcd>,
-        joypad: Box<dyn GameboyJoypad>,
-        serial: Box<dyn GameboySerial>,
-    ) -> Self {
-        let cpu = Cpu::new(rom, lcd, joypad, serial);
-
-        Self { cpu }
-    }
-
     /// Runs the Game Boy emulator in an infinite loop.
     pub fn run(&mut self) {
         loop {
@@ -72,6 +60,8 @@ impl GameboyBuilder {
     }
     /// Builds a new [`Gameboy`].
     pub fn build(self) -> Gameboy {
-        Gameboy::new(self.rom, self.lcd, self.joypad, self.serial)
+        Gameboy {
+            cpu: Cpu::new(self.rom, self.lcd, self.joypad, self.serial),
+        }
     }
 }
