@@ -71,8 +71,8 @@ impl Cpu {
     fn execute(&mut self, instrs: InstrSet) {
         let opcode = self.fetch_byte();
         let instr = &instrs[opcode as usize];
-        // log::trace!("CPU: Executing {}", instr.mnemonic);
-        (instr.operation)(self);
+        log::trace!("CPU: Executing `{}`", instr.disasm_static());
+        instr.execute(self);
     }
 
     /// Handles an interrupt. Takes 5 machine cycles.
