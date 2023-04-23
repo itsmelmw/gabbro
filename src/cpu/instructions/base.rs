@@ -1,13 +1,13 @@
 use crate::cpu::ImeState;
 
-use super::{helpers, InstrSet, Instruction, ParamType, BITWISE_INSTRS};
+use super::{helpers, InstrSet, Instruction, ParamType};
 
-use super::disasm::{Addr::*, Cond::*, Mnemonic, Opd, Param::*, Reg::*};
+use super::mnemonic::{Addr, Cond, Imm, Mnemonic, Reg16, Reg8};
 
 pub const BASE_INSTRS: InstrSet = [
     // 0x00
     Instruction {
-        mnemonic: Mnemonic("NOP", None, None),
+        mnemonic: Mnemonic::Nop,
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -15,7 +15,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x01
     Instruction {
-        mnemonic: Mnemonic("LD", Some(Opd::Reg(BC)), Some(Opd::Param(U16))),
+        mnemonic: Mnemonic::LdReg16Imm(Reg16::BC, Imm::Unknown), //Mnemonic("LD", Some(Opd::Reg(BC)), Some(Opd::Param(U16))),
         param_type: ParamType::Word,
         cycles: 3,
         branch_cycles: None,
@@ -26,7 +26,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x02
     Instruction {
-        mnemonic: Mnemonic("LD", Some(Opd::Addr(FromReg(BC))), Some(Opd::Reg(A))),
+        mnemonic: Mnemonic::LdAddrReg8(Addr::Reg16(Reg16::BC), Reg8::A), //Mnemonic("LD", Some(Opd::Addr(FromReg(BC))), Some(Opd::Reg(A))),
         param_type: ParamType::None,
         cycles: 2,
         branch_cycles: None,
@@ -36,7 +36,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x03
     Instruction {
-        mnemonic: Mnemonic("INC", Some(Opd::Reg(BC)), None),
+        mnemonic: Mnemonic::IncReg16(Reg16::BC), //Mnemonic("INC", Some(Opd::Reg(BC)), None),
         param_type: ParamType::None,
         cycles: 2,
         branch_cycles: None,
@@ -47,7 +47,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x04
     Instruction {
-        mnemonic: Mnemonic("INC", Some(Opd::Reg(B)), None),
+        mnemonic: Mnemonic::IncReg8(Reg8::B), //Mnemonic("INC", Some(Opd::Reg(B)), None),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -58,7 +58,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x05
     Instruction {
-        mnemonic: Mnemonic("DEC", Some(Opd::Reg(B)), None),
+        mnemonic: Mnemonic::DecReg8(Reg8::B), //Mnemonic("DEC", Some(Opd::Reg(B)), None),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -69,7 +69,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x06
     Instruction {
-        mnemonic: Mnemonic("LD", Some(Opd::Reg(B)), Some(Opd::Param(U8))),
+        mnemonic: Mnemonic::LdReg8Imm(Reg8::B, Imm::Unknown), //Mnemonic("LD", Some(Opd::Reg(B)), Some(Opd::Param(U8))),
         param_type: ParamType::Byte,
         cycles: 2,
         branch_cycles: None,
@@ -80,7 +80,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x07
     Instruction {
-        mnemonic: Mnemonic("RLCA", None, None),
+        mnemonic: Mnemonic::Rlca, //Mnemonic("RLCA", None, None),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -92,7 +92,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x08
     Instruction {
-        mnemonic: Mnemonic("LD", Some(Opd::Addr(FromParam(U16))), Some(Opd::Reg(SP))),
+        mnemonic: Mnemonic::LdImmAddrSp(Imm::Unknown), //Mnemonic("LD", Some(Opd::Addr(FromParam(U16))), Some(Opd::Reg(SP))),
         param_type: ParamType::Word,
         cycles: 5,
         branch_cycles: None,
@@ -103,7 +103,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x09
     Instruction {
-        mnemonic: Mnemonic("ADD", Some(Opd::Reg(HL)), Some(Opd::Reg(BC))),
+        mnemonic: Mnemonic::AddHlReg16(Reg16::BC), //Mnemonic("ADD", Some(Opd::Reg(HL)), Some(Opd::Reg(BC))),
         param_type: ParamType::None,
         cycles: 2,
         branch_cycles: None,
@@ -114,7 +114,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x0a
     Instruction {
-        mnemonic: Mnemonic("LD", Some(Opd::Reg(A)), Some(Opd::Addr(FromReg(BC)))),
+        mnemonic: Mnemonic::LdReg8Addr(Reg8::A, Addr::Reg16(Reg16::BC)), // Mnemonic("LD", Some(Opd::Reg(A)), Some(Opd::Addr(FromReg(BC)))),
         param_type: ParamType::None,
         cycles: 2,
         branch_cycles: None,
@@ -125,7 +125,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x0b
     Instruction {
-        mnemonic: Mnemonic("DEC", Some(Opd::Reg(BC)), None),
+        mnemonic: Mnemonic::DecReg16(Reg16::BC), // Mnemonic("DEC", Some(Opd::Reg(BC)), None),
         param_type: ParamType::None,
         cycles: 2,
         branch_cycles: None,
@@ -136,7 +136,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x0c
     Instruction {
-        mnemonic: Mnemonic("INC", Some(Opd::Reg(C)), None),
+        mnemonic: Mnemonic::IncReg8(Reg8::C), //Mnemonic("INC", Some(Opd::Reg(C)), None),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -147,7 +147,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x0d
     Instruction {
-        mnemonic: Mnemonic("DEC", Some(Opd::Reg(C)), None),
+        mnemonic: Mnemonic::DecReg8(Reg8::C), //Mnemonic("DEC", Some(Opd::Reg(C)), None),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -158,7 +158,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x0e
     Instruction {
-        mnemonic: Mnemonic("LD", Some(Opd::Reg(C)), Some(Opd::Param(U8))),
+        mnemonic: Mnemonic::LdReg8Imm(Reg8::C, Imm::Unknown), // Mnemonic("LD", Some(Opd::Reg(C)), Some(Opd::Param(U8))),
         param_type: ParamType::Byte,
         cycles: 2,
         branch_cycles: None,
@@ -169,7 +169,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x0f
     Instruction {
-        mnemonic: Mnemonic("RRCA", None, None),
+        mnemonic: Mnemonic::Rrca, // Mnemonic("RRCA", None, None),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -181,7 +181,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x10
     Instruction {
-        mnemonic: Mnemonic("STOP", None, None),
+        mnemonic: Mnemonic::Stop, // Mnemonic("STOP", None, None),
         param_type: ParamType::Byte,
         cycles: 1,
         branch_cycles: None,
@@ -192,7 +192,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x11
     Instruction {
-        mnemonic: Mnemonic("LD", Some(Opd::Reg(DE)), Some(Opd::Param(U16))),
+        mnemonic: Mnemonic::LdReg16Imm(Reg16::DE, Imm::Unknown), // Mnemonic("LD", Some(Opd::Reg(DE)), Some(Opd::Param(U16))),
         param_type: ParamType::Word,
         cycles: 3,
         branch_cycles: None,
@@ -203,7 +203,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x12
     Instruction {
-        mnemonic: Mnemonic("LD", Some(Opd::Addr(FromReg(DE))), Some(Opd::Reg(A))),
+        mnemonic: Mnemonic::LdAddrReg8(Addr::Reg16(Reg16::DE), Reg8::A), // Mnemonic("LD", Some(Opd::Addr(FromReg(DE))), Some(Opd::Reg(A))),
         param_type: ParamType::None,
         cycles: 2,
         branch_cycles: None,
@@ -213,7 +213,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x13
     Instruction {
-        mnemonic: Mnemonic("INC", Some(Opd::Reg(DE)), None),
+        mnemonic: Mnemonic::IncReg16(Reg16::DE), // Mnemonic("INC", Some(Opd::Reg(DE)), None),
         param_type: ParamType::None,
         cycles: 2,
         branch_cycles: None,
@@ -224,7 +224,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x14
     Instruction {
-        mnemonic: Mnemonic("INC", Some(Opd::Reg(D)), None),
+        mnemonic: Mnemonic::IncReg8(Reg8::D), // Mnemonic("INC", Some(Opd::Reg(D)), None),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -235,7 +235,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x15
     Instruction {
-        mnemonic: Mnemonic("DEC", Some(Opd::Reg(D)), None),
+        mnemonic: Mnemonic::DecReg8(Reg8::D), // Mnemonic("DEC", Some(Opd::Reg(D)), None),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -246,7 +246,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x16
     Instruction {
-        mnemonic: Mnemonic("LD", Some(Opd::Reg(D)), Some(Opd::Param(U8))),
+        mnemonic: Mnemonic::LdReg8Imm(Reg8::D, Imm::Unknown), // Mnemonic("LD", Some(Opd::Reg(D)), Some(Opd::Param(U8))),
         param_type: ParamType::Byte,
         cycles: 2,
         branch_cycles: None,
@@ -257,7 +257,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x17
     Instruction {
-        mnemonic: Mnemonic("RLA", None, None),
+        mnemonic: Mnemonic::Rla, //Mnemonic("RLA", None, None),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -269,7 +269,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x18
     Instruction {
-        mnemonic: Mnemonic("JR", Some(Opd::Param(I8)), None),
+        mnemonic: Mnemonic::Jr(Imm::Unknown), // Mnemonic("JR", Some(Opd::Param(I8)), None),
         param_type: ParamType::Byte,
         cycles: 3,
         branch_cycles: None,
@@ -281,7 +281,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x19
     Instruction {
-        mnemonic: Mnemonic("ADD", Some(Opd::Reg(HL)), Some(Opd::Reg(DE))),
+        mnemonic: Mnemonic::AddHlReg16(Reg16::DE), // Mnemonic("ADD", Some(Opd::Reg(HL)), Some(Opd::Reg(DE))),
         param_type: ParamType::None,
         cycles: 2,
         branch_cycles: None,
@@ -292,7 +292,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x1a
     Instruction {
-        mnemonic: Mnemonic("LD", Some(Opd::Reg(A)), Some(Opd::Addr(FromReg(DE)))),
+        mnemonic: Mnemonic::LdReg8Addr(Reg8::A, Addr::Reg16(Reg16::DE)), // Mnemonic("LD", Some(Opd::Reg(A)), Some(Opd::Addr(FromReg(DE)))),
         param_type: ParamType::None,
         cycles: 2,
         branch_cycles: None,
@@ -303,7 +303,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x1b
     Instruction {
-        mnemonic: Mnemonic("DEC", Some(Opd::Reg(DE)), None),
+        mnemonic: Mnemonic::DecReg16(Reg16::DE), // Mnemonic("DEC", Some(Opd::Reg(DE)), None),
         param_type: ParamType::None,
         cycles: 2,
         branch_cycles: None,
@@ -314,7 +314,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x1c
     Instruction {
-        mnemonic: Mnemonic("INC", Some(Opd::Reg(E)), None),
+        mnemonic: Mnemonic::IncReg8(Reg8::E), // Mnemonic("INC", Some(Opd::Reg(E)), None),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -325,7 +325,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x1d
     Instruction {
-        mnemonic: Mnemonic("DEC", Some(Opd::Reg(E)), None),
+        mnemonic: Mnemonic::DecReg8(Reg8::E), // Mnemonic("DEC", Some(Opd::Reg(E)), None),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -336,7 +336,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x1e
     Instruction {
-        mnemonic: Mnemonic("LD", Some(Opd::Reg(E)), Some(Opd::Param(U8))),
+        mnemonic: Mnemonic::LdReg8Imm(Reg8::E, Imm::Unknown), // Mnemonic("LD", Some(Opd::Reg(E)), Some(Opd::Param(U8))),
         param_type: ParamType::Byte,
         cycles: 2,
         branch_cycles: None,
@@ -347,7 +347,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x1f
     Instruction {
-        mnemonic: Mnemonic("RRA", None, None),
+        mnemonic: Mnemonic::Rra, // Mnemonic("RRA", None, None),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -359,7 +359,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x20
     Instruction {
-        mnemonic: Mnemonic("JR", Some(Opd::Cond(NotZero)), Some(Opd::Param(I8))),
+        mnemonic: Mnemonic::JrCond(Cond::NZ, Imm::Unknown), //Mnemonic("JR", Some(Opd::Cond(NotZero)), Some(Opd::Param(I8))),
         param_type: ParamType::Byte,
         cycles: 2,
         branch_cycles: Some(1),
@@ -373,7 +373,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x21
     Instruction {
-        mnemonic: Mnemonic("LD", Some(Opd::Reg(HL)), Some(Opd::Param(U16))),
+        mnemonic: Mnemonic::LdReg16Imm(Reg16::HL, Imm::Unknown), // Mnemonic("LD", Some(Opd::Reg(HL)), Some(Opd::Param(U16))),
         param_type: ParamType::Word,
         cycles: 3,
         branch_cycles: None,
@@ -384,7 +384,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x22
     Instruction {
-        mnemonic: Mnemonic("LD", Some(Opd::Addr(FromRegInc(HL))), Some(Opd::Reg(A))),
+        mnemonic: Mnemonic::LdAddrReg8(Addr::Reg16Inc(Reg16::HL), Reg8::A), // Mnemonic("LD", Some(Opd::Addr(FromRegInc(HL))), Some(Opd::Reg(A))),
         param_type: ParamType::None,
         cycles: 2,
         branch_cycles: None,
@@ -395,7 +395,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x23
     Instruction {
-        mnemonic: Mnemonic("INC", Some(Opd::Reg(HL)), None),
+        mnemonic: Mnemonic::IncReg16(Reg16::HL), // Mnemonic("INC", Some(Opd::Reg(HL)), None),
         param_type: ParamType::None,
         cycles: 2,
         branch_cycles: None,
@@ -406,7 +406,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x24
     Instruction {
-        mnemonic: Mnemonic("INC", Some(Opd::Reg(H)), None),
+        mnemonic: Mnemonic::IncReg8(Reg8::H), // Mnemonic("INC", Some(Opd::Reg(H)), None),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -417,7 +417,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x25
     Instruction {
-        mnemonic: Mnemonic("DEC", Some(Opd::Reg(H)), None),
+        mnemonic: Mnemonic::DecReg8(Reg8::H), // Mnemonic("DEC", Some(Opd::Reg(H)), None),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -428,7 +428,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x26
     Instruction {
-        mnemonic: Mnemonic("LD", Some(Opd::Reg(H)), Some(Opd::Param(U8))),
+        mnemonic: Mnemonic::LdReg8Imm(Reg8::H, Imm::Unknown), // Mnemonic("LD", Some(Opd::Reg(H)), Some(Opd::Param(U8))),
         param_type: ParamType::Byte,
         cycles: 2,
         branch_cycles: None,
@@ -439,7 +439,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x27
     Instruction {
-        mnemonic: Mnemonic("DAA", None, None),
+        mnemonic: Mnemonic::Daa, // Mnemonic("DAA", None, None),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -449,7 +449,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x28
     Instruction {
-        mnemonic: Mnemonic("JR", Some(Opd::Cond(Zero)), Some(Opd::Param(I8))),
+        mnemonic: Mnemonic::JrCond(Cond::Z, Imm::Unknown), // Mnemonic("JR", Some(Opd::Cond(Zero)), Some(Opd::Param(I8))),
         param_type: ParamType::Byte,
         cycles: 2,
         branch_cycles: Some(1),
@@ -463,7 +463,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x29
     Instruction {
-        mnemonic: Mnemonic("ADD", Some(Opd::Reg(HL)), Some(Opd::Reg(HL))),
+        mnemonic: Mnemonic::AddHlReg16(Reg16::HL), // Mnemonic("ADD", Some(Opd::Reg(HL)), Some(Opd::Reg(HL))),
         param_type: ParamType::None,
         cycles: 2,
         branch_cycles: None,
@@ -474,7 +474,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x2a
     Instruction {
-        mnemonic: Mnemonic("LD", Some(Opd::Reg(A)), Some(Opd::Addr(FromRegInc(HL)))),
+        mnemonic: Mnemonic::LdReg8Addr(Reg8::A, Addr::Reg16Inc(Reg16::HL)), // Mnemonic("LD", Some(Opd::Reg(A)), Some(Opd::Addr(FromRegInc(HL)))),
         param_type: ParamType::None,
         cycles: 2,
         branch_cycles: None,
@@ -486,7 +486,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x2b
     Instruction {
-        mnemonic: Mnemonic("DEC", Some(Opd::Reg(HL)), None),
+        mnemonic: Mnemonic::DecReg16(Reg16::HL), // Mnemonic("DEC", Some(Opd::Reg(HL)), None),
         param_type: ParamType::None,
         cycles: 2,
         branch_cycles: None,
@@ -497,7 +497,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x2c
     Instruction {
-        mnemonic: Mnemonic("INC", Some(Opd::Reg(L)), None),
+        mnemonic: Mnemonic::IncReg8(Reg8::L), // Mnemonic("INC", Some(Opd::Reg(L)), None),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -508,7 +508,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x2d
     Instruction {
-        mnemonic: Mnemonic("DEC", Some(Opd::Reg(L)), None),
+        mnemonic: Mnemonic::DecReg8(Reg8::L), // Mnemonic("DEC", Some(Opd::Reg(L)), None),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -519,7 +519,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x2e
     Instruction {
-        mnemonic: Mnemonic("LD", Some(Opd::Reg(L)), Some(Opd::Param(U8))),
+        mnemonic: Mnemonic::LdReg8Imm(Reg8::L, Imm::Unknown), // Mnemonic("LD", Some(Opd::Reg(L)), Some(Opd::Param(U8))),
         param_type: ParamType::Byte,
         cycles: 2,
         branch_cycles: None,
@@ -530,7 +530,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x2f
     Instruction {
-        mnemonic: Mnemonic("CPL", None, None),
+        mnemonic: Mnemonic::Cpl, // Mnemonic("CPL", None, None),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -540,7 +540,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x30
     Instruction {
-        mnemonic: Mnemonic("JR", Some(Opd::Cond(NotCarry)), Some(Opd::Param(I8))),
+        mnemonic: Mnemonic::JrCond(Cond::NC, Imm::Unknown), // Mnemonic("JR", Some(Opd::Cond(NotCarry)), Some(Opd::Param(I8))),
         param_type: ParamType::Byte,
         cycles: 2,
         branch_cycles: Some(1),
@@ -554,7 +554,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x31
     Instruction {
-        mnemonic: Mnemonic("LD", Some(Opd::Reg(SP)), Some(Opd::Param(U16))),
+        mnemonic: Mnemonic::LdReg16Imm(Reg16::SP, Imm::Unknown), // Mnemonic("LD", Some(Opd::Reg(SP)), Some(Opd::Param(U16))),
         param_type: ParamType::Word,
         cycles: 3,
         branch_cycles: None,
@@ -565,7 +565,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x32
     Instruction {
-        mnemonic: Mnemonic("LD", Some(Opd::Addr(FromRegDec(HL))), Some(Opd::Reg(A))),
+        mnemonic: Mnemonic::LdAddrReg8(Addr::Reg16Dec(Reg16::HL), Reg8::A), // Mnemonic("LD", Some(Opd::Addr(FromRegDec(HL))), Some(Opd::Reg(A))),
         param_type: ParamType::None,
         cycles: 2,
         branch_cycles: None,
@@ -576,7 +576,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x33
     Instruction {
-        mnemonic: Mnemonic("INC", Some(Opd::Reg(SP)), None),
+        mnemonic: Mnemonic::IncReg16(Reg16::SP), // Mnemonic("INC", Some(Opd::Reg(SP)), None),
         param_type: ParamType::None,
         cycles: 2,
         branch_cycles: None,
@@ -587,7 +587,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x34
     Instruction {
-        mnemonic: Mnemonic("INC", Some(Opd::Addr(FromReg(HL))), None),
+        mnemonic: Mnemonic::IncHlAddr, // Mnemonic("INC", Some(Opd::Addr(FromReg(HL))), None),
         param_type: ParamType::None,
         cycles: 3,
         branch_cycles: None,
@@ -599,7 +599,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x35
     Instruction {
-        mnemonic: Mnemonic("DEC", Some(Opd::Addr(FromReg(HL))), None),
+        mnemonic: Mnemonic::DecHlAddr, // Mnemonic("DEC", Some(Opd::Addr(FromReg(HL))), None),
         param_type: ParamType::None,
         cycles: 3,
         branch_cycles: None,
@@ -611,7 +611,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x36
     Instruction {
-        mnemonic: Mnemonic("LD", Some(Opd::Addr(FromReg(HL))), Some(Opd::Param(U8))),
+        mnemonic: Mnemonic::LdHlAddrImm(Imm::Unknown), // Mnemonic("LD", Some(Opd::Addr(FromReg(HL))), Some(Opd::Param(U8))),
         param_type: ParamType::Byte,
         cycles: 3,
         branch_cycles: None,
@@ -622,7 +622,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x37
     Instruction {
-        mnemonic: Mnemonic("SCF", None, None),
+        mnemonic: Mnemonic::Scf, // Mnemonic("SCF", None, None),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -632,7 +632,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x38
     Instruction {
-        mnemonic: Mnemonic("JR", Some(Opd::Cond(Carry)), Some(Opd::Param(I8))),
+        mnemonic: Mnemonic::JrCond(Cond::C, Imm::Unknown), //Mnemonic("JR", Some(Opd::Cond(Carry)), Some(Opd::Param(I8))),
         param_type: ParamType::Byte,
         cycles: 2,
         branch_cycles: Some(1),
@@ -646,7 +646,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x39
     Instruction {
-        mnemonic: Mnemonic("ADD", Some(Opd::Reg(HL)), Some(Opd::Reg(SP))),
+        mnemonic: Mnemonic::AddHlReg16(Reg16::SP), // Mnemonic("ADD", Some(Opd::Reg(HL)), Some(Opd::Reg(SP))),
         param_type: ParamType::None,
         cycles: 2,
         branch_cycles: None,
@@ -657,7 +657,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x3a
     Instruction {
-        mnemonic: Mnemonic("LD", Some(Opd::Reg(A)), Some(Opd::Addr(FromRegDec(HL)))),
+        mnemonic: Mnemonic::LdReg8Addr(Reg8::A, Addr::Reg16Dec(Reg16::HL)), // Mnemonic("LD", Some(Opd::Reg(A)), Some(Opd::Addr(FromRegDec(HL)))),
         param_type: ParamType::None,
         cycles: 2,
         branch_cycles: None,
@@ -669,7 +669,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x3b
     Instruction {
-        mnemonic: Mnemonic("DEC", Some(Opd::Reg(SP)), None),
+        mnemonic: Mnemonic::DecReg16(Reg16::SP), // Mnemonic("DEC", Some(Opd::Reg(SP)), None),
         param_type: ParamType::None,
         cycles: 2,
         branch_cycles: None,
@@ -680,7 +680,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x3c
     Instruction {
-        mnemonic: Mnemonic("INC", Some(Opd::Reg(A)), None),
+        mnemonic: Mnemonic::IncReg8(Reg8::A), // Mnemonic("INC", Some(Opd::Reg(A)), None),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -691,7 +691,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x3d
     Instruction {
-        mnemonic: Mnemonic("DEC", Some(Opd::Reg(A)), None),
+        mnemonic: Mnemonic::DecReg8(Reg8::A), // Mnemonic("DEC", Some(Opd::Reg(A)), None),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -702,7 +702,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x3e
     Instruction {
-        mnemonic: Mnemonic("LD", Some(Opd::Reg(A)), Some(Opd::Param(U8))),
+        mnemonic: Mnemonic::LdReg8Imm(Reg8::A, Imm::Unknown), // Mnemonic("LD", Some(Opd::Reg(A)), Some(Opd::Param(U8))),
         param_type: ParamType::Byte,
         cycles: 2,
         branch_cycles: None,
@@ -713,7 +713,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x3f
     Instruction {
-        mnemonic: Mnemonic("CCF", None, None),
+        mnemonic: Mnemonic::Ccf, // Mnemonic("CCF", None, None),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -723,7 +723,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x40
     Instruction {
-        mnemonic: Mnemonic("LD", Some(Opd::Reg(B)), Some(Opd::Reg(B))),
+        mnemonic: Mnemonic::LdReg8Reg8(Reg8::B, Reg8::B),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -731,7 +731,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x41
     Instruction {
-        mnemonic: Mnemonic("LD", Some(Opd::Reg(B)), Some(Opd::Reg(C))),
+        mnemonic: Mnemonic::LdReg8Reg8(Reg8::B, Reg8::C),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -741,7 +741,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x42
     Instruction {
-        mnemonic: Mnemonic("LD", Some(Opd::Reg(B)), Some(Opd::Reg(D))),
+        mnemonic: Mnemonic::LdReg8Reg8(Reg8::B, Reg8::D),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -751,7 +751,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x43
     Instruction {
-        mnemonic: Mnemonic("LD", Some(Opd::Reg(B)), Some(Opd::Reg(E))),
+        mnemonic: Mnemonic::LdReg8Reg8(Reg8::B, Reg8::E),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -761,7 +761,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x44
     Instruction {
-        mnemonic: Mnemonic("LD", Some(Opd::Reg(B)), Some(Opd::Reg(H))),
+        mnemonic: Mnemonic::LdReg8Reg8(Reg8::B, Reg8::H),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -771,7 +771,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x45
     Instruction {
-        mnemonic: Mnemonic("LD", Some(Opd::Reg(B)), Some(Opd::Reg(L))),
+        mnemonic: Mnemonic::LdReg8Reg8(Reg8::B, Reg8::L),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -781,7 +781,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x46
     Instruction {
-        mnemonic: Mnemonic("LD", Some(Opd::Reg(B)), Some(Opd::Addr(FromReg(HL)))),
+        mnemonic: Mnemonic::LdReg8Addr(Reg8::B, Addr::Reg16(Reg16::HL)), // Mnemonic("LD", Some(Opd::Reg(B)), Some(Opd::Addr(FromReg(HL)))),
         param_type: ParamType::None,
         cycles: 2,
         branch_cycles: None,
@@ -792,7 +792,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x47
     Instruction {
-        mnemonic: Mnemonic("LD", Some(Opd::Reg(B)), Some(Opd::Reg(A))),
+        mnemonic: Mnemonic::LdReg8Reg8(Reg8::B, Reg8::A),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -802,7 +802,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x48
     Instruction {
-        mnemonic: Mnemonic("LD", Some(Opd::Reg(C)), Some(Opd::Reg(B))),
+        mnemonic: Mnemonic::LdReg8Reg8(Reg8::C, Reg8::B),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -812,7 +812,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x49
     Instruction {
-        mnemonic: Mnemonic("LD", Some(Opd::Reg(C)), Some(Opd::Reg(C))),
+        mnemonic: Mnemonic::LdReg8Reg8(Reg8::C, Reg8::C),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -820,7 +820,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x4a
     Instruction {
-        mnemonic: Mnemonic("LD", Some(Opd::Reg(C)), Some(Opd::Reg(D))),
+        mnemonic: Mnemonic::LdReg8Reg8(Reg8::C, Reg8::D),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -830,7 +830,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x4b
     Instruction {
-        mnemonic: Mnemonic("LD", Some(Opd::Reg(C)), Some(Opd::Reg(E))),
+        mnemonic: Mnemonic::LdReg8Reg8(Reg8::C, Reg8::E),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -840,7 +840,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x4c
     Instruction {
-        mnemonic: Mnemonic("LD", Some(Opd::Reg(C)), Some(Opd::Reg(H))),
+        mnemonic: Mnemonic::LdReg8Reg8(Reg8::C, Reg8::H),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -850,7 +850,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x4d
     Instruction {
-        mnemonic: Mnemonic("LD", Some(Opd::Reg(C)), Some(Opd::Reg(L))),
+        mnemonic: Mnemonic::LdReg8Reg8(Reg8::C, Reg8::L),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -860,7 +860,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x4e
     Instruction {
-        mnemonic: Mnemonic("LD", Some(Opd::Reg(C)), Some(Opd::Addr(FromReg(HL)))),
+        mnemonic: Mnemonic::LdReg8Addr(Reg8::C, Addr::Reg16(Reg16::HL)), // Mnemonic("LD", Some(Opd::Reg(C)), Some(Opd::Addr(FromReg(HL)))),
         param_type: ParamType::None,
         cycles: 2,
         branch_cycles: None,
@@ -871,7 +871,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x4f
     Instruction {
-        mnemonic: Mnemonic("LD", Some(Opd::Reg(C)), Some(Opd::Reg(A))),
+        mnemonic: Mnemonic::LdReg8Reg8(Reg8::C, Reg8::A),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -881,7 +881,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x50
     Instruction {
-        mnemonic: Mnemonic("LD", Some(Opd::Reg(D)), Some(Opd::Reg(B))),
+        mnemonic: Mnemonic::LdReg8Reg8(Reg8::D, Reg8::B),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -891,7 +891,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x51
     Instruction {
-        mnemonic: Mnemonic("LD", Some(Opd::Reg(D)), Some(Opd::Reg(C))),
+        mnemonic: Mnemonic::LdReg8Reg8(Reg8::D, Reg8::C),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -901,7 +901,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x52
     Instruction {
-        mnemonic: Mnemonic("LD", Some(Opd::Reg(D)), Some(Opd::Reg(D))),
+        mnemonic: Mnemonic::LdReg8Reg8(Reg8::D, Reg8::D),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -909,7 +909,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x53
     Instruction {
-        mnemonic: Mnemonic("LD", Some(Opd::Reg(D)), Some(Opd::Reg(E))),
+        mnemonic: Mnemonic::LdReg8Reg8(Reg8::D, Reg8::E),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -919,7 +919,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x54
     Instruction {
-        mnemonic: Mnemonic("LD", Some(Opd::Reg(D)), Some(Opd::Reg(H))),
+        mnemonic: Mnemonic::LdReg8Reg8(Reg8::D, Reg8::H),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -929,7 +929,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x55
     Instruction {
-        mnemonic: Mnemonic("LD", Some(Opd::Reg(D)), Some(Opd::Reg(L))),
+        mnemonic: Mnemonic::LdReg8Reg8(Reg8::D, Reg8::L),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -939,7 +939,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x56
     Instruction {
-        mnemonic: Mnemonic("LD", Some(Opd::Reg(D)), Some(Opd::Addr(FromReg(HL)))),
+        mnemonic: Mnemonic::LdReg8Addr(Reg8::D, Addr::Reg16(Reg16::HL)), // Mnemonic("LD", Some(Opd::Reg(D)), Some(Opd::Addr(FromReg(HL)))),
         param_type: ParamType::None,
         cycles: 2,
         branch_cycles: None,
@@ -950,7 +950,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x57
     Instruction {
-        mnemonic: Mnemonic("LD", Some(Opd::Reg(D)), Some(Opd::Reg(A))),
+        mnemonic: Mnemonic::LdReg8Reg8(Reg8::D, Reg8::A),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -960,7 +960,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x58
     Instruction {
-        mnemonic: Mnemonic("LD", Some(Opd::Reg(E)), Some(Opd::Reg(B))),
+        mnemonic: Mnemonic::LdReg8Reg8(Reg8::E, Reg8::B),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -970,7 +970,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x59
     Instruction {
-        mnemonic: Mnemonic("LD", Some(Opd::Reg(E)), Some(Opd::Reg(C))),
+        mnemonic: Mnemonic::LdReg8Reg8(Reg8::E, Reg8::C),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -980,7 +980,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x5a
     Instruction {
-        mnemonic: Mnemonic("LD", Some(Opd::Reg(E)), Some(Opd::Reg(D))),
+        mnemonic: Mnemonic::LdReg8Reg8(Reg8::E, Reg8::D),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -990,7 +990,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x5b
     Instruction {
-        mnemonic: Mnemonic("LD", Some(Opd::Reg(E)), Some(Opd::Reg(E))),
+        mnemonic: Mnemonic::LdReg8Reg8(Reg8::E, Reg8::E),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -998,7 +998,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x5c
     Instruction {
-        mnemonic: Mnemonic("LD", Some(Opd::Reg(E)), Some(Opd::Reg(H))),
+        mnemonic: Mnemonic::LdReg8Reg8(Reg8::E, Reg8::H),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1008,7 +1008,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x5d
     Instruction {
-        mnemonic: Mnemonic("LD", Some(Opd::Reg(E)), Some(Opd::Reg(L))),
+        mnemonic: Mnemonic::LdReg8Reg8(Reg8::E, Reg8::L),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1018,7 +1018,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x5e
     Instruction {
-        mnemonic: Mnemonic("LD", Some(Opd::Reg(E)), Some(Opd::Addr(FromReg(HL)))),
+        mnemonic: Mnemonic::LdReg8Addr(Reg8::E, Addr::Reg16(Reg16::HL)), // Mnemonic("LD", Some(Opd::Reg(E)), Some(Opd::Addr(FromReg(HL)))),
         param_type: ParamType::None,
         cycles: 2,
         branch_cycles: None,
@@ -1029,7 +1029,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x5f
     Instruction {
-        mnemonic: Mnemonic("LD", Some(Opd::Reg(E)), Some(Opd::Reg(A))),
+        mnemonic: Mnemonic::LdReg8Reg8(Reg8::E, Reg8::A),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1039,7 +1039,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x60
     Instruction {
-        mnemonic: Mnemonic("LD", Some(Opd::Reg(H)), Some(Opd::Reg(B))),
+        mnemonic: Mnemonic::LdReg8Reg8(Reg8::H, Reg8::B),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1049,7 +1049,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x61
     Instruction {
-        mnemonic: Mnemonic("LD", Some(Opd::Reg(H)), Some(Opd::Reg(C))),
+        mnemonic: Mnemonic::LdReg8Reg8(Reg8::H, Reg8::C),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1059,7 +1059,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x62
     Instruction {
-        mnemonic: Mnemonic("LD", Some(Opd::Reg(H)), Some(Opd::Reg(D))),
+        mnemonic: Mnemonic::LdReg8Reg8(Reg8::H, Reg8::D),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1069,7 +1069,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x63
     Instruction {
-        mnemonic: Mnemonic("LD", Some(Opd::Reg(H)), Some(Opd::Reg(E))),
+        mnemonic: Mnemonic::LdReg8Reg8(Reg8::H, Reg8::E),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1079,7 +1079,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x64
     Instruction {
-        mnemonic: Mnemonic("LD", Some(Opd::Reg(H)), Some(Opd::Reg(H))),
+        mnemonic: Mnemonic::LdReg8Reg8(Reg8::H, Reg8::H),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1087,7 +1087,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x65
     Instruction {
-        mnemonic: Mnemonic("LD", Some(Opd::Reg(H)), Some(Opd::Reg(L))),
+        mnemonic: Mnemonic::LdReg8Reg8(Reg8::H, Reg8::L),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1097,7 +1097,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x66
     Instruction {
-        mnemonic: Mnemonic("LD", Some(Opd::Reg(H)), Some(Opd::Addr(FromReg(HL)))),
+        mnemonic: Mnemonic::LdReg8Addr(Reg8::H, Addr::Reg16(Reg16::HL)), // Mnemonic("LD", Some(Opd::Reg(H)), Some(Opd::Addr(FromReg(HL)))),
         param_type: ParamType::None,
         cycles: 2,
         branch_cycles: None,
@@ -1108,7 +1108,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x67
     Instruction {
-        mnemonic: Mnemonic("LD", Some(Opd::Reg(H)), Some(Opd::Reg(A))),
+        mnemonic: Mnemonic::LdReg8Reg8(Reg8::H, Reg8::A),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1118,7 +1118,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x68
     Instruction {
-        mnemonic: Mnemonic("LD", Some(Opd::Reg(L)), Some(Opd::Reg(B))),
+        mnemonic: Mnemonic::LdReg8Reg8(Reg8::L, Reg8::B),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1128,7 +1128,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x69
     Instruction {
-        mnemonic: Mnemonic("LD", Some(Opd::Reg(L)), Some(Opd::Reg(C))),
+        mnemonic: Mnemonic::LdReg8Reg8(Reg8::L, Reg8::C),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1138,7 +1138,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x6a
     Instruction {
-        mnemonic: Mnemonic("LD", Some(Opd::Reg(L)), Some(Opd::Reg(D))),
+        mnemonic: Mnemonic::LdReg8Reg8(Reg8::L, Reg8::D),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1148,7 +1148,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x6b
     Instruction {
-        mnemonic: Mnemonic("LD", Some(Opd::Reg(L)), Some(Opd::Reg(E))),
+        mnemonic: Mnemonic::LdReg8Reg8(Reg8::L, Reg8::E),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1158,7 +1158,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x6c
     Instruction {
-        mnemonic: Mnemonic("LD", Some(Opd::Reg(L)), Some(Opd::Reg(H))),
+        mnemonic: Mnemonic::LdReg8Reg8(Reg8::L, Reg8::H),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1168,7 +1168,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x6d
     Instruction {
-        mnemonic: Mnemonic("LD", Some(Opd::Reg(L)), Some(Opd::Reg(L))),
+        mnemonic: Mnemonic::LdReg8Reg8(Reg8::L, Reg8::L),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1176,7 +1176,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x6e
     Instruction {
-        mnemonic: Mnemonic("LD", Some(Opd::Reg(L)), Some(Opd::Addr(FromReg(HL)))),
+        mnemonic: Mnemonic::LdReg8Addr(Reg8::L, Addr::Reg16(Reg16::HL)), // Mnemonic("LD", Some(Opd::Reg(L)), Some(Opd::Addr(FromReg(HL)))),
         param_type: ParamType::None,
         cycles: 2,
         branch_cycles: None,
@@ -1187,7 +1187,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x6f
     Instruction {
-        mnemonic: Mnemonic("LD", Some(Opd::Reg(L)), Some(Opd::Reg(A))),
+        mnemonic: Mnemonic::LdReg8Reg8(Reg8::L, Reg8::A),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1197,7 +1197,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x70
     Instruction {
-        mnemonic: Mnemonic("LD", Some(Opd::Addr(FromReg(HL))), Some(Opd::Reg(B))),
+        mnemonic: Mnemonic::LdAddrReg8(Addr::Reg16(Reg16::HL), Reg8::B), // Mnemonic("LD", Some(Opd::Addr(FromReg(HL))), Some(Opd::Reg(B))),
         param_type: ParamType::None,
         cycles: 2,
         branch_cycles: None,
@@ -1207,7 +1207,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x71
     Instruction {
-        mnemonic: Mnemonic("LD", Some(Opd::Addr(FromReg(HL))), Some(Opd::Reg(C))),
+        mnemonic: Mnemonic::LdAddrReg8(Addr::Reg16(Reg16::HL), Reg8::C),
         param_type: ParamType::None,
         cycles: 2,
         branch_cycles: None,
@@ -1217,7 +1217,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x72
     Instruction {
-        mnemonic: Mnemonic("LD", Some(Opd::Addr(FromReg(HL))), Some(Opd::Reg(D))),
+        mnemonic: Mnemonic::LdAddrReg8(Addr::Reg16(Reg16::HL), Reg8::D),
         param_type: ParamType::None,
         cycles: 2,
         branch_cycles: None,
@@ -1227,7 +1227,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x73
     Instruction {
-        mnemonic: Mnemonic("LD", Some(Opd::Addr(FromReg(HL))), Some(Opd::Reg(E))),
+        mnemonic: Mnemonic::LdAddrReg8(Addr::Reg16(Reg16::HL), Reg8::E),
         param_type: ParamType::None,
         cycles: 2,
         branch_cycles: None,
@@ -1237,7 +1237,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x74
     Instruction {
-        mnemonic: Mnemonic("LD", Some(Opd::Addr(FromReg(HL))), Some(Opd::Reg(H))),
+        mnemonic: Mnemonic::LdAddrReg8(Addr::Reg16(Reg16::HL), Reg8::H),
         param_type: ParamType::None,
         cycles: 2,
         branch_cycles: None,
@@ -1247,7 +1247,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x75
     Instruction {
-        mnemonic: Mnemonic("LD", Some(Opd::Addr(FromReg(HL))), Some(Opd::Reg(L))),
+        mnemonic: Mnemonic::LdAddrReg8(Addr::Reg16(Reg16::HL), Reg8::L),
         param_type: ParamType::None,
         cycles: 2,
         branch_cycles: None,
@@ -1257,7 +1257,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x76
     Instruction {
-        mnemonic: Mnemonic("HALT", None, None),
+        mnemonic: Mnemonic::Halt, // Mnemonic("HALT", None, None),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1268,7 +1268,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x77
     Instruction {
-        mnemonic: Mnemonic("LD", Some(Opd::Addr(FromReg(HL))), Some(Opd::Reg(A))),
+        mnemonic: Mnemonic::LdAddrReg8(Addr::Reg16(Reg16::HL), Reg8::A),
         param_type: ParamType::None,
         cycles: 2,
         branch_cycles: None,
@@ -1278,7 +1278,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x78
     Instruction {
-        mnemonic: Mnemonic("LD", Some(Opd::Reg(A)), Some(Opd::Reg(B))),
+        mnemonic: Mnemonic::LdReg8Reg8(Reg8::A, Reg8::B),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1288,7 +1288,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x79
     Instruction {
-        mnemonic: Mnemonic("LD", Some(Opd::Reg(A)), Some(Opd::Reg(C))),
+        mnemonic: Mnemonic::LdReg8Reg8(Reg8::A, Reg8::C),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1298,7 +1298,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x7a
     Instruction {
-        mnemonic: Mnemonic("LD", Some(Opd::Reg(A)), Some(Opd::Reg(D))),
+        mnemonic: Mnemonic::LdReg8Reg8(Reg8::A, Reg8::D),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1308,7 +1308,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x7b
     Instruction {
-        mnemonic: Mnemonic("LD", Some(Opd::Reg(A)), Some(Opd::Reg(E))),
+        mnemonic: Mnemonic::LdReg8Reg8(Reg8::A, Reg8::E),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1318,7 +1318,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x7c
     Instruction {
-        mnemonic: Mnemonic("LD", Some(Opd::Reg(A)), Some(Opd::Reg(H))),
+        mnemonic: Mnemonic::LdReg8Reg8(Reg8::A, Reg8::H),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1328,7 +1328,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x7d
     Instruction {
-        mnemonic: Mnemonic("LD", Some(Opd::Reg(A)), Some(Opd::Reg(L))),
+        mnemonic: Mnemonic::LdReg8Reg8(Reg8::A, Reg8::L),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1338,7 +1338,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x7e
     Instruction {
-        mnemonic: Mnemonic("LD", Some(Opd::Reg(A)), Some(Opd::Addr(FromReg(HL)))),
+        mnemonic: Mnemonic::LdReg8Addr(Reg8::A, Addr::Reg16(Reg16::HL)),
         param_type: ParamType::None,
         cycles: 2,
         branch_cycles: None,
@@ -1349,7 +1349,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x7f
     Instruction {
-        mnemonic: Mnemonic("LD", Some(Opd::Reg(A)), Some(Opd::Reg(A))),
+        mnemonic: Mnemonic::LdReg8Reg8(Reg8::A, Reg8::A),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1357,7 +1357,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x80
     Instruction {
-        mnemonic: Mnemonic("ADD", Some(Opd::Reg(A)), Some(Opd::Reg(B))),
+        mnemonic: Mnemonic::AddAReg8(Reg8::B),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1367,7 +1367,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x81
     Instruction {
-        mnemonic: Mnemonic("ADD", Some(Opd::Reg(A)), Some(Opd::Reg(C))),
+        mnemonic: Mnemonic::AddAReg8(Reg8::C),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1377,7 +1377,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x82
     Instruction {
-        mnemonic: Mnemonic("ADD", Some(Opd::Reg(A)), Some(Opd::Reg(D))),
+        mnemonic: Mnemonic::AddAReg8(Reg8::D),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1387,7 +1387,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x83
     Instruction {
-        mnemonic: Mnemonic("ADD", Some(Opd::Reg(A)), Some(Opd::Reg(E))),
+        mnemonic: Mnemonic::AddAReg8(Reg8::E),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1397,7 +1397,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x84
     Instruction {
-        mnemonic: Mnemonic("ADD", Some(Opd::Reg(A)), Some(Opd::Reg(H))),
+        mnemonic: Mnemonic::AddAReg8(Reg8::H),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1407,7 +1407,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x85
     Instruction {
-        mnemonic: Mnemonic("ADD", Some(Opd::Reg(A)), Some(Opd::Reg(L))),
+        mnemonic: Mnemonic::AddAReg8(Reg8::L),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1417,7 +1417,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x86
     Instruction {
-        mnemonic: Mnemonic("ADD", Some(Opd::Reg(A)), Some(Opd::Addr(FromReg(HL)))),
+        mnemonic: Mnemonic::AddAHlAddr, // Mnemonic("ADD", Some(Opd::Reg(A)), Some(Opd::Addr(FromReg(HL)))),
         param_type: ParamType::None,
         cycles: 2,
         branch_cycles: None,
@@ -1428,7 +1428,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x87
     Instruction {
-        mnemonic: Mnemonic("ADD", Some(Opd::Reg(A)), Some(Opd::Reg(A))),
+        mnemonic: Mnemonic::AddAReg8(Reg8::A),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1438,7 +1438,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x88
     Instruction {
-        mnemonic: Mnemonic("ADC", Some(Opd::Reg(A)), Some(Opd::Reg(B))),
+        mnemonic: Mnemonic::AdcAReg8(Reg8::B),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1448,7 +1448,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x89
     Instruction {
-        mnemonic: Mnemonic("ADC", Some(Opd::Reg(A)), Some(Opd::Reg(C))),
+        mnemonic: Mnemonic::AdcAReg8(Reg8::C),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1458,7 +1458,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x8a
     Instruction {
-        mnemonic: Mnemonic("ADC", Some(Opd::Reg(A)), Some(Opd::Reg(D))),
+        mnemonic: Mnemonic::AdcAReg8(Reg8::D),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1468,7 +1468,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x8b
     Instruction {
-        mnemonic: Mnemonic("ADC", Some(Opd::Reg(A)), Some(Opd::Reg(E))),
+        mnemonic: Mnemonic::AdcAReg8(Reg8::E),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1478,7 +1478,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x8c
     Instruction {
-        mnemonic: Mnemonic("ADC", Some(Opd::Reg(A)), Some(Opd::Reg(H))),
+        mnemonic: Mnemonic::AdcAReg8(Reg8::H),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1488,7 +1488,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x8d
     Instruction {
-        mnemonic: Mnemonic("ADC", Some(Opd::Reg(A)), Some(Opd::Reg(L))),
+        mnemonic: Mnemonic::AdcAReg8(Reg8::L),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1498,7 +1498,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x8e
     Instruction {
-        mnemonic: Mnemonic("ADC", Some(Opd::Reg(A)), Some(Opd::Addr(FromReg(HL)))),
+        mnemonic: Mnemonic::AdcAHlAddr, // Mnemonic("ADC", Some(Opd::Reg(A)), Some(Opd::Addr(FromReg(HL)))),
         param_type: ParamType::None,
         cycles: 2,
         branch_cycles: None,
@@ -1509,7 +1509,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x8f
     Instruction {
-        mnemonic: Mnemonic("ADC", Some(Opd::Reg(A)), Some(Opd::Reg(A))),
+        mnemonic: Mnemonic::AdcAReg8(Reg8::A),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1519,7 +1519,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x90
     Instruction {
-        mnemonic: Mnemonic("SUB", Some(Opd::Reg(A)), Some(Opd::Reg(B))),
+        mnemonic: Mnemonic::SubAReg8(Reg8::B),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1529,7 +1529,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x91
     Instruction {
-        mnemonic: Mnemonic("SUB", Some(Opd::Reg(A)), Some(Opd::Reg(C))),
+        mnemonic: Mnemonic::SubAReg8(Reg8::C),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1539,7 +1539,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x92
     Instruction {
-        mnemonic: Mnemonic("SUB", Some(Opd::Reg(A)), Some(Opd::Reg(D))),
+        mnemonic: Mnemonic::SubAReg8(Reg8::D),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1549,7 +1549,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x93
     Instruction {
-        mnemonic: Mnemonic("SUB", Some(Opd::Reg(A)), Some(Opd::Reg(E))),
+        mnemonic: Mnemonic::SubAReg8(Reg8::E),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1559,7 +1559,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x94
     Instruction {
-        mnemonic: Mnemonic("SUB", Some(Opd::Reg(A)), Some(Opd::Reg(H))),
+        mnemonic: Mnemonic::SubAReg8(Reg8::H),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1569,7 +1569,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x95
     Instruction {
-        mnemonic: Mnemonic("SUB", Some(Opd::Reg(A)), Some(Opd::Reg(L))),
+        mnemonic: Mnemonic::SubAReg8(Reg8::L),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1579,7 +1579,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x96
     Instruction {
-        mnemonic: Mnemonic("SUB", Some(Opd::Reg(A)), Some(Opd::Addr(FromReg(HL)))),
+        mnemonic: Mnemonic::SubAHlAddr, // Mnemonic("SUB", Some(Opd::Reg(A)), Some(Opd::Addr(FromReg(HL)))),
         param_type: ParamType::None,
         cycles: 2,
         branch_cycles: None,
@@ -1590,7 +1590,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x97
     Instruction {
-        mnemonic: Mnemonic("SUB", Some(Opd::Reg(A)), Some(Opd::Reg(A))),
+        mnemonic: Mnemonic::SubAReg8(Reg8::A),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1600,7 +1600,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x98
     Instruction {
-        mnemonic: Mnemonic("SBC", Some(Opd::Reg(A)), Some(Opd::Reg(B))),
+        mnemonic: Mnemonic::SbcAReg8(Reg8::B),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1610,7 +1610,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x99
     Instruction {
-        mnemonic: Mnemonic("SBC", Some(Opd::Reg(A)), Some(Opd::Reg(C))),
+        mnemonic: Mnemonic::SbcAReg8(Reg8::C),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1620,7 +1620,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x9a
     Instruction {
-        mnemonic: Mnemonic("SBC", Some(Opd::Reg(A)), Some(Opd::Reg(D))),
+        mnemonic: Mnemonic::SbcAReg8(Reg8::D),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1630,7 +1630,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x9b
     Instruction {
-        mnemonic: Mnemonic("SBC", Some(Opd::Reg(A)), Some(Opd::Reg(E))),
+        mnemonic: Mnemonic::SbcAReg8(Reg8::E),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1640,7 +1640,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x9c
     Instruction {
-        mnemonic: Mnemonic("SBC", Some(Opd::Reg(A)), Some(Opd::Reg(H))),
+        mnemonic: Mnemonic::SbcAReg8(Reg8::H),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1650,7 +1650,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x9d
     Instruction {
-        mnemonic: Mnemonic("SBC", Some(Opd::Reg(A)), Some(Opd::Reg(L))),
+        mnemonic: Mnemonic::SbcAReg8(Reg8::L),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1660,7 +1660,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x9e
     Instruction {
-        mnemonic: Mnemonic("SBC", Some(Opd::Reg(A)), Some(Opd::Addr(FromReg(HL)))),
+        mnemonic: Mnemonic::SbcAHlAddr, // Mnemonic("SBC", Some(Opd::Reg(A)), Some(Opd::Addr(FromReg(HL)))),
         param_type: ParamType::None,
         cycles: 2,
         branch_cycles: None,
@@ -1671,7 +1671,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0x9f
     Instruction {
-        mnemonic: Mnemonic("SBC", Some(Opd::Reg(A)), Some(Opd::Reg(A))),
+        mnemonic: Mnemonic::SbcAReg8(Reg8::A),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1681,7 +1681,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0xa0
     Instruction {
-        mnemonic: Mnemonic("AND", Some(Opd::Reg(A)), Some(Opd::Reg(B))),
+        mnemonic: Mnemonic::AndAReg8(Reg8::B),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1691,7 +1691,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0xa1
     Instruction {
-        mnemonic: Mnemonic("AND", Some(Opd::Reg(A)), Some(Opd::Reg(C))),
+        mnemonic: Mnemonic::AndAReg8(Reg8::C),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1701,7 +1701,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0xa2
     Instruction {
-        mnemonic: Mnemonic("AND", Some(Opd::Reg(A)), Some(Opd::Reg(D))),
+        mnemonic: Mnemonic::AndAReg8(Reg8::D),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1711,7 +1711,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0xa3
     Instruction {
-        mnemonic: Mnemonic("AND", Some(Opd::Reg(A)), Some(Opd::Reg(E))),
+        mnemonic: Mnemonic::AndAReg8(Reg8::E),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1721,7 +1721,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0xa4
     Instruction {
-        mnemonic: Mnemonic("AND", Some(Opd::Reg(A)), Some(Opd::Reg(H))),
+        mnemonic: Mnemonic::AndAReg8(Reg8::H),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1731,7 +1731,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0xa5
     Instruction {
-        mnemonic: Mnemonic("AND", Some(Opd::Reg(A)), Some(Opd::Reg(L))),
+        mnemonic: Mnemonic::AndAReg8(Reg8::L),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1741,7 +1741,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0xa6
     Instruction {
-        mnemonic: Mnemonic("AND", Some(Opd::Reg(A)), Some(Opd::Addr(FromReg(HL)))),
+        mnemonic: Mnemonic::AndAHlAddr, // Mnemonic("AND", Some(Opd::Reg(A)), Some(Opd::Addr(FromReg(HL)))),
         param_type: ParamType::None,
         cycles: 2,
         branch_cycles: None,
@@ -1752,7 +1752,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0xa7
     Instruction {
-        mnemonic: Mnemonic("AND", Some(Opd::Reg(A)), Some(Opd::Reg(A))),
+        mnemonic: Mnemonic::AndAReg8(Reg8::A),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1762,7 +1762,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0xa8
     Instruction {
-        mnemonic: Mnemonic("XOR", Some(Opd::Reg(A)), Some(Opd::Reg(B))),
+        mnemonic: Mnemonic::XorAReg8(Reg8::B),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1772,7 +1772,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0xa9
     Instruction {
-        mnemonic: Mnemonic("XOR", Some(Opd::Reg(A)), Some(Opd::Reg(C))),
+        mnemonic: Mnemonic::XorAReg8(Reg8::C),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1782,7 +1782,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0xaa
     Instruction {
-        mnemonic: Mnemonic("XOR", Some(Opd::Reg(A)), Some(Opd::Reg(D))),
+        mnemonic: Mnemonic::XorAReg8(Reg8::D),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1792,7 +1792,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0xab
     Instruction {
-        mnemonic: Mnemonic("XOR", Some(Opd::Reg(A)), Some(Opd::Reg(E))),
+        mnemonic: Mnemonic::XorAReg8(Reg8::E),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1802,7 +1802,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0xac
     Instruction {
-        mnemonic: Mnemonic("XOR", Some(Opd::Reg(A)), Some(Opd::Reg(H))),
+        mnemonic: Mnemonic::XorAReg8(Reg8::H),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1812,7 +1812,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0xad
     Instruction {
-        mnemonic: Mnemonic("XOR", Some(Opd::Reg(A)), Some(Opd::Reg(L))),
+        mnemonic: Mnemonic::XorAReg8(Reg8::L),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1822,7 +1822,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0xae
     Instruction {
-        mnemonic: Mnemonic("XOR", Some(Opd::Reg(A)), Some(Opd::Addr(FromReg(HL)))),
+        mnemonic: Mnemonic::XorAHlAddr, // Mnemonic("XOR", Some(Opd::Reg(A)), Some(Opd::Addr(FromReg(HL)))),
         param_type: ParamType::None,
         cycles: 2,
         branch_cycles: None,
@@ -1833,7 +1833,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0xaf
     Instruction {
-        mnemonic: Mnemonic("XOR", Some(Opd::Reg(A)), Some(Opd::Reg(A))),
+        mnemonic: Mnemonic::XorAReg8(Reg8::A),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1843,7 +1843,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0xb0
     Instruction {
-        mnemonic: Mnemonic("OR", Some(Opd::Reg(A)), Some(Opd::Reg(B))),
+        mnemonic: Mnemonic::OrAReg8(Reg8::B),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1853,7 +1853,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0xb1
     Instruction {
-        mnemonic: Mnemonic("OR", Some(Opd::Reg(A)), Some(Opd::Reg(C))),
+        mnemonic: Mnemonic::OrAReg8(Reg8::C),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1863,7 +1863,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0xb2
     Instruction {
-        mnemonic: Mnemonic("OR", Some(Opd::Reg(A)), Some(Opd::Reg(D))),
+        mnemonic: Mnemonic::OrAReg8(Reg8::D),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1873,7 +1873,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0xb3
     Instruction {
-        mnemonic: Mnemonic("OR", Some(Opd::Reg(A)), Some(Opd::Reg(E))),
+        mnemonic: Mnemonic::OrAReg8(Reg8::E),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1883,7 +1883,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0xb4
     Instruction {
-        mnemonic: Mnemonic("OR", Some(Opd::Reg(A)), Some(Opd::Reg(H))),
+        mnemonic: Mnemonic::OrAReg8(Reg8::H),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1893,7 +1893,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0xb5
     Instruction {
-        mnemonic: Mnemonic("OR", Some(Opd::Reg(A)), Some(Opd::Reg(L))),
+        mnemonic: Mnemonic::OrAReg8(Reg8::L),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1903,7 +1903,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0xb6
     Instruction {
-        mnemonic: Mnemonic("OR", Some(Opd::Reg(A)), Some(Opd::Addr(FromReg(HL)))),
+        mnemonic: Mnemonic::OrAHlAddr, // Mnemonic("OR", Some(Opd::Reg(A)), Some(Opd::Addr(FromReg(HL)))),
         param_type: ParamType::None,
         cycles: 2,
         branch_cycles: None,
@@ -1914,7 +1914,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0xb7
     Instruction {
-        mnemonic: Mnemonic("OR", Some(Opd::Reg(A)), Some(Opd::Reg(A))),
+        mnemonic: Mnemonic::OrAReg8(Reg8::A),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1924,7 +1924,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0xb8
     Instruction {
-        mnemonic: Mnemonic("CP", Some(Opd::Reg(A)), Some(Opd::Reg(B))),
+        mnemonic: Mnemonic::CpAReg8(Reg8::B),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1934,7 +1934,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0xb9
     Instruction {
-        mnemonic: Mnemonic("CP", Some(Opd::Reg(A)), Some(Opd::Reg(C))),
+        mnemonic: Mnemonic::CpAReg8(Reg8::C),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1944,7 +1944,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0xba
     Instruction {
-        mnemonic: Mnemonic("CP", Some(Opd::Reg(A)), Some(Opd::Reg(D))),
+        mnemonic: Mnemonic::CpAReg8(Reg8::D),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1954,7 +1954,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0xbb
     Instruction {
-        mnemonic: Mnemonic("CP", Some(Opd::Reg(A)), Some(Opd::Reg(E))),
+        mnemonic: Mnemonic::CpAReg8(Reg8::E),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1964,7 +1964,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0xbc
     Instruction {
-        mnemonic: Mnemonic("CP", Some(Opd::Reg(A)), Some(Opd::Reg(H))),
+        mnemonic: Mnemonic::CpAReg8(Reg8::H),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1974,7 +1974,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0xbd
     Instruction {
-        mnemonic: Mnemonic("CP", Some(Opd::Reg(A)), Some(Opd::Reg(L))),
+        mnemonic: Mnemonic::CpAReg8(Reg8::L),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1984,7 +1984,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0xbe
     Instruction {
-        mnemonic: Mnemonic("CP", Some(Opd::Reg(A)), Some(Opd::Addr(FromReg(HL)))),
+        mnemonic: Mnemonic::CpAHlAddr, // Mnemonic("CP", Some(Opd::Reg(A)), Some(Opd::Addr(FromReg(HL)))),
         param_type: ParamType::None,
         cycles: 2,
         branch_cycles: None,
@@ -1995,7 +1995,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0xbf
     Instruction {
-        mnemonic: Mnemonic("CP", Some(Opd::Reg(A)), Some(Opd::Reg(A))),
+        mnemonic: Mnemonic::CpAReg8(Reg8::A),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -2005,7 +2005,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0xc0
     Instruction {
-        mnemonic: Mnemonic("RET", Some(Opd::Cond(NotZero)), None),
+        mnemonic: Mnemonic::RetCond(Cond::NZ), // Mnemonic("RET", Some(Opd::Cond(NotZero)), None),
         param_type: ParamType::None,
         cycles: 2,
         branch_cycles: Some(3),
@@ -2019,7 +2019,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0xc1
     Instruction {
-        mnemonic: Mnemonic("POP", Some(Opd::Reg(BC)), None),
+        mnemonic: Mnemonic::Pop(Reg16::BC), // Mnemonic::Pop(Reg16::BC),
         param_type: ParamType::None,
         cycles: 3,
         branch_cycles: None,
@@ -2030,7 +2030,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0xc2
     Instruction {
-        mnemonic: Mnemonic("JP", Some(Opd::Cond(NotZero)), Some(Opd::Param(U16))),
+        mnemonic: Mnemonic::JpCond(Cond::NZ, Imm::Unknown), // Mnemonic("JP", Some(Opd::Cond(NotZero)), Some(Opd::Param(U16))),
         param_type: ParamType::Word,
         cycles: 3,
         branch_cycles: Some(1),
@@ -2044,7 +2044,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0xc3
     Instruction {
-        mnemonic: Mnemonic("JP", Some(Opd::Param(U16)), None),
+        mnemonic: Mnemonic::Jp(Imm::Unknown), // Mnemonic("JP", Some(Opd::Param(U16)), None),
         param_type: ParamType::Word,
         cycles: 4,
         branch_cycles: None,
@@ -2056,7 +2056,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0xc4
     Instruction {
-        mnemonic: Mnemonic("CALL", Some(Opd::Cond(NotZero)), Some(Opd::Param(U16))),
+        mnemonic: Mnemonic::CallCond(Cond::NZ, Imm::Unknown), // Mnemonic("CALL", Some(Opd::Cond(NotZero)), Some(Opd::Param(U16))),
         param_type: ParamType::Word,
         cycles: 3,
         branch_cycles: Some(3),
@@ -2070,7 +2070,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0xc5
     Instruction {
-        mnemonic: Mnemonic("PUSH", Some(Opd::Reg(BC)), None),
+        mnemonic: Mnemonic::Push(Reg16::BC), // Mnemonic::Push(Reg16::BC),
         param_type: ParamType::None,
         cycles: 4,
         branch_cycles: None,
@@ -2081,7 +2081,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0xc6
     Instruction {
-        mnemonic: Mnemonic("ADD", Some(Opd::Reg(A)), Some(Opd::Param(U8))),
+        mnemonic: Mnemonic::AddAImm(Imm::Unknown), // Mnemonic("ADD", Some(Opd::Reg(A)), Some(Opd::Param(U8))),
         param_type: ParamType::Byte,
         cycles: 2,
         branch_cycles: None,
@@ -2092,7 +2092,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0xc7
     Instruction {
-        mnemonic: Mnemonic("RST", Some(Opd::Num(0x00)), None),
+        mnemonic: Mnemonic::Rst(Imm::Known(0x00)),
         param_type: ParamType::None,
         cycles: 4,
         branch_cycles: None,
@@ -2103,7 +2103,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0xc8
     Instruction {
-        mnemonic: Mnemonic("RET", Some(Opd::Cond(Zero)), None),
+        mnemonic: Mnemonic::RetCond(Cond::Z), // Mnemonic("RET", Some(Opd::Cond(Zero)), None),
         param_type: ParamType::None,
         cycles: 2,
         branch_cycles: Some(3),
@@ -2117,7 +2117,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0xc9
     Instruction {
-        mnemonic: Mnemonic("RET", None, None),
+        mnemonic: Mnemonic::Ret, //Mnemonic("RET", None, None),
         param_type: ParamType::None,
         cycles: 4,
         branch_cycles: None,
@@ -2128,7 +2128,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0xca
     Instruction {
-        mnemonic: Mnemonic("JP", Some(Opd::Cond(Zero)), Some(Opd::Param(U16))),
+        mnemonic: Mnemonic::JpCond(Cond::Z, Imm::Unknown), // Mnemonic("JP", Some(Opd::Cond(Zero)), Some(Opd::Param(U16))),
         param_type: ParamType::Word,
         cycles: 3,
         branch_cycles: Some(1),
@@ -2140,17 +2140,17 @@ pub const BASE_INSTRS: InstrSet = [
             }
         },
     },
-    // 0xcb
+    // 0xcb Invalid as it is a prefix.
     Instruction {
-        mnemonic: Mnemonic("PREFIX CB", None, None),
+        mnemonic: Mnemonic::Invalid, // Mnemonic("INVALID", None, None),
         param_type: ParamType::None,
         cycles: 0,
         branch_cycles: None,
-        operation: |cpu| cpu.execute(BITWISE_INSTRS),
+        operation: |_| helpers::invalid(),
     },
     // 0xcc
     Instruction {
-        mnemonic: Mnemonic("CALL", Some(Opd::Cond(Zero)), Some(Opd::Param(U16))),
+        mnemonic: Mnemonic::CallCond(Cond::Z, Imm::Unknown), // Mnemonic("CALL", Some(Opd::Cond(Zero)), Some(Opd::Param(U16))),
         param_type: ParamType::Word,
         cycles: 3,
         branch_cycles: Some(3),
@@ -2164,7 +2164,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0xcd
     Instruction {
-        mnemonic: Mnemonic("CALL", Some(Opd::Param(U16)), None),
+        mnemonic: Mnemonic::Call(Imm::Unknown), // Mnemonic("CALL", Some(Opd::Param(U16)), None),
         param_type: ParamType::Word,
         cycles: 6,
         branch_cycles: None,
@@ -2176,7 +2176,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0xce
     Instruction {
-        mnemonic: Mnemonic("ADC", Some(Opd::Reg(A)), Some(Opd::Param(U8))),
+        mnemonic: Mnemonic::AdcAImm(Imm::Unknown), // Mnemonic("ADC", Some(Opd::Reg(A)), Some(Opd::Param(U8))),
         param_type: ParamType::Byte,
         cycles: 2,
         branch_cycles: None,
@@ -2187,7 +2187,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0xcf
     Instruction {
-        mnemonic: Mnemonic("RST", Some(Opd::Num(0x08)), None),
+        mnemonic: Mnemonic::Rst(Imm::Known(0x08)),
         param_type: ParamType::None,
         cycles: 4,
         branch_cycles: None,
@@ -2198,7 +2198,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0xd0
     Instruction {
-        mnemonic: Mnemonic("RET", Some(Opd::Cond(NotCarry)), None),
+        mnemonic: Mnemonic::RetCond(Cond::NC), // Mnemonic("RET", Some(Opd::Cond(NotCarry)), None),
         param_type: ParamType::None,
         cycles: 2,
         branch_cycles: Some(3),
@@ -2212,7 +2212,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0xd1
     Instruction {
-        mnemonic: Mnemonic("POP", Some(Opd::Reg(DE)), None),
+        mnemonic: Mnemonic::Pop(Reg16::DE), // Mnemonic::Pop(Reg16::DE),
         param_type: ParamType::None,
         cycles: 3,
         branch_cycles: None,
@@ -2223,7 +2223,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0xd2
     Instruction {
-        mnemonic: Mnemonic("JP", Some(Opd::Cond(NotCarry)), Some(Opd::Param(U16))),
+        mnemonic: Mnemonic::JpCond(Cond::NC, Imm::Unknown), // Mnemonic("JP", Some(Opd::Cond(NotCarry)), Some(Opd::Param(U16))),
         param_type: ParamType::Word,
         cycles: 3,
         branch_cycles: Some(1),
@@ -2237,8 +2237,8 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0xd3
     Instruction {
-        mnemonic: Mnemonic("INVALID", None, None),
-        param_type: ParamType::Word,
+        mnemonic: Mnemonic::Invalid, // Mnemonic("INVALID", None, None),
+        param_type: ParamType::None,
         cycles: 0,
         branch_cycles: None,
         operation: |_| {
@@ -2247,7 +2247,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0xd4
     Instruction {
-        mnemonic: Mnemonic("CALL", Some(Opd::Cond(NotCarry)), Some(Opd::Param(U16))),
+        mnemonic: Mnemonic::CallCond(Cond::NC, Imm::Unknown), // Mnemonic("CALL", Some(Opd::Cond(NotCarry)), Some(Opd::Param(U16))),
         param_type: ParamType::Word,
         cycles: 3,
         branch_cycles: Some(3),
@@ -2261,7 +2261,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0xd5
     Instruction {
-        mnemonic: Mnemonic("PUSH", Some(Opd::Reg(DE)), None),
+        mnemonic: Mnemonic::Push(Reg16::DE),
         param_type: ParamType::None,
         cycles: 4,
         branch_cycles: None,
@@ -2272,7 +2272,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0xd6
     Instruction {
-        mnemonic: Mnemonic("SUB", Some(Opd::Reg(A)), Some(Opd::Param(U8))),
+        mnemonic: Mnemonic::SubAImm(Imm::Unknown), // Mnemonic("SUB", Some(Opd::Reg(A)), Some(Opd::Param(U8))),
         param_type: ParamType::Byte,
         cycles: 2,
         branch_cycles: None,
@@ -2283,7 +2283,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0xd7
     Instruction {
-        mnemonic: Mnemonic("RST", Some(Opd::Num(0x10)), None),
+        mnemonic: Mnemonic::Rst(Imm::Known(0x10)),
         param_type: ParamType::None,
         cycles: 4,
         branch_cycles: None,
@@ -2294,7 +2294,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0xd8
     Instruction {
-        mnemonic: Mnemonic("RET", Some(Opd::Cond(Carry)), None),
+        mnemonic: Mnemonic::RetCond(Cond::C), // Mnemonic("RET", Some(Opd::Cond(Carry)), None),
         param_type: ParamType::None,
         cycles: 2,
         branch_cycles: Some(3),
@@ -2308,7 +2308,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0xd9
     Instruction {
-        mnemonic: Mnemonic("RETI", None, None),
+        mnemonic: Mnemonic::Reti, // Mnemonic("RETI", None, None),
         param_type: ParamType::None,
         cycles: 4,
         branch_cycles: None,
@@ -2320,7 +2320,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0xda
     Instruction {
-        mnemonic: Mnemonic("JP", Some(Opd::Cond(Carry)), Some(Opd::Param(U16))),
+        mnemonic: Mnemonic::JpCond(Cond::C, Imm::Unknown), // Mnemonic("JP", Some(Opd::Cond(Carry)), Some(Opd::Param(U16))),
         param_type: ParamType::Word,
         cycles: 3,
         branch_cycles: Some(1),
@@ -2334,8 +2334,8 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0xdb
     Instruction {
-        mnemonic: Mnemonic("INVALID", None, None),
-        param_type: ParamType::Word,
+        mnemonic: Mnemonic::Invalid, // Mnemonic("INVALID", None, None),
+        param_type: ParamType::None,
         cycles: 0,
         branch_cycles: None,
         operation: |_| {
@@ -2344,7 +2344,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0xdc
     Instruction {
-        mnemonic: Mnemonic("CALL", Some(Opd::Cond(Carry)), Some(Opd::Param(U16))),
+        mnemonic: Mnemonic::CallCond(Cond::C, Imm::Unknown), // Mnemonic("CALL", Some(Opd::Cond(Carry)), Some(Opd::Param(U16))),
         param_type: ParamType::Word,
         cycles: 3,
         branch_cycles: Some(3),
@@ -2358,8 +2358,8 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0xdd
     Instruction {
-        mnemonic: Mnemonic("INVALID", None, None),
-        param_type: ParamType::Word,
+        mnemonic: Mnemonic::Invalid, // Mnemonic("INVALID", None, None),
+        param_type: ParamType::None,
         cycles: 0,
         branch_cycles: None,
         operation: |_| {
@@ -2368,7 +2368,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0xde
     Instruction {
-        mnemonic: Mnemonic("SBC", Some(Opd::Reg(A)), Some(Opd::Param(U8))),
+        mnemonic: Mnemonic::SbcAImm(Imm::Unknown), // Mnemonic("SBC", Some(Opd::Reg(A)), Some(Opd::Param(U8))),
         param_type: ParamType::Byte,
         cycles: 2,
         branch_cycles: None,
@@ -2379,7 +2379,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0xdf
     Instruction {
-        mnemonic: Mnemonic("RST", Some(Opd::Num(0x18)), None),
+        mnemonic: Mnemonic::Rst(Imm::Known(0x18)),
         param_type: ParamType::None,
         cycles: 4,
         branch_cycles: None,
@@ -2390,7 +2390,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0xe0
     Instruction {
-        mnemonic: Mnemonic("LD", Some(Opd::Addr(FromParam(U8))), Some(Opd::Reg(A))),
+        mnemonic: Mnemonic::LdAddrReg8(Addr::Imm8(Imm::Unknown), Reg8::A), // Mnemonic("LD", Some(Opd::Addr(FromParam(U8))), Some(Opd::Reg(A))),
         param_type: ParamType::Byte,
         cycles: 3,
         branch_cycles: None,
@@ -2401,7 +2401,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0xe1
     Instruction {
-        mnemonic: Mnemonic("POP", Some(Opd::Reg(HL)), None),
+        mnemonic: Mnemonic::Pop(Reg16::HL),
         param_type: ParamType::None,
         cycles: 3,
         branch_cycles: None,
@@ -2412,7 +2412,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0xe2
     Instruction {
-        mnemonic: Mnemonic("LD", Some(Opd::Addr(FromReg(C))), Some(Opd::Reg(A))),
+        mnemonic: Mnemonic::LdAddrReg8(Addr::Reg8(Reg8::C), Reg8::A), // Mnemonic("LD", Some(Opd::Addr(FromReg(C))), Some(Opd::Reg(A))),
         param_type: ParamType::None,
         cycles: 2,
         branch_cycles: None,
@@ -2422,8 +2422,8 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0xe3
     Instruction {
-        mnemonic: Mnemonic("INVALID", None, None),
-        param_type: ParamType::Word,
+        mnemonic: Mnemonic::Invalid, // Mnemonic("INVALID", None, None),
+        param_type: ParamType::None,
         cycles: 0,
         branch_cycles: None,
         operation: |_| {
@@ -2432,8 +2432,8 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0xe4
     Instruction {
-        mnemonic: Mnemonic("INVALID", None, None),
-        param_type: ParamType::Word,
+        mnemonic: Mnemonic::Invalid, // Mnemonic("INVALID", None, None),
+        param_type: ParamType::None,
         cycles: 0,
         branch_cycles: None,
         operation: |_| {
@@ -2442,7 +2442,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0xe5
     Instruction {
-        mnemonic: Mnemonic("PUSH", Some(Opd::Reg(HL)), None),
+        mnemonic: Mnemonic::Push(Reg16::HL),
         param_type: ParamType::None,
         cycles: 4,
         branch_cycles: None,
@@ -2453,7 +2453,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0xe6
     Instruction {
-        mnemonic: Mnemonic("AND", Some(Opd::Reg(A)), Some(Opd::Param(U8))),
+        mnemonic: Mnemonic::AndAImm(Imm::Unknown), // Mnemonic("AND", Some(Opd::Reg(A)), Some(Opd::Param(U8))),
         param_type: ParamType::Byte,
         cycles: 2,
         branch_cycles: None,
@@ -2464,7 +2464,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0xe7
     Instruction {
-        mnemonic: Mnemonic("RST", Some(Opd::Num(0x20)), None),
+        mnemonic: Mnemonic::Rst(Imm::Known(0x20)),
         param_type: ParamType::None,
         cycles: 4,
         branch_cycles: None,
@@ -2475,7 +2475,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0xe8
     Instruction {
-        mnemonic: Mnemonic("ADD", Some(Opd::Reg(SP)), Some(Opd::Param(I8))),
+        mnemonic: Mnemonic::AddSpImm(Imm::Unknown), // Mnemonic("ADD", Some(Opd::Reg(SP)), Some(Opd::Param(I8))),
         param_type: ParamType::Byte,
         cycles: 4,
         branch_cycles: None,
@@ -2489,7 +2489,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0xe9
     Instruction {
-        mnemonic: Mnemonic("JP", Some(Opd::Reg(HL)), None),
+        mnemonic: Mnemonic::JpHl, // Mnemonic("JP", Some(Opd::Reg(HL)), None),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -2499,7 +2499,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0xea
     Instruction {
-        mnemonic: Mnemonic("LD", Some(Opd::Addr(FromParam(U16))), Some(Opd::Reg(A))),
+        mnemonic: Mnemonic::LdAddrReg8(Addr::Imm16(Imm::Unknown), Reg8::A), // Mnemonic("LD", Some(Opd::Addr(FromParam(U16))), Some(Opd::Reg(A))),
         param_type: ParamType::Word,
         cycles: 4,
         branch_cycles: None,
@@ -2510,8 +2510,8 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0xeb
     Instruction {
-        mnemonic: Mnemonic("INVALID", None, None),
-        param_type: ParamType::Word,
+        mnemonic: Mnemonic::Invalid, // Mnemonic("INVALID", None, None),
+        param_type: ParamType::None,
         cycles: 0,
         branch_cycles: None,
         operation: |_| {
@@ -2520,8 +2520,8 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0xec
     Instruction {
-        mnemonic: Mnemonic("INVALID", None, None),
-        param_type: ParamType::Word,
+        mnemonic: Mnemonic::Invalid, // Mnemonic("INVALID", None, None),
+        param_type: ParamType::None,
         cycles: 0,
         branch_cycles: None,
         operation: |_| {
@@ -2530,8 +2530,8 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0xed
     Instruction {
-        mnemonic: Mnemonic("INVALID", None, None),
-        param_type: ParamType::Word,
+        mnemonic: Mnemonic::Invalid, // Mnemonic("INVALID", None, None),
+        param_type: ParamType::None,
         cycles: 0,
         branch_cycles: None,
         operation: |_| {
@@ -2540,7 +2540,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0xee
     Instruction {
-        mnemonic: Mnemonic("XOR", Some(Opd::Reg(A)), Some(Opd::Param(U8))),
+        mnemonic: Mnemonic::XorAImm(Imm::Unknown), // Mnemonic("XOR", Some(Opd::Reg(A)), Some(Opd::Param(U8))),
         param_type: ParamType::Byte,
         cycles: 2,
         branch_cycles: None,
@@ -2551,7 +2551,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0xef
     Instruction {
-        mnemonic: Mnemonic("RST", Some(Opd::Num(0x28)), None),
+        mnemonic: Mnemonic::Rst(Imm::Known(0x28)),
         param_type: ParamType::None,
         cycles: 4,
         branch_cycles: None,
@@ -2562,7 +2562,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0xf0
     Instruction {
-        mnemonic: Mnemonic("LD", Some(Opd::Reg(A)), Some(Opd::Addr(FromParam(U8)))),
+        mnemonic: Mnemonic::LdReg8Addr(Reg8::A, Addr::Imm8(Imm::Unknown)), // Mnemonic("LD", Some(Opd::Reg(A)), Some(Opd::Addr(FromParam(U8)))),
         param_type: ParamType::Byte,
         cycles: 3,
         branch_cycles: None,
@@ -2574,7 +2574,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0xf1
     Instruction {
-        mnemonic: Mnemonic("POP", Some(Opd::Reg(AF)), None),
+        mnemonic: Mnemonic::Pop(Reg16::AF),
         param_type: ParamType::None,
         cycles: 3,
         branch_cycles: None,
@@ -2585,7 +2585,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0xf2
     Instruction {
-        mnemonic: Mnemonic("LD", Some(Opd::Reg(A)), Some(Opd::Addr(FromReg(C)))),
+        mnemonic: Mnemonic::LdReg8Addr(Reg8::A, Addr::Reg8(Reg8::C)), // Mnemonic("LD", Some(Opd::Reg(A)), Some(Opd::Addr(FromReg(C)))),
         param_type: ParamType::None,
         cycles: 2,
         branch_cycles: None,
@@ -2596,7 +2596,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0xf3
     Instruction {
-        mnemonic: Mnemonic("DI", None, None),
+        mnemonic: Mnemonic::Di, // Mnemonic("DI", None, None),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -2606,8 +2606,8 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0xf4
     Instruction {
-        mnemonic: Mnemonic("INVALID", None, None),
-        param_type: ParamType::Word,
+        mnemonic: Mnemonic::Invalid, // Mnemonic("INVALID", None, None),
+        param_type: ParamType::None,
         cycles: 0,
         branch_cycles: None,
         operation: |_| {
@@ -2616,7 +2616,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0xf5
     Instruction {
-        mnemonic: Mnemonic("PUSH", Some(Opd::Reg(AF)), None),
+        mnemonic: Mnemonic::Push(Reg16::AF),
         param_type: ParamType::None,
         cycles: 4,
         branch_cycles: None,
@@ -2627,7 +2627,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0xf6
     Instruction {
-        mnemonic: Mnemonic("OR", Some(Opd::Reg(A)), Some(Opd::Param(U8))),
+        mnemonic: Mnemonic::OrAImm(Imm::Unknown), // Mnemonic("OR", Some(Opd::Reg(A)), Some(Opd::Param(U8))),
         param_type: ParamType::Byte,
         cycles: 2,
         branch_cycles: None,
@@ -2638,7 +2638,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0xf7
     Instruction {
-        mnemonic: Mnemonic("RST", Some(Opd::Num(0x30)), None),
+        mnemonic: Mnemonic::Rst(Imm::Known(0x30)),
         param_type: ParamType::None,
         cycles: 4,
         branch_cycles: None,
@@ -2649,7 +2649,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0xf8
     Instruction {
-        mnemonic: Mnemonic("LD", Some(Opd::Reg(HL)), Some(Opd::Sum(SP, I8))),
+        mnemonic: Mnemonic::LdHlAddSpImm(Imm::Unknown), // Mnemonic("LD", Some(Opd::Reg(HL)), Some(Opd::Sum(SP, I8))),
         param_type: ParamType::Byte,
         cycles: 3,
         branch_cycles: None,
@@ -2662,7 +2662,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0xf9
     Instruction {
-        mnemonic: Mnemonic("LD", Some(Opd::Reg(SP)), Some(Opd::Reg(HL))),
+        mnemonic: Mnemonic::LdSpHl, // Mnemonic("LD", Some(Opd::Reg(SP)), Some(Opd::Reg(HL))),
         param_type: ParamType::None,
         cycles: 2,
         branch_cycles: None,
@@ -2673,7 +2673,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0xfa
     Instruction {
-        mnemonic: Mnemonic("LD", Some(Opd::Reg(A)), Some(Opd::Addr(FromParam(U16)))),
+        mnemonic: Mnemonic::LdReg8Addr(Reg8::A, Addr::Imm16(Imm::Unknown)), // Mnemonic("LD", Some(Opd::Reg(A)), Some(Opd::Addr(FromParam(U16)))),
         param_type: ParamType::Word,
         cycles: 4,
         branch_cycles: None,
@@ -2685,7 +2685,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0xfb
     Instruction {
-        mnemonic: Mnemonic("EI", None, None),
+        mnemonic: Mnemonic::Ei, // Mnemonic("EI", None, None),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -2696,8 +2696,8 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0xfc
     Instruction {
-        mnemonic: Mnemonic("INVALID", None, None),
-        param_type: ParamType::Word,
+        mnemonic: Mnemonic::Invalid, // Mnemonic("INVALID", None, None),
+        param_type: ParamType::None,
         cycles: 0,
         branch_cycles: None,
         operation: |_| {
@@ -2706,8 +2706,8 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0xfd
     Instruction {
-        mnemonic: Mnemonic("INVALID", None, None),
-        param_type: ParamType::Word,
+        mnemonic: Mnemonic::Invalid, // Mnemonic("INVALID", None, None),
+        param_type: ParamType::None,
         cycles: 0,
         branch_cycles: None,
         operation: |_| {
@@ -2716,7 +2716,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0xfe
     Instruction {
-        mnemonic: Mnemonic("CP", Some(Opd::Reg(A)), Some(Opd::Param(U8))),
+        mnemonic: Mnemonic::CpAImm(Imm::Unknown), // Mnemonic("CP", Some(Opd::Reg(A)), Some(Opd::Param(U8))),
         param_type: ParamType::Byte,
         cycles: 2,
         branch_cycles: None,
@@ -2727,7 +2727,7 @@ pub const BASE_INSTRS: InstrSet = [
     },
     // 0xff
     Instruction {
-        mnemonic: Mnemonic("RST", Some(Opd::Num(0x38)), None),
+        mnemonic: Mnemonic::Rst(Imm::Known(0x38)),
         param_type: ParamType::None,
         cycles: 4,
         branch_cycles: None,

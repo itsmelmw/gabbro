@@ -1,11 +1,13 @@
 use super::{helpers, InstrSet, Instruction, ParamType};
 
-use super::disasm::{Addr::*, Mnemonic, Opd, Reg::*};
+use super::mnemonic::{Imm, Mnemonic, Reg8};
+
+pub const BITWISE_PREFIX: u8 = 0xcb;
 
 pub const BITWISE_INSTRS: InstrSet = [
     // 0x00
     Instruction {
-        mnemonic: Mnemonic("RLC", Some(Opd::Reg(B)), None),
+        mnemonic: Mnemonic::RlcReg8(Reg8::B),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -16,7 +18,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x01
     Instruction {
-        mnemonic: Mnemonic("RLC", Some(Opd::Reg(C)), None),
+        mnemonic: Mnemonic::RlcReg8(Reg8::C),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -27,7 +29,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x02
     Instruction {
-        mnemonic: Mnemonic("RLC", Some(Opd::Reg(D)), None),
+        mnemonic: Mnemonic::RlcReg8(Reg8::D),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -38,7 +40,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x03
     Instruction {
-        mnemonic: Mnemonic("RLC", Some(Opd::Reg(E)), None),
+        mnemonic: Mnemonic::RlcReg8(Reg8::E),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -49,7 +51,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x04
     Instruction {
-        mnemonic: Mnemonic("RLC", Some(Opd::Reg(H)), None),
+        mnemonic: Mnemonic::RlcReg8(Reg8::H),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -60,7 +62,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x05
     Instruction {
-        mnemonic: Mnemonic("RLC", Some(Opd::Reg(L)), None),
+        mnemonic: Mnemonic::RlcReg8(Reg8::L),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -71,7 +73,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x06
     Instruction {
-        mnemonic: Mnemonic("RLC", Some(Opd::Addr(FromReg(HL))), None),
+        mnemonic: Mnemonic::RlcHlAddr, // Mnemonic("RLC", Some(Opd::Addr(FromReg(HL))), None),
         param_type: ParamType::None,
         cycles: 3,
         branch_cycles: None,
@@ -83,7 +85,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x07
     Instruction {
-        mnemonic: Mnemonic("RLC", Some(Opd::Reg(A)), None),
+        mnemonic: Mnemonic::RlcReg8(Reg8::A),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -94,7 +96,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x08
     Instruction {
-        mnemonic: Mnemonic("RRC", Some(Opd::Reg(B)), None),
+        mnemonic: Mnemonic::RrcReg8(Reg8::B),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -105,7 +107,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x09
     Instruction {
-        mnemonic: Mnemonic("RRC", Some(Opd::Reg(C)), None),
+        mnemonic: Mnemonic::RrcReg8(Reg8::C),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -116,7 +118,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x0a
     Instruction {
-        mnemonic: Mnemonic("RRC", Some(Opd::Reg(D)), None),
+        mnemonic: Mnemonic::RrcReg8(Reg8::D),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -127,7 +129,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x0b
     Instruction {
-        mnemonic: Mnemonic("RRC", Some(Opd::Reg(E)), None),
+        mnemonic: Mnemonic::RrcReg8(Reg8::E),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -138,7 +140,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x0c
     Instruction {
-        mnemonic: Mnemonic("RRC", Some(Opd::Reg(H)), None),
+        mnemonic: Mnemonic::RrcReg8(Reg8::H),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -149,7 +151,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x0d
     Instruction {
-        mnemonic: Mnemonic("RRC", Some(Opd::Reg(L)), None),
+        mnemonic: Mnemonic::RrcReg8(Reg8::L),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -160,7 +162,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x0e
     Instruction {
-        mnemonic: Mnemonic("RRC", Some(Opd::Addr(FromReg(HL))), None),
+        mnemonic: Mnemonic::RrcHlAddr, // Mnemonic("RRC", Some(Opd::Addr(FromReg(HL))), None),
         param_type: ParamType::None,
         cycles: 3,
         branch_cycles: None,
@@ -172,7 +174,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x0f
     Instruction {
-        mnemonic: Mnemonic("RRC", Some(Opd::Reg(A)), None),
+        mnemonic: Mnemonic::RrcReg8(Reg8::A),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -183,7 +185,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x10
     Instruction {
-        mnemonic: Mnemonic("RL", Some(Opd::Reg(B)), None),
+        mnemonic: Mnemonic::RlReg8(Reg8::B),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -194,7 +196,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x11
     Instruction {
-        mnemonic: Mnemonic("RL", Some(Opd::Reg(C)), None),
+        mnemonic: Mnemonic::RlReg8(Reg8::C),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -205,7 +207,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x12
     Instruction {
-        mnemonic: Mnemonic("RL", Some(Opd::Reg(D)), None),
+        mnemonic: Mnemonic::RlReg8(Reg8::D),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -216,7 +218,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x13
     Instruction {
-        mnemonic: Mnemonic("RL", Some(Opd::Reg(E)), None),
+        mnemonic: Mnemonic::RlReg8(Reg8::E),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -227,7 +229,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x14
     Instruction {
-        mnemonic: Mnemonic("RL", Some(Opd::Reg(H)), None),
+        mnemonic: Mnemonic::RlReg8(Reg8::H),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -238,7 +240,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x15
     Instruction {
-        mnemonic: Mnemonic("RL", Some(Opd::Reg(L)), None),
+        mnemonic: Mnemonic::RlReg8(Reg8::L),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -249,7 +251,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x16
     Instruction {
-        mnemonic: Mnemonic("RL", Some(Opd::Addr(FromReg(HL))), None),
+        mnemonic: Mnemonic::RlHlAddr, // Mnemonic("RL", Some(Opd::Addr(FromReg(HL))), None),
         param_type: ParamType::None,
         cycles: 3,
         branch_cycles: None,
@@ -261,7 +263,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x17
     Instruction {
-        mnemonic: Mnemonic("RL", Some(Opd::Reg(A)), None),
+        mnemonic: Mnemonic::RlReg8(Reg8::A),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -272,7 +274,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x18
     Instruction {
-        mnemonic: Mnemonic("RR", Some(Opd::Reg(B)), None),
+        mnemonic: Mnemonic::RrReg8(Reg8::B),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -283,7 +285,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x19
     Instruction {
-        mnemonic: Mnemonic("RR", Some(Opd::Reg(C)), None),
+        mnemonic: Mnemonic::RrReg8(Reg8::C),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -294,7 +296,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x1a
     Instruction {
-        mnemonic: Mnemonic("RR", Some(Opd::Reg(D)), None),
+        mnemonic: Mnemonic::RrReg8(Reg8::D),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -305,7 +307,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x1b
     Instruction {
-        mnemonic: Mnemonic("RR", Some(Opd::Reg(E)), None),
+        mnemonic: Mnemonic::RrReg8(Reg8::E),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -316,7 +318,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x1c
     Instruction {
-        mnemonic: Mnemonic("RR", Some(Opd::Reg(H)), None),
+        mnemonic: Mnemonic::RrReg8(Reg8::H),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -327,7 +329,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x1d
     Instruction {
-        mnemonic: Mnemonic("RR", Some(Opd::Reg(L)), None),
+        mnemonic: Mnemonic::RrReg8(Reg8::L),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -338,7 +340,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x1e
     Instruction {
-        mnemonic: Mnemonic("RR", Some(Opd::Addr(FromReg(HL))), None),
+        mnemonic: Mnemonic::RrHlAddr, // Mnemonic("RR", Some(Opd::Addr(FromReg(HL))), None),
         param_type: ParamType::None,
         cycles: 3,
         branch_cycles: None,
@@ -350,7 +352,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x1f
     Instruction {
-        mnemonic: Mnemonic("RR", Some(Opd::Reg(A)), None),
+        mnemonic: Mnemonic::RrReg8(Reg8::A),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -361,7 +363,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x20
     Instruction {
-        mnemonic: Mnemonic("SLA", Some(Opd::Reg(B)), None),
+        mnemonic: Mnemonic::SlaReg8(Reg8::B),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -372,7 +374,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x21
     Instruction {
-        mnemonic: Mnemonic("SLA", Some(Opd::Reg(C)), None),
+        mnemonic: Mnemonic::SlaReg8(Reg8::C),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -383,7 +385,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x22
     Instruction {
-        mnemonic: Mnemonic("SLA", Some(Opd::Reg(D)), None),
+        mnemonic: Mnemonic::SlaReg8(Reg8::D),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -394,7 +396,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x23
     Instruction {
-        mnemonic: Mnemonic("SLA", Some(Opd::Reg(E)), None),
+        mnemonic: Mnemonic::SlaReg8(Reg8::E),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -405,7 +407,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x24
     Instruction {
-        mnemonic: Mnemonic("SLA", Some(Opd::Reg(H)), None),
+        mnemonic: Mnemonic::SlaReg8(Reg8::H),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -416,7 +418,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x25
     Instruction {
-        mnemonic: Mnemonic("SLA", Some(Opd::Reg(L)), None),
+        mnemonic: Mnemonic::SlaReg8(Reg8::L),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -427,7 +429,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x26
     Instruction {
-        mnemonic: Mnemonic("SLA", Some(Opd::Addr(FromReg(HL))), None),
+        mnemonic: Mnemonic::SlaHlAddr, // Mnemonic("SLA", Some(Opd::Addr(FromReg(HL))), None),
         param_type: ParamType::None,
         cycles: 3,
         branch_cycles: None,
@@ -439,7 +441,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x27
     Instruction {
-        mnemonic: Mnemonic("SLA", Some(Opd::Reg(A)), None),
+        mnemonic: Mnemonic::SlaReg8(Reg8::A),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -450,7 +452,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x28
     Instruction {
-        mnemonic: Mnemonic("SRA", Some(Opd::Reg(B)), None),
+        mnemonic: Mnemonic::SraReg8(Reg8::B),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -461,7 +463,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x29
     Instruction {
-        mnemonic: Mnemonic("SRA", Some(Opd::Reg(C)), None),
+        mnemonic: Mnemonic::SraReg8(Reg8::C),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -472,7 +474,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x2a
     Instruction {
-        mnemonic: Mnemonic("SRA", Some(Opd::Reg(D)), None),
+        mnemonic: Mnemonic::SraReg8(Reg8::D),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -483,7 +485,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x2b
     Instruction {
-        mnemonic: Mnemonic("SRA", Some(Opd::Reg(E)), None),
+        mnemonic: Mnemonic::SraReg8(Reg8::E),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -494,7 +496,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x2c
     Instruction {
-        mnemonic: Mnemonic("SRA", Some(Opd::Reg(H)), None),
+        mnemonic: Mnemonic::SraReg8(Reg8::H),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -505,7 +507,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x2d
     Instruction {
-        mnemonic: Mnemonic("SRA", Some(Opd::Reg(L)), None),
+        mnemonic: Mnemonic::SraReg8(Reg8::L),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -516,7 +518,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x2e
     Instruction {
-        mnemonic: Mnemonic("SRA", Some(Opd::Addr(FromReg(HL))), None),
+        mnemonic: Mnemonic::SraHlAddr, // Mnemonic("SRA", Some(Opd::Addr(FromReg(HL))), None),
         param_type: ParamType::None,
         cycles: 3,
         branch_cycles: None,
@@ -528,7 +530,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x2f
     Instruction {
-        mnemonic: Mnemonic("SRA", Some(Opd::Reg(A)), None),
+        mnemonic: Mnemonic::SraReg8(Reg8::A),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -539,7 +541,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x30
     Instruction {
-        mnemonic: Mnemonic("SWAP", Some(Opd::Reg(B)), None),
+        mnemonic: Mnemonic::SwapReg8(Reg8::B),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -550,7 +552,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x31
     Instruction {
-        mnemonic: Mnemonic("SWAP", Some(Opd::Reg(C)), None),
+        mnemonic: Mnemonic::SwapReg8(Reg8::C),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -561,7 +563,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x32
     Instruction {
-        mnemonic: Mnemonic("SWAP", Some(Opd::Reg(D)), None),
+        mnemonic: Mnemonic::SwapReg8(Reg8::D),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -572,7 +574,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x33
     Instruction {
-        mnemonic: Mnemonic("SWAP", Some(Opd::Reg(E)), None),
+        mnemonic: Mnemonic::SwapReg8(Reg8::E),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -583,7 +585,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x34
     Instruction {
-        mnemonic: Mnemonic("SWAP", Some(Opd::Reg(H)), None),
+        mnemonic: Mnemonic::SwapReg8(Reg8::H),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -594,7 +596,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x35
     Instruction {
-        mnemonic: Mnemonic("SWAP", Some(Opd::Reg(L)), None),
+        mnemonic: Mnemonic::SwapReg8(Reg8::L),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -605,7 +607,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x36
     Instruction {
-        mnemonic: Mnemonic("SWAP", Some(Opd::Addr(FromReg(HL))), None),
+        mnemonic: Mnemonic::SwapHlAddr, // Mnemonic("SWAP", Some(Opd::Addr(FromReg(HL))), None),
         param_type: ParamType::None,
         cycles: 3,
         branch_cycles: None,
@@ -617,7 +619,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x37
     Instruction {
-        mnemonic: Mnemonic("SWAP", Some(Opd::Reg(A)), None),
+        mnemonic: Mnemonic::SwapReg8(Reg8::A),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -628,7 +630,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x38
     Instruction {
-        mnemonic: Mnemonic("SRL", Some(Opd::Reg(B)), None),
+        mnemonic: Mnemonic::SrlReg8(Reg8::B),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -639,7 +641,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x39
     Instruction {
-        mnemonic: Mnemonic("SRL", Some(Opd::Reg(C)), None),
+        mnemonic: Mnemonic::SrlReg8(Reg8::C),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -650,7 +652,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x3a
     Instruction {
-        mnemonic: Mnemonic("SRL", Some(Opd::Reg(D)), None),
+        mnemonic: Mnemonic::SrlReg8(Reg8::D),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -661,7 +663,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x3b
     Instruction {
-        mnemonic: Mnemonic("SRL", Some(Opd::Reg(E)), None),
+        mnemonic: Mnemonic::SrlReg8(Reg8::E),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -672,7 +674,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x3c
     Instruction {
-        mnemonic: Mnemonic("SRL", Some(Opd::Reg(H)), None),
+        mnemonic: Mnemonic::SrlReg8(Reg8::H),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -683,7 +685,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x3d
     Instruction {
-        mnemonic: Mnemonic("SRL", Some(Opd::Reg(L)), None),
+        mnemonic: Mnemonic::SrlReg8(Reg8::L),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -694,7 +696,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x3e
     Instruction {
-        mnemonic: Mnemonic("SRL", Some(Opd::Addr(FromReg(HL))), None),
+        mnemonic: Mnemonic::SrlHlAddr, // Mnemonic("SRL", Some(Opd::Addr(FromReg(HL))), None),
         param_type: ParamType::None,
         cycles: 3,
         branch_cycles: None,
@@ -706,7 +708,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x3f
     Instruction {
-        mnemonic: Mnemonic("SRL", Some(Opd::Reg(A)), None),
+        mnemonic: Mnemonic::SrlReg8(Reg8::A),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -717,7 +719,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x40
     Instruction {
-        mnemonic: Mnemonic("BIT", Some(Opd::Num(0)), Some(Opd::Reg(B))),
+        mnemonic: Mnemonic::BitReg8(Imm::Known(0), Reg8::B),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -727,7 +729,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x41
     Instruction {
-        mnemonic: Mnemonic("BIT", Some(Opd::Num(0)), Some(Opd::Reg(C))),
+        mnemonic: Mnemonic::BitReg8(Imm::Known(0), Reg8::C),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -737,7 +739,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x42
     Instruction {
-        mnemonic: Mnemonic("BIT", Some(Opd::Num(0)), Some(Opd::Reg(D))),
+        mnemonic: Mnemonic::BitReg8(Imm::Known(0), Reg8::D),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -747,7 +749,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x43
     Instruction {
-        mnemonic: Mnemonic("BIT", Some(Opd::Num(0)), Some(Opd::Reg(E))),
+        mnemonic: Mnemonic::BitReg8(Imm::Known(0), Reg8::E),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -757,7 +759,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x44
     Instruction {
-        mnemonic: Mnemonic("BIT", Some(Opd::Num(0)), Some(Opd::Reg(H))),
+        mnemonic: Mnemonic::BitReg8(Imm::Known(0), Reg8::H),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -767,7 +769,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x45
     Instruction {
-        mnemonic: Mnemonic("BIT", Some(Opd::Num(0)), Some(Opd::Reg(L))),
+        mnemonic: Mnemonic::BitReg8(Imm::Known(0), Reg8::L),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -777,7 +779,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x46
     Instruction {
-        mnemonic: Mnemonic("BIT", Some(Opd::Num(0)), Some(Opd::Addr(FromReg(HL)))),
+        mnemonic: Mnemonic::BitHlAddr(Imm::Known(0)),
         param_type: ParamType::None,
         cycles: 2,
         branch_cycles: None,
@@ -788,7 +790,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x47
     Instruction {
-        mnemonic: Mnemonic("BIT", Some(Opd::Num(0)), Some(Opd::Reg(A))),
+        mnemonic: Mnemonic::BitReg8(Imm::Known(0), Reg8::A),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -798,7 +800,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x48
     Instruction {
-        mnemonic: Mnemonic("BIT", Some(Opd::Num(1)), Some(Opd::Reg(B))),
+        mnemonic: Mnemonic::BitReg8(Imm::Known(1), Reg8::B),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -808,7 +810,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x49
     Instruction {
-        mnemonic: Mnemonic("BIT", Some(Opd::Num(1)), Some(Opd::Reg(C))),
+        mnemonic: Mnemonic::BitReg8(Imm::Known(1), Reg8::C),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -818,7 +820,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x4a
     Instruction {
-        mnemonic: Mnemonic("BIT", Some(Opd::Num(1)), Some(Opd::Reg(D))),
+        mnemonic: Mnemonic::BitReg8(Imm::Known(1), Reg8::D),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -828,7 +830,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x4b
     Instruction {
-        mnemonic: Mnemonic("BIT", Some(Opd::Num(1)), Some(Opd::Reg(E))),
+        mnemonic: Mnemonic::BitReg8(Imm::Known(1), Reg8::E),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -838,7 +840,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x4c
     Instruction {
-        mnemonic: Mnemonic("BIT", Some(Opd::Num(1)), Some(Opd::Reg(H))),
+        mnemonic: Mnemonic::BitReg8(Imm::Known(1), Reg8::H),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -848,7 +850,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x4d
     Instruction {
-        mnemonic: Mnemonic("BIT", Some(Opd::Num(1)), Some(Opd::Reg(L))),
+        mnemonic: Mnemonic::BitReg8(Imm::Known(1), Reg8::L),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -858,7 +860,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x4e
     Instruction {
-        mnemonic: Mnemonic("BIT", Some(Opd::Num(1)), Some(Opd::Addr(FromReg(HL)))),
+        mnemonic: Mnemonic::BitHlAddr(Imm::Known(1)),
         param_type: ParamType::None,
         cycles: 2,
         branch_cycles: None,
@@ -869,7 +871,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x4f
     Instruction {
-        mnemonic: Mnemonic("BIT", Some(Opd::Num(1)), Some(Opd::Reg(A))),
+        mnemonic: Mnemonic::BitReg8(Imm::Known(1), Reg8::A),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -879,7 +881,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x50
     Instruction {
-        mnemonic: Mnemonic("BIT", Some(Opd::Num(2)), Some(Opd::Reg(B))),
+        mnemonic: Mnemonic::BitReg8(Imm::Known(2), Reg8::B),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -889,7 +891,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x51
     Instruction {
-        mnemonic: Mnemonic("BIT", Some(Opd::Num(2)), Some(Opd::Reg(C))),
+        mnemonic: Mnemonic::BitReg8(Imm::Known(2), Reg8::C),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -899,7 +901,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x52
     Instruction {
-        mnemonic: Mnemonic("BIT", Some(Opd::Num(2)), Some(Opd::Reg(D))),
+        mnemonic: Mnemonic::BitReg8(Imm::Known(2), Reg8::D),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -909,7 +911,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x53
     Instruction {
-        mnemonic: Mnemonic("BIT", Some(Opd::Num(2)), Some(Opd::Reg(E))),
+        mnemonic: Mnemonic::BitReg8(Imm::Known(2), Reg8::E),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -919,7 +921,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x54
     Instruction {
-        mnemonic: Mnemonic("BIT", Some(Opd::Num(2)), Some(Opd::Reg(H))),
+        mnemonic: Mnemonic::BitReg8(Imm::Known(2), Reg8::H),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -929,7 +931,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x55
     Instruction {
-        mnemonic: Mnemonic("BIT", Some(Opd::Num(2)), Some(Opd::Reg(L))),
+        mnemonic: Mnemonic::BitReg8(Imm::Known(2), Reg8::L),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -939,7 +941,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x56
     Instruction {
-        mnemonic: Mnemonic("BIT", Some(Opd::Num(2)), Some(Opd::Addr(FromReg(HL)))),
+        mnemonic: Mnemonic::BitHlAddr(Imm::Known(2)),
         param_type: ParamType::None,
         cycles: 2,
         branch_cycles: None,
@@ -950,7 +952,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x57
     Instruction {
-        mnemonic: Mnemonic("BIT", Some(Opd::Num(2)), Some(Opd::Reg(A))),
+        mnemonic: Mnemonic::BitReg8(Imm::Known(2), Reg8::A),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -960,7 +962,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x58
     Instruction {
-        mnemonic: Mnemonic("BIT", Some(Opd::Num(3)), Some(Opd::Reg(B))),
+        mnemonic: Mnemonic::BitReg8(Imm::Known(3), Reg8::B),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -970,7 +972,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x59
     Instruction {
-        mnemonic: Mnemonic("BIT", Some(Opd::Num(3)), Some(Opd::Reg(C))),
+        mnemonic: Mnemonic::BitReg8(Imm::Known(3), Reg8::C),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -980,7 +982,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x5a
     Instruction {
-        mnemonic: Mnemonic("BIT", Some(Opd::Num(3)), Some(Opd::Reg(D))),
+        mnemonic: Mnemonic::BitReg8(Imm::Known(3), Reg8::D),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -990,7 +992,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x5b
     Instruction {
-        mnemonic: Mnemonic("BIT", Some(Opd::Num(3)), Some(Opd::Reg(E))),
+        mnemonic: Mnemonic::BitReg8(Imm::Known(3), Reg8::E),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1000,7 +1002,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x5c
     Instruction {
-        mnemonic: Mnemonic("BIT", Some(Opd::Num(3)), Some(Opd::Reg(H))),
+        mnemonic: Mnemonic::BitReg8(Imm::Known(3), Reg8::H),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1010,7 +1012,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x5d
     Instruction {
-        mnemonic: Mnemonic("BIT", Some(Opd::Num(3)), Some(Opd::Reg(L))),
+        mnemonic: Mnemonic::BitReg8(Imm::Known(3), Reg8::L),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1020,7 +1022,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x5e
     Instruction {
-        mnemonic: Mnemonic("BIT", Some(Opd::Num(3)), Some(Opd::Addr(FromReg(HL)))),
+        mnemonic: Mnemonic::BitHlAddr(Imm::Known(3)),
         param_type: ParamType::None,
         cycles: 2,
         branch_cycles: None,
@@ -1031,7 +1033,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x5f
     Instruction {
-        mnemonic: Mnemonic("BIT", Some(Opd::Num(3)), Some(Opd::Reg(A))),
+        mnemonic: Mnemonic::BitReg8(Imm::Known(3), Reg8::A),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1041,7 +1043,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x60
     Instruction {
-        mnemonic: Mnemonic("BIT", Some(Opd::Num(4)), Some(Opd::Reg(B))),
+        mnemonic: Mnemonic::BitReg8(Imm::Known(4), Reg8::B),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1051,7 +1053,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x61
     Instruction {
-        mnemonic: Mnemonic("BIT", Some(Opd::Num(4)), Some(Opd::Reg(C))),
+        mnemonic: Mnemonic::BitReg8(Imm::Known(4), Reg8::C),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1061,7 +1063,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x62
     Instruction {
-        mnemonic: Mnemonic("BIT", Some(Opd::Num(4)), Some(Opd::Reg(D))),
+        mnemonic: Mnemonic::BitReg8(Imm::Known(4), Reg8::D),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1071,7 +1073,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x63
     Instruction {
-        mnemonic: Mnemonic("BIT", Some(Opd::Num(4)), Some(Opd::Reg(E))),
+        mnemonic: Mnemonic::BitReg8(Imm::Known(4), Reg8::E),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1081,7 +1083,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x64
     Instruction {
-        mnemonic: Mnemonic("BIT", Some(Opd::Num(4)), Some(Opd::Reg(H))),
+        mnemonic: Mnemonic::BitReg8(Imm::Known(4), Reg8::H),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1091,7 +1093,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x65
     Instruction {
-        mnemonic: Mnemonic("BIT", Some(Opd::Num(4)), Some(Opd::Reg(L))),
+        mnemonic: Mnemonic::BitReg8(Imm::Known(4), Reg8::L),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1101,7 +1103,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x66
     Instruction {
-        mnemonic: Mnemonic("BIT", Some(Opd::Num(4)), Some(Opd::Addr(FromReg(HL)))),
+        mnemonic: Mnemonic::BitHlAddr(Imm::Known(4)),
         param_type: ParamType::None,
         cycles: 2,
         branch_cycles: None,
@@ -1112,7 +1114,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x67
     Instruction {
-        mnemonic: Mnemonic("BIT", Some(Opd::Num(4)), Some(Opd::Reg(A))),
+        mnemonic: Mnemonic::BitReg8(Imm::Known(4), Reg8::A),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1122,7 +1124,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x68
     Instruction {
-        mnemonic: Mnemonic("BIT", Some(Opd::Num(5)), Some(Opd::Reg(B))),
+        mnemonic: Mnemonic::BitReg8(Imm::Known(5), Reg8::B),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1132,7 +1134,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x69
     Instruction {
-        mnemonic: Mnemonic("BIT", Some(Opd::Num(5)), Some(Opd::Reg(C))),
+        mnemonic: Mnemonic::BitReg8(Imm::Known(5), Reg8::C),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1142,7 +1144,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x6a
     Instruction {
-        mnemonic: Mnemonic("BIT", Some(Opd::Num(5)), Some(Opd::Reg(D))),
+        mnemonic: Mnemonic::BitReg8(Imm::Known(5), Reg8::D),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1152,7 +1154,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x6b
     Instruction {
-        mnemonic: Mnemonic("BIT", Some(Opd::Num(5)), Some(Opd::Reg(E))),
+        mnemonic: Mnemonic::BitReg8(Imm::Known(5), Reg8::E),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1162,7 +1164,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x6c
     Instruction {
-        mnemonic: Mnemonic("BIT", Some(Opd::Num(5)), Some(Opd::Reg(H))),
+        mnemonic: Mnemonic::BitReg8(Imm::Known(5), Reg8::H),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1172,7 +1174,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x6d
     Instruction {
-        mnemonic: Mnemonic("BIT", Some(Opd::Num(5)), Some(Opd::Reg(L))),
+        mnemonic: Mnemonic::BitReg8(Imm::Known(5), Reg8::L),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1182,7 +1184,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x6e
     Instruction {
-        mnemonic: Mnemonic("BIT", Some(Opd::Num(5)), Some(Opd::Addr(FromReg(HL)))),
+        mnemonic: Mnemonic::BitHlAddr(Imm::Known(5)),
         param_type: ParamType::None,
         cycles: 2,
         branch_cycles: None,
@@ -1193,7 +1195,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x6f
     Instruction {
-        mnemonic: Mnemonic("BIT", Some(Opd::Num(5)), Some(Opd::Reg(A))),
+        mnemonic: Mnemonic::BitReg8(Imm::Known(5), Reg8::A),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1203,7 +1205,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x70
     Instruction {
-        mnemonic: Mnemonic("BIT", Some(Opd::Num(6)), Some(Opd::Reg(B))),
+        mnemonic: Mnemonic::BitReg8(Imm::Known(6), Reg8::B),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1213,7 +1215,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x71
     Instruction {
-        mnemonic: Mnemonic("BIT", Some(Opd::Num(6)), Some(Opd::Reg(C))),
+        mnemonic: Mnemonic::BitReg8(Imm::Known(6), Reg8::C),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1223,7 +1225,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x72
     Instruction {
-        mnemonic: Mnemonic("BIT", Some(Opd::Num(6)), Some(Opd::Reg(D))),
+        mnemonic: Mnemonic::BitReg8(Imm::Known(6), Reg8::D),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1233,7 +1235,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x73
     Instruction {
-        mnemonic: Mnemonic("BIT", Some(Opd::Num(6)), Some(Opd::Reg(E))),
+        mnemonic: Mnemonic::BitReg8(Imm::Known(6), Reg8::E),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1243,7 +1245,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x74
     Instruction {
-        mnemonic: Mnemonic("BIT", Some(Opd::Num(6)), Some(Opd::Reg(H))),
+        mnemonic: Mnemonic::BitReg8(Imm::Known(6), Reg8::H),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1253,7 +1255,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x75
     Instruction {
-        mnemonic: Mnemonic("BIT", Some(Opd::Num(6)), Some(Opd::Reg(L))),
+        mnemonic: Mnemonic::BitReg8(Imm::Known(6), Reg8::L),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1263,7 +1265,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x76
     Instruction {
-        mnemonic: Mnemonic("BIT", Some(Opd::Num(6)), Some(Opd::Addr(FromReg(HL)))),
+        mnemonic: Mnemonic::BitHlAddr(Imm::Known(6)),
         param_type: ParamType::None,
         cycles: 2,
         branch_cycles: None,
@@ -1274,7 +1276,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x77
     Instruction {
-        mnemonic: Mnemonic("BIT", Some(Opd::Num(6)), Some(Opd::Reg(A))),
+        mnemonic: Mnemonic::BitReg8(Imm::Known(6), Reg8::A),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1284,7 +1286,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x78
     Instruction {
-        mnemonic: Mnemonic("BIT", Some(Opd::Num(7)), Some(Opd::Reg(B))),
+        mnemonic: Mnemonic::BitReg8(Imm::Known(7), Reg8::B),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1294,7 +1296,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x79
     Instruction {
-        mnemonic: Mnemonic("BIT", Some(Opd::Num(7)), Some(Opd::Reg(C))),
+        mnemonic: Mnemonic::BitReg8(Imm::Known(7), Reg8::C),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1304,7 +1306,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x7a
     Instruction {
-        mnemonic: Mnemonic("BIT", Some(Opd::Num(7)), Some(Opd::Reg(D))),
+        mnemonic: Mnemonic::BitReg8(Imm::Known(7), Reg8::D),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1314,7 +1316,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x7b
     Instruction {
-        mnemonic: Mnemonic("BIT", Some(Opd::Num(7)), Some(Opd::Reg(E))),
+        mnemonic: Mnemonic::BitReg8(Imm::Known(7), Reg8::E),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1324,7 +1326,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x7c
     Instruction {
-        mnemonic: Mnemonic("BIT", Some(Opd::Num(7)), Some(Opd::Reg(H))),
+        mnemonic: Mnemonic::BitReg8(Imm::Known(7), Reg8::H),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1334,7 +1336,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x7d
     Instruction {
-        mnemonic: Mnemonic("BIT", Some(Opd::Num(7)), Some(Opd::Reg(L))),
+        mnemonic: Mnemonic::BitReg8(Imm::Known(7), Reg8::L),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1344,7 +1346,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x7e
     Instruction {
-        mnemonic: Mnemonic("BIT", Some(Opd::Num(7)), Some(Opd::Addr(FromReg(HL)))),
+        mnemonic: Mnemonic::BitHlAddr(Imm::Known(7)),
         param_type: ParamType::None,
         cycles: 2,
         branch_cycles: None,
@@ -1355,7 +1357,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x7f
     Instruction {
-        mnemonic: Mnemonic("BIT", Some(Opd::Num(7)), Some(Opd::Reg(A))),
+        mnemonic: Mnemonic::BitReg8(Imm::Known(7), Reg8::A),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1365,7 +1367,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x80
     Instruction {
-        mnemonic: Mnemonic("RES", Some(Opd::Num(0)), Some(Opd::Reg(B))),
+        mnemonic: Mnemonic::ResReg8(Imm::Known(0), Reg8::B),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1375,7 +1377,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x81
     Instruction {
-        mnemonic: Mnemonic("RES", Some(Opd::Num(0)), Some(Opd::Reg(C))),
+        mnemonic: Mnemonic::ResReg8(Imm::Known(0), Reg8::C),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1385,7 +1387,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x82
     Instruction {
-        mnemonic: Mnemonic("RES", Some(Opd::Num(0)), Some(Opd::Reg(D))),
+        mnemonic: Mnemonic::ResReg8(Imm::Known(0), Reg8::D),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1395,7 +1397,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x83
     Instruction {
-        mnemonic: Mnemonic("RES", Some(Opd::Num(0)), Some(Opd::Reg(E))),
+        mnemonic: Mnemonic::ResReg8(Imm::Known(0), Reg8::E),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1405,7 +1407,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x84
     Instruction {
-        mnemonic: Mnemonic("RES", Some(Opd::Num(0)), Some(Opd::Reg(H))),
+        mnemonic: Mnemonic::ResReg8(Imm::Known(0), Reg8::H),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1415,7 +1417,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x85
     Instruction {
-        mnemonic: Mnemonic("RES", Some(Opd::Num(0)), Some(Opd::Reg(L))),
+        mnemonic: Mnemonic::ResReg8(Imm::Known(0), Reg8::L),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1425,7 +1427,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x86
     Instruction {
-        mnemonic: Mnemonic("RES", Some(Opd::Num(0)), Some(Opd::Addr(FromReg(HL)))),
+        mnemonic: Mnemonic::ResHlAddr(Imm::Known(0)),
         param_type: ParamType::None,
         cycles: 3,
         branch_cycles: None,
@@ -1436,7 +1438,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x87
     Instruction {
-        mnemonic: Mnemonic("RES", Some(Opd::Num(0)), Some(Opd::Reg(A))),
+        mnemonic: Mnemonic::ResReg8(Imm::Known(0), Reg8::A),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1446,7 +1448,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x88
     Instruction {
-        mnemonic: Mnemonic("RES", Some(Opd::Num(1)), Some(Opd::Reg(B))),
+        mnemonic: Mnemonic::ResReg8(Imm::Known(1), Reg8::B),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1456,7 +1458,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x89
     Instruction {
-        mnemonic: Mnemonic("RES", Some(Opd::Num(1)), Some(Opd::Reg(C))),
+        mnemonic: Mnemonic::ResReg8(Imm::Known(1), Reg8::C),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1466,7 +1468,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x8a
     Instruction {
-        mnemonic: Mnemonic("RES", Some(Opd::Num(1)), Some(Opd::Reg(D))),
+        mnemonic: Mnemonic::ResReg8(Imm::Known(1), Reg8::D),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1476,7 +1478,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x8b
     Instruction {
-        mnemonic: Mnemonic("RES", Some(Opd::Num(1)), Some(Opd::Reg(E))),
+        mnemonic: Mnemonic::ResReg8(Imm::Known(1), Reg8::E),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1486,7 +1488,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x8c
     Instruction {
-        mnemonic: Mnemonic("RES", Some(Opd::Num(1)), Some(Opd::Reg(H))),
+        mnemonic: Mnemonic::ResReg8(Imm::Known(1), Reg8::H),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1496,7 +1498,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x8d
     Instruction {
-        mnemonic: Mnemonic("RES", Some(Opd::Num(1)), Some(Opd::Reg(L))),
+        mnemonic: Mnemonic::ResReg8(Imm::Known(1), Reg8::L),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1506,7 +1508,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x8e
     Instruction {
-        mnemonic: Mnemonic("RES", Some(Opd::Num(1)), Some(Opd::Addr(FromReg(HL)))),
+        mnemonic: Mnemonic::ResHlAddr(Imm::Known(1)),
         param_type: ParamType::None,
         cycles: 3,
         branch_cycles: None,
@@ -1517,7 +1519,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x8f
     Instruction {
-        mnemonic: Mnemonic("RES", Some(Opd::Num(1)), Some(Opd::Reg(A))),
+        mnemonic: Mnemonic::ResReg8(Imm::Known(1), Reg8::A),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1527,7 +1529,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x90
     Instruction {
-        mnemonic: Mnemonic("RES", Some(Opd::Num(2)), Some(Opd::Reg(B))),
+        mnemonic: Mnemonic::ResReg8(Imm::Known(2), Reg8::B),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1537,7 +1539,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x91
     Instruction {
-        mnemonic: Mnemonic("RES", Some(Opd::Num(2)), Some(Opd::Reg(C))),
+        mnemonic: Mnemonic::ResReg8(Imm::Known(2), Reg8::C),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1547,7 +1549,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x92
     Instruction {
-        mnemonic: Mnemonic("RES", Some(Opd::Num(2)), Some(Opd::Reg(D))),
+        mnemonic: Mnemonic::ResReg8(Imm::Known(2), Reg8::D),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1557,7 +1559,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x93
     Instruction {
-        mnemonic: Mnemonic("RES", Some(Opd::Num(2)), Some(Opd::Reg(E))),
+        mnemonic: Mnemonic::ResReg8(Imm::Known(2), Reg8::E),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1567,7 +1569,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x94
     Instruction {
-        mnemonic: Mnemonic("RES", Some(Opd::Num(2)), Some(Opd::Reg(H))),
+        mnemonic: Mnemonic::ResReg8(Imm::Known(2), Reg8::H),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1577,7 +1579,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x95
     Instruction {
-        mnemonic: Mnemonic("RES", Some(Opd::Num(2)), Some(Opd::Reg(L))),
+        mnemonic: Mnemonic::ResReg8(Imm::Known(2), Reg8::L),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1587,7 +1589,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x96
     Instruction {
-        mnemonic: Mnemonic("RES", Some(Opd::Num(2)), Some(Opd::Addr(FromReg(HL)))),
+        mnemonic: Mnemonic::ResHlAddr(Imm::Known(2)),
         param_type: ParamType::None,
         cycles: 3,
         branch_cycles: None,
@@ -1598,7 +1600,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x97
     Instruction {
-        mnemonic: Mnemonic("RES", Some(Opd::Num(2)), Some(Opd::Reg(A))),
+        mnemonic: Mnemonic::ResReg8(Imm::Known(2), Reg8::A),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1608,7 +1610,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x98
     Instruction {
-        mnemonic: Mnemonic("RES", Some(Opd::Num(3)), Some(Opd::Reg(B))),
+        mnemonic: Mnemonic::ResReg8(Imm::Known(3), Reg8::B),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1618,7 +1620,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x99
     Instruction {
-        mnemonic: Mnemonic("RES", Some(Opd::Num(3)), Some(Opd::Reg(C))),
+        mnemonic: Mnemonic::ResReg8(Imm::Known(3), Reg8::C),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1628,7 +1630,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x9a
     Instruction {
-        mnemonic: Mnemonic("RES", Some(Opd::Num(3)), Some(Opd::Reg(D))),
+        mnemonic: Mnemonic::ResReg8(Imm::Known(3), Reg8::D),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1638,7 +1640,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x9b
     Instruction {
-        mnemonic: Mnemonic("RES", Some(Opd::Num(3)), Some(Opd::Reg(E))),
+        mnemonic: Mnemonic::ResReg8(Imm::Known(3), Reg8::E),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1648,7 +1650,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x9c
     Instruction {
-        mnemonic: Mnemonic("RES", Some(Opd::Num(3)), Some(Opd::Reg(H))),
+        mnemonic: Mnemonic::ResReg8(Imm::Known(3), Reg8::H),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1658,7 +1660,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x9d
     Instruction {
-        mnemonic: Mnemonic("RES", Some(Opd::Num(3)), Some(Opd::Reg(L))),
+        mnemonic: Mnemonic::ResReg8(Imm::Known(3), Reg8::L),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1668,7 +1670,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x9e
     Instruction {
-        mnemonic: Mnemonic("RES", Some(Opd::Num(3)), Some(Opd::Addr(FromReg(HL)))),
+        mnemonic: Mnemonic::ResHlAddr(Imm::Known(3)),
         param_type: ParamType::None,
         cycles: 3,
         branch_cycles: None,
@@ -1679,7 +1681,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0x9f
     Instruction {
-        mnemonic: Mnemonic("RES", Some(Opd::Num(3)), Some(Opd::Reg(A))),
+        mnemonic: Mnemonic::ResReg8(Imm::Known(3), Reg8::A),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1689,7 +1691,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0xa0
     Instruction {
-        mnemonic: Mnemonic("RES", Some(Opd::Num(4)), Some(Opd::Reg(B))),
+        mnemonic: Mnemonic::ResReg8(Imm::Known(4), Reg8::B),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1699,7 +1701,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0xa1
     Instruction {
-        mnemonic: Mnemonic("RES", Some(Opd::Num(4)), Some(Opd::Reg(C))),
+        mnemonic: Mnemonic::ResReg8(Imm::Known(4), Reg8::C),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1709,7 +1711,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0xa2
     Instruction {
-        mnemonic: Mnemonic("RES", Some(Opd::Num(4)), Some(Opd::Reg(D))),
+        mnemonic: Mnemonic::ResReg8(Imm::Known(4), Reg8::D),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1719,7 +1721,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0xa3
     Instruction {
-        mnemonic: Mnemonic("RES", Some(Opd::Num(4)), Some(Opd::Reg(E))),
+        mnemonic: Mnemonic::ResReg8(Imm::Known(4), Reg8::E),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1729,7 +1731,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0xa4
     Instruction {
-        mnemonic: Mnemonic("RES", Some(Opd::Num(4)), Some(Opd::Reg(H))),
+        mnemonic: Mnemonic::ResReg8(Imm::Known(4), Reg8::H),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1739,7 +1741,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0xa5
     Instruction {
-        mnemonic: Mnemonic("RES", Some(Opd::Num(4)), Some(Opd::Reg(L))),
+        mnemonic: Mnemonic::ResReg8(Imm::Known(4), Reg8::L),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1749,7 +1751,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0xa6
     Instruction {
-        mnemonic: Mnemonic("RES", Some(Opd::Num(4)), Some(Opd::Addr(FromReg(HL)))),
+        mnemonic: Mnemonic::ResHlAddr(Imm::Known(4)),
         param_type: ParamType::None,
         cycles: 3,
         branch_cycles: None,
@@ -1760,7 +1762,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0xa7
     Instruction {
-        mnemonic: Mnemonic("RES", Some(Opd::Num(4)), Some(Opd::Reg(A))),
+        mnemonic: Mnemonic::ResReg8(Imm::Known(4), Reg8::A),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1770,7 +1772,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0xa8
     Instruction {
-        mnemonic: Mnemonic("RES", Some(Opd::Num(5)), Some(Opd::Reg(B))),
+        mnemonic: Mnemonic::ResReg8(Imm::Known(5), Reg8::B),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1780,7 +1782,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0xa9
     Instruction {
-        mnemonic: Mnemonic("RES", Some(Opd::Num(5)), Some(Opd::Reg(C))),
+        mnemonic: Mnemonic::ResReg8(Imm::Known(5), Reg8::C),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1790,7 +1792,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0xaa
     Instruction {
-        mnemonic: Mnemonic("RES", Some(Opd::Num(5)), Some(Opd::Reg(D))),
+        mnemonic: Mnemonic::ResReg8(Imm::Known(5), Reg8::D),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1800,7 +1802,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0xab
     Instruction {
-        mnemonic: Mnemonic("RES", Some(Opd::Num(5)), Some(Opd::Reg(E))),
+        mnemonic: Mnemonic::ResReg8(Imm::Known(5), Reg8::E),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1810,7 +1812,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0xac
     Instruction {
-        mnemonic: Mnemonic("RES", Some(Opd::Num(5)), Some(Opd::Reg(H))),
+        mnemonic: Mnemonic::ResReg8(Imm::Known(5), Reg8::H),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1820,7 +1822,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0xad
     Instruction {
-        mnemonic: Mnemonic("RES", Some(Opd::Num(5)), Some(Opd::Reg(L))),
+        mnemonic: Mnemonic::ResReg8(Imm::Known(5), Reg8::L),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1830,7 +1832,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0xae
     Instruction {
-        mnemonic: Mnemonic("RES", Some(Opd::Num(5)), Some(Opd::Addr(FromReg(HL)))),
+        mnemonic: Mnemonic::ResHlAddr(Imm::Known(5)),
         param_type: ParamType::None,
         cycles: 3,
         branch_cycles: None,
@@ -1841,7 +1843,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0xaf
     Instruction {
-        mnemonic: Mnemonic("RES", Some(Opd::Num(5)), Some(Opd::Reg(A))),
+        mnemonic: Mnemonic::ResReg8(Imm::Known(5), Reg8::A),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1851,7 +1853,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0xb0
     Instruction {
-        mnemonic: Mnemonic("RES", Some(Opd::Num(6)), Some(Opd::Reg(B))),
+        mnemonic: Mnemonic::ResReg8(Imm::Known(6), Reg8::B),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1861,7 +1863,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0xb1
     Instruction {
-        mnemonic: Mnemonic("RES", Some(Opd::Num(6)), Some(Opd::Reg(C))),
+        mnemonic: Mnemonic::ResReg8(Imm::Known(6), Reg8::C),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1871,7 +1873,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0xb2
     Instruction {
-        mnemonic: Mnemonic("RES", Some(Opd::Num(6)), Some(Opd::Reg(D))),
+        mnemonic: Mnemonic::ResReg8(Imm::Known(6), Reg8::D),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1881,7 +1883,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0xb3
     Instruction {
-        mnemonic: Mnemonic("RES", Some(Opd::Num(6)), Some(Opd::Reg(E))),
+        mnemonic: Mnemonic::ResReg8(Imm::Known(6), Reg8::E),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1891,7 +1893,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0xb4
     Instruction {
-        mnemonic: Mnemonic("RES", Some(Opd::Num(6)), Some(Opd::Reg(H))),
+        mnemonic: Mnemonic::ResReg8(Imm::Known(6), Reg8::H),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1901,7 +1903,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0xb5
     Instruction {
-        mnemonic: Mnemonic("RES", Some(Opd::Num(6)), Some(Opd::Reg(L))),
+        mnemonic: Mnemonic::ResReg8(Imm::Known(6), Reg8::L),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1911,7 +1913,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0xb6
     Instruction {
-        mnemonic: Mnemonic("RES", Some(Opd::Num(6)), Some(Opd::Addr(FromReg(HL)))),
+        mnemonic: Mnemonic::ResHlAddr(Imm::Known(6)),
         param_type: ParamType::None,
         cycles: 3,
         branch_cycles: None,
@@ -1922,7 +1924,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0xb7
     Instruction {
-        mnemonic: Mnemonic("RES", Some(Opd::Num(6)), Some(Opd::Reg(A))),
+        mnemonic: Mnemonic::ResReg8(Imm::Known(6), Reg8::A),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1932,7 +1934,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0xb8
     Instruction {
-        mnemonic: Mnemonic("RES", Some(Opd::Num(7)), Some(Opd::Reg(B))),
+        mnemonic: Mnemonic::ResReg8(Imm::Known(7), Reg8::B),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1942,7 +1944,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0xb9
     Instruction {
-        mnemonic: Mnemonic("RES", Some(Opd::Num(7)), Some(Opd::Reg(C))),
+        mnemonic: Mnemonic::ResReg8(Imm::Known(7), Reg8::C),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1952,7 +1954,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0xba
     Instruction {
-        mnemonic: Mnemonic("RES", Some(Opd::Num(7)), Some(Opd::Reg(D))),
+        mnemonic: Mnemonic::ResReg8(Imm::Known(7), Reg8::D),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1962,7 +1964,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0xbb
     Instruction {
-        mnemonic: Mnemonic("RES", Some(Opd::Num(7)), Some(Opd::Reg(E))),
+        mnemonic: Mnemonic::ResReg8(Imm::Known(7), Reg8::E),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1972,7 +1974,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0xbc
     Instruction {
-        mnemonic: Mnemonic("RES", Some(Opd::Num(7)), Some(Opd::Reg(H))),
+        mnemonic: Mnemonic::ResReg8(Imm::Known(7), Reg8::H),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1982,7 +1984,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0xbd
     Instruction {
-        mnemonic: Mnemonic("RES", Some(Opd::Num(7)), Some(Opd::Reg(L))),
+        mnemonic: Mnemonic::ResReg8(Imm::Known(7), Reg8::L),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -1992,7 +1994,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0xbe
     Instruction {
-        mnemonic: Mnemonic("RES", Some(Opd::Num(7)), Some(Opd::Addr(FromReg(HL)))),
+        mnemonic: Mnemonic::ResHlAddr(Imm::Known(7)),
         param_type: ParamType::None,
         cycles: 3,
         branch_cycles: None,
@@ -2003,7 +2005,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0xbf
     Instruction {
-        mnemonic: Mnemonic("RES", Some(Opd::Num(7)), Some(Opd::Reg(A))),
+        mnemonic: Mnemonic::ResReg8(Imm::Known(7), Reg8::A),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -2013,7 +2015,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0xc0
     Instruction {
-        mnemonic: Mnemonic("SET", Some(Opd::Num(0)), Some(Opd::Reg(B))),
+        mnemonic: Mnemonic::SetReg8(Imm::Known(0), Reg8::B),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -2023,7 +2025,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0xc1
     Instruction {
-        mnemonic: Mnemonic("SET", Some(Opd::Num(0)), Some(Opd::Reg(C))),
+        mnemonic: Mnemonic::SetReg8(Imm::Known(0), Reg8::C),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -2033,7 +2035,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0xc2
     Instruction {
-        mnemonic: Mnemonic("SET", Some(Opd::Num(0)), Some(Opd::Reg(D))),
+        mnemonic: Mnemonic::SetReg8(Imm::Known(0), Reg8::D),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -2043,7 +2045,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0xc3
     Instruction {
-        mnemonic: Mnemonic("SET", Some(Opd::Num(0)), Some(Opd::Reg(E))),
+        mnemonic: Mnemonic::SetReg8(Imm::Known(0), Reg8::E),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -2053,7 +2055,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0xc4
     Instruction {
-        mnemonic: Mnemonic("SET", Some(Opd::Num(0)), Some(Opd::Reg(H))),
+        mnemonic: Mnemonic::SetReg8(Imm::Known(0), Reg8::H),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -2063,7 +2065,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0xc5
     Instruction {
-        mnemonic: Mnemonic("SET", Some(Opd::Num(0)), Some(Opd::Reg(L))),
+        mnemonic: Mnemonic::SetReg8(Imm::Known(0), Reg8::L),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -2073,7 +2075,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0xc6
     Instruction {
-        mnemonic: Mnemonic("SET", Some(Opd::Num(0)), Some(Opd::Addr(FromReg(HL)))),
+        mnemonic: Mnemonic::SetHlAddr(Imm::Known(0)),
         param_type: ParamType::None,
         cycles: 3,
         branch_cycles: None,
@@ -2084,7 +2086,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0xc7
     Instruction {
-        mnemonic: Mnemonic("SET", Some(Opd::Num(0)), Some(Opd::Reg(A))),
+        mnemonic: Mnemonic::SetReg8(Imm::Known(0), Reg8::A),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -2094,7 +2096,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0xc8
     Instruction {
-        mnemonic: Mnemonic("SET", Some(Opd::Num(1)), Some(Opd::Reg(B))),
+        mnemonic: Mnemonic::SetReg8(Imm::Known(1), Reg8::B),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -2104,7 +2106,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0xc9
     Instruction {
-        mnemonic: Mnemonic("SET", Some(Opd::Num(1)), Some(Opd::Reg(C))),
+        mnemonic: Mnemonic::SetReg8(Imm::Known(1), Reg8::C),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -2114,7 +2116,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0xca
     Instruction {
-        mnemonic: Mnemonic("SET", Some(Opd::Num(1)), Some(Opd::Reg(D))),
+        mnemonic: Mnemonic::SetReg8(Imm::Known(1), Reg8::D),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -2124,7 +2126,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0xcb
     Instruction {
-        mnemonic: Mnemonic("SET", Some(Opd::Num(1)), Some(Opd::Reg(E))),
+        mnemonic: Mnemonic::SetReg8(Imm::Known(1), Reg8::E),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -2134,7 +2136,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0xcc
     Instruction {
-        mnemonic: Mnemonic("SET", Some(Opd::Num(1)), Some(Opd::Reg(H))),
+        mnemonic: Mnemonic::SetReg8(Imm::Known(1), Reg8::H),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -2144,7 +2146,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0xcd
     Instruction {
-        mnemonic: Mnemonic("SET", Some(Opd::Num(1)), Some(Opd::Reg(L))),
+        mnemonic: Mnemonic::SetReg8(Imm::Known(1), Reg8::L),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -2154,7 +2156,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0xce
     Instruction {
-        mnemonic: Mnemonic("SET", Some(Opd::Num(1)), Some(Opd::Addr(FromReg(HL)))),
+        mnemonic: Mnemonic::SetHlAddr(Imm::Known(1)),
         param_type: ParamType::None,
         cycles: 3,
         branch_cycles: None,
@@ -2165,7 +2167,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0xcf
     Instruction {
-        mnemonic: Mnemonic("SET", Some(Opd::Num(1)), Some(Opd::Reg(A))),
+        mnemonic: Mnemonic::SetReg8(Imm::Known(1), Reg8::A),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -2175,7 +2177,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0xd0
     Instruction {
-        mnemonic: Mnemonic("SET", Some(Opd::Num(2)), Some(Opd::Reg(B))),
+        mnemonic: Mnemonic::SetReg8(Imm::Known(2), Reg8::B),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -2185,7 +2187,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0xd1
     Instruction {
-        mnemonic: Mnemonic("SET", Some(Opd::Num(2)), Some(Opd::Reg(C))),
+        mnemonic: Mnemonic::SetReg8(Imm::Known(2), Reg8::C),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -2195,7 +2197,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0xd2
     Instruction {
-        mnemonic: Mnemonic("SET", Some(Opd::Num(2)), Some(Opd::Reg(D))),
+        mnemonic: Mnemonic::SetReg8(Imm::Known(2), Reg8::D),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -2205,7 +2207,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0xd3
     Instruction {
-        mnemonic: Mnemonic("SET", Some(Opd::Num(2)), Some(Opd::Reg(E))),
+        mnemonic: Mnemonic::SetReg8(Imm::Known(2), Reg8::E),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -2215,7 +2217,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0xd4
     Instruction {
-        mnemonic: Mnemonic("SET", Some(Opd::Num(2)), Some(Opd::Reg(H))),
+        mnemonic: Mnemonic::SetReg8(Imm::Known(2), Reg8::H),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -2225,7 +2227,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0xd5
     Instruction {
-        mnemonic: Mnemonic("SET", Some(Opd::Num(2)), Some(Opd::Reg(L))),
+        mnemonic: Mnemonic::SetReg8(Imm::Known(2), Reg8::L),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -2235,7 +2237,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0xd6
     Instruction {
-        mnemonic: Mnemonic("SET", Some(Opd::Num(2)), Some(Opd::Addr(FromReg(HL)))),
+        mnemonic: Mnemonic::SetHlAddr(Imm::Known(2)),
         param_type: ParamType::None,
         cycles: 3,
         branch_cycles: None,
@@ -2246,7 +2248,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0xd7
     Instruction {
-        mnemonic: Mnemonic("SET", Some(Opd::Num(2)), Some(Opd::Reg(A))),
+        mnemonic: Mnemonic::SetReg8(Imm::Known(2), Reg8::A),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -2256,7 +2258,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0xd8
     Instruction {
-        mnemonic: Mnemonic("SET", Some(Opd::Num(3)), Some(Opd::Reg(B))),
+        mnemonic: Mnemonic::SetReg8(Imm::Known(3), Reg8::B),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -2266,7 +2268,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0xd9
     Instruction {
-        mnemonic: Mnemonic("SET", Some(Opd::Num(3)), Some(Opd::Reg(C))),
+        mnemonic: Mnemonic::SetReg8(Imm::Known(3), Reg8::C),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -2276,7 +2278,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0xda
     Instruction {
-        mnemonic: Mnemonic("SET", Some(Opd::Num(3)), Some(Opd::Reg(D))),
+        mnemonic: Mnemonic::SetReg8(Imm::Known(3), Reg8::D),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -2286,7 +2288,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0xdb
     Instruction {
-        mnemonic: Mnemonic("SET", Some(Opd::Num(3)), Some(Opd::Reg(E))),
+        mnemonic: Mnemonic::SetReg8(Imm::Known(3), Reg8::E),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -2296,7 +2298,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0xdc
     Instruction {
-        mnemonic: Mnemonic("SET", Some(Opd::Num(3)), Some(Opd::Reg(H))),
+        mnemonic: Mnemonic::SetReg8(Imm::Known(3), Reg8::H),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -2306,7 +2308,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0xdd
     Instruction {
-        mnemonic: Mnemonic("SET", Some(Opd::Num(3)), Some(Opd::Reg(L))),
+        mnemonic: Mnemonic::SetReg8(Imm::Known(3), Reg8::L),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -2316,7 +2318,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0xde
     Instruction {
-        mnemonic: Mnemonic("SET", Some(Opd::Num(3)), Some(Opd::Addr(FromReg(HL)))),
+        mnemonic: Mnemonic::SetHlAddr(Imm::Known(3)),
         param_type: ParamType::None,
         cycles: 3,
         branch_cycles: None,
@@ -2327,7 +2329,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0xdf
     Instruction {
-        mnemonic: Mnemonic("SET", Some(Opd::Num(3)), Some(Opd::Reg(A))),
+        mnemonic: Mnemonic::SetReg8(Imm::Known(3), Reg8::A),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -2337,7 +2339,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0xe0
     Instruction {
-        mnemonic: Mnemonic("SET", Some(Opd::Num(4)), Some(Opd::Reg(B))),
+        mnemonic: Mnemonic::SetReg8(Imm::Known(4), Reg8::B),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -2347,7 +2349,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0xe1
     Instruction {
-        mnemonic: Mnemonic("SET", Some(Opd::Num(4)), Some(Opd::Reg(C))),
+        mnemonic: Mnemonic::SetReg8(Imm::Known(4), Reg8::C),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -2357,7 +2359,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0xe2
     Instruction {
-        mnemonic: Mnemonic("SET", Some(Opd::Num(4)), Some(Opd::Reg(D))),
+        mnemonic: Mnemonic::SetReg8(Imm::Known(4), Reg8::D),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -2367,7 +2369,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0xe3
     Instruction {
-        mnemonic: Mnemonic("SET", Some(Opd::Num(4)), Some(Opd::Reg(E))),
+        mnemonic: Mnemonic::SetReg8(Imm::Known(4), Reg8::E),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -2377,7 +2379,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0xe4
     Instruction {
-        mnemonic: Mnemonic("SET", Some(Opd::Num(4)), Some(Opd::Reg(H))),
+        mnemonic: Mnemonic::SetReg8(Imm::Known(4), Reg8::H),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -2387,7 +2389,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0xe5
     Instruction {
-        mnemonic: Mnemonic("SET", Some(Opd::Num(4)), Some(Opd::Reg(L))),
+        mnemonic: Mnemonic::SetReg8(Imm::Known(4), Reg8::L),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -2397,7 +2399,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0xe6
     Instruction {
-        mnemonic: Mnemonic("SET", Some(Opd::Num(4)), Some(Opd::Addr(FromReg(HL)))),
+        mnemonic: Mnemonic::SetHlAddr(Imm::Known(4)),
         param_type: ParamType::None,
         cycles: 3,
         branch_cycles: None,
@@ -2408,7 +2410,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0xe7
     Instruction {
-        mnemonic: Mnemonic("SET", Some(Opd::Num(4)), Some(Opd::Reg(A))),
+        mnemonic: Mnemonic::SetReg8(Imm::Known(4), Reg8::A),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -2418,7 +2420,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0xe8
     Instruction {
-        mnemonic: Mnemonic("SET", Some(Opd::Num(5)), Some(Opd::Reg(B))),
+        mnemonic: Mnemonic::SetReg8(Imm::Known(5), Reg8::B),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -2428,7 +2430,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0xe9
     Instruction {
-        mnemonic: Mnemonic("SET", Some(Opd::Num(5)), Some(Opd::Reg(C))),
+        mnemonic: Mnemonic::SetReg8(Imm::Known(5), Reg8::C),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -2438,7 +2440,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0xea
     Instruction {
-        mnemonic: Mnemonic("SET", Some(Opd::Num(5)), Some(Opd::Reg(D))),
+        mnemonic: Mnemonic::SetReg8(Imm::Known(5), Reg8::D),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -2448,7 +2450,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0xeb
     Instruction {
-        mnemonic: Mnemonic("SET", Some(Opd::Num(5)), Some(Opd::Reg(E))),
+        mnemonic: Mnemonic::SetReg8(Imm::Known(5), Reg8::E),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -2458,7 +2460,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0xec
     Instruction {
-        mnemonic: Mnemonic("SET", Some(Opd::Num(5)), Some(Opd::Reg(H))),
+        mnemonic: Mnemonic::SetReg8(Imm::Known(5), Reg8::H),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -2468,7 +2470,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0xed
     Instruction {
-        mnemonic: Mnemonic("SET", Some(Opd::Num(5)), Some(Opd::Reg(L))),
+        mnemonic: Mnemonic::SetReg8(Imm::Known(5), Reg8::L),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -2478,7 +2480,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0xee
     Instruction {
-        mnemonic: Mnemonic("SET", Some(Opd::Num(5)), Some(Opd::Addr(FromReg(HL)))),
+        mnemonic: Mnemonic::SetHlAddr(Imm::Known(5)),
         param_type: ParamType::None,
         cycles: 3,
         branch_cycles: None,
@@ -2489,7 +2491,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0xef
     Instruction {
-        mnemonic: Mnemonic("SET", Some(Opd::Num(5)), Some(Opd::Reg(A))),
+        mnemonic: Mnemonic::SetReg8(Imm::Known(5), Reg8::A),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -2499,7 +2501,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0xf0
     Instruction {
-        mnemonic: Mnemonic("SET", Some(Opd::Num(6)), Some(Opd::Reg(B))),
+        mnemonic: Mnemonic::SetReg8(Imm::Known(6), Reg8::B),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -2509,7 +2511,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0xf1
     Instruction {
-        mnemonic: Mnemonic("SET", Some(Opd::Num(6)), Some(Opd::Reg(C))),
+        mnemonic: Mnemonic::SetReg8(Imm::Known(6), Reg8::C),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -2519,7 +2521,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0xf2
     Instruction {
-        mnemonic: Mnemonic("SET", Some(Opd::Num(6)), Some(Opd::Reg(D))),
+        mnemonic: Mnemonic::SetReg8(Imm::Known(6), Reg8::D),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -2529,7 +2531,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0xf3
     Instruction {
-        mnemonic: Mnemonic("SET", Some(Opd::Num(6)), Some(Opd::Reg(E))),
+        mnemonic: Mnemonic::SetReg8(Imm::Known(6), Reg8::E),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -2539,7 +2541,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0xf4
     Instruction {
-        mnemonic: Mnemonic("SET", Some(Opd::Num(6)), Some(Opd::Reg(H))),
+        mnemonic: Mnemonic::SetReg8(Imm::Known(6), Reg8::H),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -2549,7 +2551,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0xf5
     Instruction {
-        mnemonic: Mnemonic("SET", Some(Opd::Num(6)), Some(Opd::Reg(L))),
+        mnemonic: Mnemonic::SetReg8(Imm::Known(6), Reg8::L),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -2559,7 +2561,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0xf6
     Instruction {
-        mnemonic: Mnemonic("SET", Some(Opd::Num(6)), Some(Opd::Addr(FromReg(HL)))),
+        mnemonic: Mnemonic::SetHlAddr(Imm::Known(6)),
         param_type: ParamType::None,
         cycles: 3,
         branch_cycles: None,
@@ -2570,7 +2572,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0xf7
     Instruction {
-        mnemonic: Mnemonic("SET", Some(Opd::Num(6)), Some(Opd::Reg(A))),
+        mnemonic: Mnemonic::SetReg8(Imm::Known(6), Reg8::A),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -2580,7 +2582,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0xf8
     Instruction {
-        mnemonic: Mnemonic("SET", Some(Opd::Num(7)), Some(Opd::Reg(B))),
+        mnemonic: Mnemonic::SetReg8(Imm::Known(7), Reg8::B),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -2590,7 +2592,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0xf9
     Instruction {
-        mnemonic: Mnemonic("SET", Some(Opd::Num(7)), Some(Opd::Reg(C))),
+        mnemonic: Mnemonic::SetReg8(Imm::Known(7), Reg8::C),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -2600,7 +2602,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0xfa
     Instruction {
-        mnemonic: Mnemonic("SET", Some(Opd::Num(7)), Some(Opd::Reg(D))),
+        mnemonic: Mnemonic::SetReg8(Imm::Known(7), Reg8::D),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -2610,7 +2612,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0xfb
     Instruction {
-        mnemonic: Mnemonic("SET", Some(Opd::Num(7)), Some(Opd::Reg(E))),
+        mnemonic: Mnemonic::SetReg8(Imm::Known(7), Reg8::E),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -2620,7 +2622,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0xfc
     Instruction {
-        mnemonic: Mnemonic("SET", Some(Opd::Num(7)), Some(Opd::Reg(H))),
+        mnemonic: Mnemonic::SetReg8(Imm::Known(7), Reg8::H),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -2630,7 +2632,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0xfd
     Instruction {
-        mnemonic: Mnemonic("SET", Some(Opd::Num(7)), Some(Opd::Reg(L))),
+        mnemonic: Mnemonic::SetReg8(Imm::Known(7), Reg8::L),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,
@@ -2640,7 +2642,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0xfe
     Instruction {
-        mnemonic: Mnemonic("SET", Some(Opd::Num(7)), Some(Opd::Addr(FromReg(HL)))),
+        mnemonic: Mnemonic::SetHlAddr(Imm::Known(7)),
         param_type: ParamType::None,
         cycles: 3,
         branch_cycles: None,
@@ -2651,7 +2653,7 @@ pub const BITWISE_INSTRS: InstrSet = [
     },
     // 0xff
     Instruction {
-        mnemonic: Mnemonic("SET", Some(Opd::Num(7)), Some(Opd::Reg(A))),
+        mnemonic: Mnemonic::SetReg8(Imm::Known(7), Reg8::A),
         param_type: ParamType::None,
         cycles: 1,
         branch_cycles: None,

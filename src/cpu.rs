@@ -6,7 +6,7 @@ use crate::interfaces::{GameboyJoypad, GameboyLcd, GameboySerial};
 pub use interrupts::{IntReg, InterruptControl};
 use registers::Regs;
 
-use self::instructions::{InstrSet, BASE_INSTRS};
+use self::instructions::{BASE_INSTRS, BITWISE_INSTRS, BITWISE_PREFIX};
 
 /// State of the Interrupt Master Enable (IME).
 /// - Disabled: All interrupts are disabled.
@@ -56,7 +56,7 @@ impl Cpu {
                 self.halted = false;
             }
         } else {
-            self.execute(BASE_INSTRS);
+            self.execute_next();
         }
 
         if self.ime == ImeState::Enabled {
@@ -67,11 +67,17 @@ impl Cpu {
         }
     }
 
-    /// Executes the instruction at `(PC)` according to the given `instrs`.
-    fn execute(&mut self, instrs: InstrSet) {
+    /// Executes the instruction currently at `(PC)`.
+    fn execute_next(&mut self) {
         let opcode = self.fetch_byte();
-        let instr = &instrs[opcode as usize];
-        log::trace!("CPU: Executing `{}`", instr.disasm_static());
+        let instr = match opcode {
+            BITWISE_PREFIX => {
+                let opcode = self.fetch_byte();
+                &BITWISE_INSTRS[opcode as usize]
+            }
+            _ => &BASE_INSTRS[opcode as usize],
+        };
+        log::trace!("CPU: Executing `{}`", instr.mnemonic());
         instr.execute(self);
     }
 
