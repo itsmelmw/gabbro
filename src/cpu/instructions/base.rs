@@ -9,16 +9,16 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::Nop,
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |_| {},
     },
     // 0x01
     Instruction {
         mnemonic: Mnemonic::LdReg16Imm(Reg16::BC, Imm::Unknown), //Mnemonic("LD", Some(Opd::Reg(BC)), Some(Opd::Param(U16))),
         param_type: ParamType::Word,
-        cycles: 3,
-        branch_cycles: None,
+        _cycles: 3,
+        _branch_cycles: None,
         operation: |cpu| {
             let val = cpu.fetch_word();
             cpu.regs.set_bc(val);
@@ -28,8 +28,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::LdAddrReg8(Addr::Reg16(Reg16::BC), Reg8::A), //Mnemonic("LD", Some(Opd::Addr(FromReg(BC))), Some(Opd::Reg(A))),
         param_type: ParamType::None,
-        cycles: 2,
-        branch_cycles: None,
+        _cycles: 2,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.write_byte(cpu.regs.bc(), cpu.regs.a());
         },
@@ -38,8 +38,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::IncReg16(Reg16::BC), //Mnemonic("INC", Some(Opd::Reg(BC)), None),
         param_type: ParamType::None,
-        cycles: 2,
-        branch_cycles: None,
+        _cycles: 2,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.cycle();
             cpu.regs.set_bc(cpu.regs.bc().wrapping_add(1));
@@ -49,8 +49,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::IncReg8(Reg8::B), //Mnemonic("INC", Some(Opd::Reg(B)), None),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             let res = helpers::inc(cpu, cpu.regs.b());
             cpu.regs.set_b(res);
@@ -60,8 +60,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::DecReg8(Reg8::B), //Mnemonic("DEC", Some(Opd::Reg(B)), None),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             let res = helpers::dec(cpu, cpu.regs.b());
             cpu.regs.set_b(res);
@@ -71,8 +71,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::LdReg8Imm(Reg8::B, Imm::Unknown), //Mnemonic("LD", Some(Opd::Reg(B)), Some(Opd::Param(U8))),
         param_type: ParamType::Byte,
-        cycles: 2,
-        branch_cycles: None,
+        _cycles: 2,
+        _branch_cycles: None,
         operation: |cpu| {
             let val = cpu.fetch_byte();
             cpu.regs.set_b(val);
@@ -82,8 +82,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::Rlca, //Mnemonic("RLCA", None, None),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             let res = helpers::rlc(cpu, cpu.regs.a());
             cpu.regs.flags().set_z(false);
@@ -94,8 +94,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::LdImmAddrSp(Imm::Unknown), //Mnemonic("LD", Some(Opd::Addr(FromParam(U16))), Some(Opd::Reg(SP))),
         param_type: ParamType::Word,
-        cycles: 5,
-        branch_cycles: None,
+        _cycles: 5,
+        _branch_cycles: None,
         operation: |cpu| {
             let addr = cpu.fetch_word();
             cpu.write_word(addr, cpu.regs.sp());
@@ -105,8 +105,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::AddHlReg16(Reg16::BC), //Mnemonic("ADD", Some(Opd::Reg(HL)), Some(Opd::Reg(BC))),
         param_type: ParamType::None,
-        cycles: 2,
-        branch_cycles: None,
+        _cycles: 2,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.cycle();
             helpers::add_hl(cpu, cpu.regs.bc());
@@ -116,8 +116,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::LdReg8Addr(Reg8::A, Addr::Reg16(Reg16::BC)), // Mnemonic("LD", Some(Opd::Reg(A)), Some(Opd::Addr(FromReg(BC)))),
         param_type: ParamType::None,
-        cycles: 2,
-        branch_cycles: None,
+        _cycles: 2,
+        _branch_cycles: None,
         operation: |cpu| {
             let val = cpu.read_byte(cpu.regs.bc());
             cpu.regs.set_a(val);
@@ -127,8 +127,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::DecReg16(Reg16::BC), // Mnemonic("DEC", Some(Opd::Reg(BC)), None),
         param_type: ParamType::None,
-        cycles: 2,
-        branch_cycles: None,
+        _cycles: 2,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.cycle();
             cpu.regs.set_bc(cpu.regs.bc().wrapping_sub(1));
@@ -138,8 +138,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::IncReg8(Reg8::C), //Mnemonic("INC", Some(Opd::Reg(C)), None),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             let res = helpers::inc(cpu, cpu.regs.c());
             cpu.regs.set_c(res);
@@ -149,8 +149,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::DecReg8(Reg8::C), //Mnemonic("DEC", Some(Opd::Reg(C)), None),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             let res = helpers::dec(cpu, cpu.regs.c());
             cpu.regs.set_c(res);
@@ -160,8 +160,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::LdReg8Imm(Reg8::C, Imm::Unknown), // Mnemonic("LD", Some(Opd::Reg(C)), Some(Opd::Param(U8))),
         param_type: ParamType::Byte,
-        cycles: 2,
-        branch_cycles: None,
+        _cycles: 2,
+        _branch_cycles: None,
         operation: |cpu| {
             let val = cpu.fetch_byte();
             cpu.regs.set_c(val);
@@ -171,8 +171,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::Rrca, // Mnemonic("RRCA", None, None),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             let res = helpers::rrc(cpu, cpu.regs.a());
             cpu.regs.flags().set_z(false);
@@ -183,8 +183,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::Stop, // Mnemonic("STOP", None, None),
         param_type: ParamType::Byte,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |_| {
             log::warn!("STOP instruction called, but it is not implemented properly yet.");
             // TODO
@@ -194,8 +194,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::LdReg16Imm(Reg16::DE, Imm::Unknown), // Mnemonic("LD", Some(Opd::Reg(DE)), Some(Opd::Param(U16))),
         param_type: ParamType::Word,
-        cycles: 3,
-        branch_cycles: None,
+        _cycles: 3,
+        _branch_cycles: None,
         operation: |cpu| {
             let val = cpu.fetch_word();
             cpu.regs.set_de(val);
@@ -205,8 +205,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::LdAddrReg8(Addr::Reg16(Reg16::DE), Reg8::A), // Mnemonic("LD", Some(Opd::Addr(FromReg(DE))), Some(Opd::Reg(A))),
         param_type: ParamType::None,
-        cycles: 2,
-        branch_cycles: None,
+        _cycles: 2,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.write_byte(cpu.regs.de(), cpu.regs.a());
         },
@@ -215,8 +215,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::IncReg16(Reg16::DE), // Mnemonic("INC", Some(Opd::Reg(DE)), None),
         param_type: ParamType::None,
-        cycles: 2,
-        branch_cycles: None,
+        _cycles: 2,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.cycle();
             cpu.regs.set_de(cpu.regs.de().wrapping_add(1));
@@ -226,8 +226,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::IncReg8(Reg8::D), // Mnemonic("INC", Some(Opd::Reg(D)), None),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             let res = helpers::inc(cpu, cpu.regs.d());
             cpu.regs.set_d(res);
@@ -237,8 +237,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::DecReg8(Reg8::D), // Mnemonic("DEC", Some(Opd::Reg(D)), None),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             let res = helpers::dec(cpu, cpu.regs.d());
             cpu.regs.set_d(res);
@@ -248,8 +248,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::LdReg8Imm(Reg8::D, Imm::Unknown), // Mnemonic("LD", Some(Opd::Reg(D)), Some(Opd::Param(U8))),
         param_type: ParamType::Byte,
-        cycles: 2,
-        branch_cycles: None,
+        _cycles: 2,
+        _branch_cycles: None,
         operation: |cpu| {
             let val = cpu.fetch_byte();
             cpu.regs.set_d(val);
@@ -259,8 +259,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::Rla, //Mnemonic("RLA", None, None),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             let res = helpers::rl(cpu, cpu.regs.a());
             cpu.regs.flags().set_z(false);
@@ -271,8 +271,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::Jr(Imm::Unknown), // Mnemonic("JR", Some(Opd::Param(I8)), None),
         param_type: ParamType::Byte,
-        cycles: 3,
-        branch_cycles: None,
+        _cycles: 3,
+        _branch_cycles: None,
         operation: |cpu| {
             let val = cpu.fetch_byte() as i8;
             cpu.cycle();
@@ -283,8 +283,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::AddHlReg16(Reg16::DE), // Mnemonic("ADD", Some(Opd::Reg(HL)), Some(Opd::Reg(DE))),
         param_type: ParamType::None,
-        cycles: 2,
-        branch_cycles: None,
+        _cycles: 2,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.cycle();
             helpers::add_hl(cpu, cpu.regs.de());
@@ -294,8 +294,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::LdReg8Addr(Reg8::A, Addr::Reg16(Reg16::DE)), // Mnemonic("LD", Some(Opd::Reg(A)), Some(Opd::Addr(FromReg(DE)))),
         param_type: ParamType::None,
-        cycles: 2,
-        branch_cycles: None,
+        _cycles: 2,
+        _branch_cycles: None,
         operation: |cpu| {
             let val = cpu.read_byte(cpu.regs.de());
             cpu.regs.set_a(val);
@@ -305,8 +305,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::DecReg16(Reg16::DE), // Mnemonic("DEC", Some(Opd::Reg(DE)), None),
         param_type: ParamType::None,
-        cycles: 2,
-        branch_cycles: None,
+        _cycles: 2,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.cycle();
             cpu.regs.set_de(cpu.regs.de().wrapping_sub(1));
@@ -316,8 +316,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::IncReg8(Reg8::E), // Mnemonic("INC", Some(Opd::Reg(E)), None),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             let res = helpers::inc(cpu, cpu.regs.e());
             cpu.regs.set_e(res);
@@ -327,8 +327,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::DecReg8(Reg8::E), // Mnemonic("DEC", Some(Opd::Reg(E)), None),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             let res = helpers::dec(cpu, cpu.regs.e());
             cpu.regs.set_e(res);
@@ -338,8 +338,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::LdReg8Imm(Reg8::E, Imm::Unknown), // Mnemonic("LD", Some(Opd::Reg(E)), Some(Opd::Param(U8))),
         param_type: ParamType::Byte,
-        cycles: 2,
-        branch_cycles: None,
+        _cycles: 2,
+        _branch_cycles: None,
         operation: |cpu| {
             let val = cpu.fetch_byte();
             cpu.regs.set_e(val);
@@ -349,8 +349,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::Rra, // Mnemonic("RRA", None, None),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             let res = helpers::rr(cpu, cpu.regs.a());
             cpu.regs.flags().set_z(false);
@@ -361,8 +361,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::JrCond(Cond::NZ, Imm::Unknown), //Mnemonic("JR", Some(Opd::Cond(NotZero)), Some(Opd::Param(I8))),
         param_type: ParamType::Byte,
-        cycles: 2,
-        branch_cycles: Some(1),
+        _cycles: 2,
+        _branch_cycles: Some(1),
         operation: |cpu| {
             let val = cpu.fetch_byte() as i8;
             if !cpu.regs.flags().z() {
@@ -375,8 +375,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::LdReg16Imm(Reg16::HL, Imm::Unknown), // Mnemonic("LD", Some(Opd::Reg(HL)), Some(Opd::Param(U16))),
         param_type: ParamType::Word,
-        cycles: 3,
-        branch_cycles: None,
+        _cycles: 3,
+        _branch_cycles: None,
         operation: |cpu| {
             let val = cpu.fetch_word();
             cpu.regs.set_hl(val);
@@ -386,19 +386,20 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::LdAddrReg8(Addr::Reg16Inc(Reg16::HL), Reg8::A), // Mnemonic("LD", Some(Opd::Addr(FromRegInc(HL))), Some(Opd::Reg(A))),
         param_type: ParamType::None,
-        cycles: 2,
-        branch_cycles: None,
+        _cycles: 2,
+        _branch_cycles: None,
         operation: |cpu| {
-            let hl = cpu.regs.inc_hl();
+            let hl = cpu.regs.hl();
             cpu.write_byte(hl, cpu.regs.a());
+            cpu.regs.inc_hl();
         },
     },
     // 0x23
     Instruction {
         mnemonic: Mnemonic::IncReg16(Reg16::HL), // Mnemonic("INC", Some(Opd::Reg(HL)), None),
         param_type: ParamType::None,
-        cycles: 2,
-        branch_cycles: None,
+        _cycles: 2,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.cycle();
             cpu.regs.set_hl(cpu.regs.hl().wrapping_add(1));
@@ -408,8 +409,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::IncReg8(Reg8::H), // Mnemonic("INC", Some(Opd::Reg(H)), None),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             let res = helpers::inc(cpu, cpu.regs.h());
             cpu.regs.set_h(res);
@@ -419,8 +420,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::DecReg8(Reg8::H), // Mnemonic("DEC", Some(Opd::Reg(H)), None),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             let res = helpers::dec(cpu, cpu.regs.h());
             cpu.regs.set_h(res);
@@ -430,8 +431,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::LdReg8Imm(Reg8::H, Imm::Unknown), // Mnemonic("LD", Some(Opd::Reg(H)), Some(Opd::Param(U8))),
         param_type: ParamType::Byte,
-        cycles: 2,
-        branch_cycles: None,
+        _cycles: 2,
+        _branch_cycles: None,
         operation: |cpu| {
             let val = cpu.fetch_byte();
             cpu.regs.set_h(val);
@@ -441,8 +442,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::Daa, // Mnemonic("DAA", None, None),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             helpers::daa(cpu);
         },
@@ -451,8 +452,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::JrCond(Cond::Z, Imm::Unknown), // Mnemonic("JR", Some(Opd::Cond(Zero)), Some(Opd::Param(I8))),
         param_type: ParamType::Byte,
-        cycles: 2,
-        branch_cycles: Some(1),
+        _cycles: 2,
+        _branch_cycles: Some(1),
         operation: |cpu| {
             let val = cpu.fetch_byte() as i8;
             if cpu.regs.flags().z() {
@@ -465,8 +466,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::AddHlReg16(Reg16::HL), // Mnemonic("ADD", Some(Opd::Reg(HL)), Some(Opd::Reg(HL))),
         param_type: ParamType::None,
-        cycles: 2,
-        branch_cycles: None,
+        _cycles: 2,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.cycle();
             helpers::add_hl(cpu, cpu.regs.hl());
@@ -476,11 +477,12 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::LdReg8Addr(Reg8::A, Addr::Reg16Inc(Reg16::HL)), // Mnemonic("LD", Some(Opd::Reg(A)), Some(Opd::Addr(FromRegInc(HL)))),
         param_type: ParamType::None,
-        cycles: 2,
-        branch_cycles: None,
+        _cycles: 2,
+        _branch_cycles: None,
         operation: |cpu| {
-            let hl = cpu.regs.inc_hl();
+            let hl = cpu.regs.hl();
             let val = cpu.read_byte(hl);
+            cpu.regs.inc_hl();
             cpu.regs.set_a(val);
         },
     },
@@ -488,8 +490,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::DecReg16(Reg16::HL), // Mnemonic("DEC", Some(Opd::Reg(HL)), None),
         param_type: ParamType::None,
-        cycles: 2,
-        branch_cycles: None,
+        _cycles: 2,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.cycle();
             cpu.regs.set_hl(cpu.regs.hl().wrapping_sub(1));
@@ -499,8 +501,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::IncReg8(Reg8::L), // Mnemonic("INC", Some(Opd::Reg(L)), None),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             let res = helpers::inc(cpu, cpu.regs.l());
             cpu.regs.set_l(res);
@@ -510,8 +512,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::DecReg8(Reg8::L), // Mnemonic("DEC", Some(Opd::Reg(L)), None),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             let res = helpers::dec(cpu, cpu.regs.l());
             cpu.regs.set_l(res);
@@ -521,8 +523,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::LdReg8Imm(Reg8::L, Imm::Unknown), // Mnemonic("LD", Some(Opd::Reg(L)), Some(Opd::Param(U8))),
         param_type: ParamType::Byte,
-        cycles: 2,
-        branch_cycles: None,
+        _cycles: 2,
+        _branch_cycles: None,
         operation: |cpu| {
             let val = cpu.fetch_byte();
             cpu.regs.set_l(val);
@@ -532,8 +534,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::Cpl, // Mnemonic("CPL", None, None),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             helpers::cpl(cpu);
         },
@@ -542,8 +544,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::JrCond(Cond::NC, Imm::Unknown), // Mnemonic("JR", Some(Opd::Cond(NotCarry)), Some(Opd::Param(I8))),
         param_type: ParamType::Byte,
-        cycles: 2,
-        branch_cycles: Some(1),
+        _cycles: 2,
+        _branch_cycles: Some(1),
         operation: |cpu| {
             let val = cpu.fetch_byte() as i8;
             if !cpu.regs.flags().c() {
@@ -556,8 +558,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::LdReg16Imm(Reg16::SP, Imm::Unknown), // Mnemonic("LD", Some(Opd::Reg(SP)), Some(Opd::Param(U16))),
         param_type: ParamType::Word,
-        cycles: 3,
-        branch_cycles: None,
+        _cycles: 3,
+        _branch_cycles: None,
         operation: |cpu| {
             let val = cpu.fetch_word();
             cpu.regs.set_sp(val);
@@ -567,19 +569,20 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::LdAddrReg8(Addr::Reg16Dec(Reg16::HL), Reg8::A), // Mnemonic("LD", Some(Opd::Addr(FromRegDec(HL))), Some(Opd::Reg(A))),
         param_type: ParamType::None,
-        cycles: 2,
-        branch_cycles: None,
+        _cycles: 2,
+        _branch_cycles: None,
         operation: |cpu| {
-            let hl = cpu.regs.dec_hl();
+            let hl = cpu.regs.hl();
             cpu.write_byte(hl, cpu.regs.a());
+            cpu.regs.dec_hl();
         },
     },
     // 0x33
     Instruction {
         mnemonic: Mnemonic::IncReg16(Reg16::SP), // Mnemonic("INC", Some(Opd::Reg(SP)), None),
         param_type: ParamType::None,
-        cycles: 2,
-        branch_cycles: None,
+        _cycles: 2,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.cycle();
             cpu.regs.set_sp(cpu.regs.sp().wrapping_add(1));
@@ -589,8 +592,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::IncHlAddr, // Mnemonic("INC", Some(Opd::Addr(FromReg(HL))), None),
         param_type: ParamType::None,
-        cycles: 3,
-        branch_cycles: None,
+        _cycles: 3,
+        _branch_cycles: None,
         operation: |cpu| {
             let val = cpu.read_byte(cpu.regs.hl());
             let res = helpers::inc(cpu, val);
@@ -601,8 +604,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::DecHlAddr, // Mnemonic("DEC", Some(Opd::Addr(FromReg(HL))), None),
         param_type: ParamType::None,
-        cycles: 3,
-        branch_cycles: None,
+        _cycles: 3,
+        _branch_cycles: None,
         operation: |cpu| {
             let val = cpu.read_byte(cpu.regs.hl());
             let res = helpers::dec(cpu, val);
@@ -613,8 +616,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::LdHlAddrImm(Imm::Unknown), // Mnemonic("LD", Some(Opd::Addr(FromReg(HL))), Some(Opd::Param(U8))),
         param_type: ParamType::Byte,
-        cycles: 3,
-        branch_cycles: None,
+        _cycles: 3,
+        _branch_cycles: None,
         operation: |cpu| {
             let val = cpu.fetch_byte();
             cpu.write_byte(cpu.regs.hl(), val);
@@ -624,8 +627,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::Scf, // Mnemonic("SCF", None, None),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             helpers::scf(cpu);
         },
@@ -634,8 +637,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::JrCond(Cond::C, Imm::Unknown), //Mnemonic("JR", Some(Opd::Cond(Carry)), Some(Opd::Param(I8))),
         param_type: ParamType::Byte,
-        cycles: 2,
-        branch_cycles: Some(1),
+        _cycles: 2,
+        _branch_cycles: Some(1),
         operation: |cpu| {
             let val = cpu.fetch_byte() as i8;
             if cpu.regs.flags().c() {
@@ -648,8 +651,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::AddHlReg16(Reg16::SP), // Mnemonic("ADD", Some(Opd::Reg(HL)), Some(Opd::Reg(SP))),
         param_type: ParamType::None,
-        cycles: 2,
-        branch_cycles: None,
+        _cycles: 2,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.cycle();
             helpers::add_hl(cpu, cpu.regs.sp());
@@ -659,11 +662,12 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::LdReg8Addr(Reg8::A, Addr::Reg16Dec(Reg16::HL)), // Mnemonic("LD", Some(Opd::Reg(A)), Some(Opd::Addr(FromRegDec(HL)))),
         param_type: ParamType::None,
-        cycles: 2,
-        branch_cycles: None,
+        _cycles: 2,
+        _branch_cycles: None,
         operation: |cpu| {
-            let hl = cpu.regs.dec_hl();
+            let hl = cpu.regs.hl();
             let val = cpu.read_byte(hl);
+            cpu.regs.dec_hl();
             cpu.regs.set_a(val);
         },
     },
@@ -671,8 +675,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::DecReg16(Reg16::SP), // Mnemonic("DEC", Some(Opd::Reg(SP)), None),
         param_type: ParamType::None,
-        cycles: 2,
-        branch_cycles: None,
+        _cycles: 2,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.cycle();
             cpu.regs.set_sp(cpu.regs.sp().wrapping_sub(1));
@@ -682,8 +686,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::IncReg8(Reg8::A), // Mnemonic("INC", Some(Opd::Reg(A)), None),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             let res = helpers::inc(cpu, cpu.regs.a());
             cpu.regs.set_a(res);
@@ -693,8 +697,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::DecReg8(Reg8::A), // Mnemonic("DEC", Some(Opd::Reg(A)), None),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             let res = helpers::dec(cpu, cpu.regs.a());
             cpu.regs.set_a(res);
@@ -704,8 +708,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::LdReg8Imm(Reg8::A, Imm::Unknown), // Mnemonic("LD", Some(Opd::Reg(A)), Some(Opd::Param(U8))),
         param_type: ParamType::Byte,
-        cycles: 2,
-        branch_cycles: None,
+        _cycles: 2,
+        _branch_cycles: None,
         operation: |cpu| {
             let val = cpu.fetch_byte();
             cpu.regs.set_a(val);
@@ -715,8 +719,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::Ccf, // Mnemonic("CCF", None, None),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             helpers::ccf(cpu);
         },
@@ -725,16 +729,16 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::LdReg8Reg8(Reg8::B, Reg8::B),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |_| {},
     },
     // 0x41
     Instruction {
         mnemonic: Mnemonic::LdReg8Reg8(Reg8::B, Reg8::C),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_b(cpu.regs.c());
         },
@@ -743,8 +747,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::LdReg8Reg8(Reg8::B, Reg8::D),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_b(cpu.regs.d());
         },
@@ -753,8 +757,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::LdReg8Reg8(Reg8::B, Reg8::E),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_b(cpu.regs.e());
         },
@@ -763,8 +767,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::LdReg8Reg8(Reg8::B, Reg8::H),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_b(cpu.regs.h());
         },
@@ -773,8 +777,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::LdReg8Reg8(Reg8::B, Reg8::L),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_b(cpu.regs.l());
         },
@@ -783,8 +787,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::LdReg8Addr(Reg8::B, Addr::Reg16(Reg16::HL)), // Mnemonic("LD", Some(Opd::Reg(B)), Some(Opd::Addr(FromReg(HL)))),
         param_type: ParamType::None,
-        cycles: 2,
-        branch_cycles: None,
+        _cycles: 2,
+        _branch_cycles: None,
         operation: |cpu| {
             let val = cpu.read_byte(cpu.regs.hl());
             cpu.regs.set_b(val);
@@ -794,8 +798,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::LdReg8Reg8(Reg8::B, Reg8::A),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_b(cpu.regs.a());
         },
@@ -804,8 +808,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::LdReg8Reg8(Reg8::C, Reg8::B),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_c(cpu.regs.b());
         },
@@ -814,16 +818,16 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::LdReg8Reg8(Reg8::C, Reg8::C),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |_| {},
     },
     // 0x4a
     Instruction {
         mnemonic: Mnemonic::LdReg8Reg8(Reg8::C, Reg8::D),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_c(cpu.regs.d());
         },
@@ -832,8 +836,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::LdReg8Reg8(Reg8::C, Reg8::E),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_c(cpu.regs.e());
         },
@@ -842,8 +846,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::LdReg8Reg8(Reg8::C, Reg8::H),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_c(cpu.regs.h());
         },
@@ -852,8 +856,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::LdReg8Reg8(Reg8::C, Reg8::L),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_c(cpu.regs.l());
         },
@@ -862,8 +866,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::LdReg8Addr(Reg8::C, Addr::Reg16(Reg16::HL)), // Mnemonic("LD", Some(Opd::Reg(C)), Some(Opd::Addr(FromReg(HL)))),
         param_type: ParamType::None,
-        cycles: 2,
-        branch_cycles: None,
+        _cycles: 2,
+        _branch_cycles: None,
         operation: |cpu| {
             let val = cpu.read_byte(cpu.regs.hl());
             cpu.regs.set_c(val);
@@ -873,8 +877,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::LdReg8Reg8(Reg8::C, Reg8::A),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_c(cpu.regs.a());
         },
@@ -883,8 +887,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::LdReg8Reg8(Reg8::D, Reg8::B),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_d(cpu.regs.b());
         },
@@ -893,8 +897,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::LdReg8Reg8(Reg8::D, Reg8::C),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_d(cpu.regs.c());
         },
@@ -903,16 +907,16 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::LdReg8Reg8(Reg8::D, Reg8::D),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |_| {},
     },
     // 0x53
     Instruction {
         mnemonic: Mnemonic::LdReg8Reg8(Reg8::D, Reg8::E),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_d(cpu.regs.e());
         },
@@ -921,8 +925,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::LdReg8Reg8(Reg8::D, Reg8::H),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_d(cpu.regs.h());
         },
@@ -931,8 +935,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::LdReg8Reg8(Reg8::D, Reg8::L),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_d(cpu.regs.l());
         },
@@ -941,8 +945,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::LdReg8Addr(Reg8::D, Addr::Reg16(Reg16::HL)), // Mnemonic("LD", Some(Opd::Reg(D)), Some(Opd::Addr(FromReg(HL)))),
         param_type: ParamType::None,
-        cycles: 2,
-        branch_cycles: None,
+        _cycles: 2,
+        _branch_cycles: None,
         operation: |cpu| {
             let val = cpu.read_byte(cpu.regs.hl());
             cpu.regs.set_d(val);
@@ -952,8 +956,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::LdReg8Reg8(Reg8::D, Reg8::A),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_d(cpu.regs.a());
         },
@@ -962,8 +966,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::LdReg8Reg8(Reg8::E, Reg8::B),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_e(cpu.regs.b());
         },
@@ -972,8 +976,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::LdReg8Reg8(Reg8::E, Reg8::C),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_e(cpu.regs.c());
         },
@@ -982,8 +986,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::LdReg8Reg8(Reg8::E, Reg8::D),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_e(cpu.regs.d());
         },
@@ -992,16 +996,16 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::LdReg8Reg8(Reg8::E, Reg8::E),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |_| {},
     },
     // 0x5c
     Instruction {
         mnemonic: Mnemonic::LdReg8Reg8(Reg8::E, Reg8::H),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_e(cpu.regs.h());
         },
@@ -1010,8 +1014,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::LdReg8Reg8(Reg8::E, Reg8::L),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_e(cpu.regs.l());
         },
@@ -1020,8 +1024,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::LdReg8Addr(Reg8::E, Addr::Reg16(Reg16::HL)), // Mnemonic("LD", Some(Opd::Reg(E)), Some(Opd::Addr(FromReg(HL)))),
         param_type: ParamType::None,
-        cycles: 2,
-        branch_cycles: None,
+        _cycles: 2,
+        _branch_cycles: None,
         operation: |cpu| {
             let val = cpu.read_byte(cpu.regs.hl());
             cpu.regs.set_e(val);
@@ -1031,8 +1035,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::LdReg8Reg8(Reg8::E, Reg8::A),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_e(cpu.regs.a());
         },
@@ -1041,8 +1045,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::LdReg8Reg8(Reg8::H, Reg8::B),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_h(cpu.regs.b());
         },
@@ -1051,8 +1055,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::LdReg8Reg8(Reg8::H, Reg8::C),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_h(cpu.regs.c());
         },
@@ -1061,8 +1065,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::LdReg8Reg8(Reg8::H, Reg8::D),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_h(cpu.regs.d());
         },
@@ -1071,8 +1075,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::LdReg8Reg8(Reg8::H, Reg8::E),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_h(cpu.regs.e());
         },
@@ -1081,16 +1085,16 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::LdReg8Reg8(Reg8::H, Reg8::H),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |_| {},
     },
     // 0x65
     Instruction {
         mnemonic: Mnemonic::LdReg8Reg8(Reg8::H, Reg8::L),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_h(cpu.regs.l());
         },
@@ -1099,8 +1103,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::LdReg8Addr(Reg8::H, Addr::Reg16(Reg16::HL)), // Mnemonic("LD", Some(Opd::Reg(H)), Some(Opd::Addr(FromReg(HL)))),
         param_type: ParamType::None,
-        cycles: 2,
-        branch_cycles: None,
+        _cycles: 2,
+        _branch_cycles: None,
         operation: |cpu| {
             let val = cpu.read_byte(cpu.regs.hl());
             cpu.regs.set_h(val);
@@ -1110,8 +1114,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::LdReg8Reg8(Reg8::H, Reg8::A),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_h(cpu.regs.a());
         },
@@ -1120,8 +1124,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::LdReg8Reg8(Reg8::L, Reg8::B),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_l(cpu.regs.b());
         },
@@ -1130,8 +1134,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::LdReg8Reg8(Reg8::L, Reg8::C),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_l(cpu.regs.c());
         },
@@ -1140,8 +1144,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::LdReg8Reg8(Reg8::L, Reg8::D),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_l(cpu.regs.d());
         },
@@ -1150,8 +1154,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::LdReg8Reg8(Reg8::L, Reg8::E),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_l(cpu.regs.e());
         },
@@ -1160,8 +1164,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::LdReg8Reg8(Reg8::L, Reg8::H),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_l(cpu.regs.h());
         },
@@ -1170,16 +1174,16 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::LdReg8Reg8(Reg8::L, Reg8::L),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |_| {},
     },
     // 0x6e
     Instruction {
         mnemonic: Mnemonic::LdReg8Addr(Reg8::L, Addr::Reg16(Reg16::HL)), // Mnemonic("LD", Some(Opd::Reg(L)), Some(Opd::Addr(FromReg(HL)))),
         param_type: ParamType::None,
-        cycles: 2,
-        branch_cycles: None,
+        _cycles: 2,
+        _branch_cycles: None,
         operation: |cpu| {
             let val = cpu.read_byte(cpu.regs.hl());
             cpu.regs.set_l(val);
@@ -1189,8 +1193,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::LdReg8Reg8(Reg8::L, Reg8::A),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_l(cpu.regs.a());
         },
@@ -1199,8 +1203,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::LdAddrReg8(Addr::Reg16(Reg16::HL), Reg8::B), // Mnemonic("LD", Some(Opd::Addr(FromReg(HL))), Some(Opd::Reg(B))),
         param_type: ParamType::None,
-        cycles: 2,
-        branch_cycles: None,
+        _cycles: 2,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.write_byte(cpu.regs.hl(), cpu.regs.b());
         },
@@ -1209,8 +1213,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::LdAddrReg8(Addr::Reg16(Reg16::HL), Reg8::C),
         param_type: ParamType::None,
-        cycles: 2,
-        branch_cycles: None,
+        _cycles: 2,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.write_byte(cpu.regs.hl(), cpu.regs.c());
         },
@@ -1219,8 +1223,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::LdAddrReg8(Addr::Reg16(Reg16::HL), Reg8::D),
         param_type: ParamType::None,
-        cycles: 2,
-        branch_cycles: None,
+        _cycles: 2,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.write_byte(cpu.regs.hl(), cpu.regs.d());
         },
@@ -1229,8 +1233,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::LdAddrReg8(Addr::Reg16(Reg16::HL), Reg8::E),
         param_type: ParamType::None,
-        cycles: 2,
-        branch_cycles: None,
+        _cycles: 2,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.write_byte(cpu.regs.hl(), cpu.regs.e());
         },
@@ -1239,8 +1243,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::LdAddrReg8(Addr::Reg16(Reg16::HL), Reg8::H),
         param_type: ParamType::None,
-        cycles: 2,
-        branch_cycles: None,
+        _cycles: 2,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.write_byte(cpu.regs.hl(), cpu.regs.h());
         },
@@ -1249,8 +1253,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::LdAddrReg8(Addr::Reg16(Reg16::HL), Reg8::L),
         param_type: ParamType::None,
-        cycles: 2,
-        branch_cycles: None,
+        _cycles: 2,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.write_byte(cpu.regs.hl(), cpu.regs.l());
         },
@@ -1259,8 +1263,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::Halt, // Mnemonic("HALT", None, None),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             log::debug!("CPU: Halted");
             cpu.halted = true;
@@ -1270,8 +1274,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::LdAddrReg8(Addr::Reg16(Reg16::HL), Reg8::A),
         param_type: ParamType::None,
-        cycles: 2,
-        branch_cycles: None,
+        _cycles: 2,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.write_byte(cpu.regs.hl(), cpu.regs.a());
         },
@@ -1280,8 +1284,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::LdReg8Reg8(Reg8::A, Reg8::B),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_a(cpu.regs.b());
         },
@@ -1290,8 +1294,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::LdReg8Reg8(Reg8::A, Reg8::C),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_a(cpu.regs.c());
         },
@@ -1300,8 +1304,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::LdReg8Reg8(Reg8::A, Reg8::D),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_a(cpu.regs.d());
         },
@@ -1310,8 +1314,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::LdReg8Reg8(Reg8::A, Reg8::E),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_a(cpu.regs.e());
         },
@@ -1320,8 +1324,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::LdReg8Reg8(Reg8::A, Reg8::H),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_a(cpu.regs.h());
         },
@@ -1330,8 +1334,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::LdReg8Reg8(Reg8::A, Reg8::L),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_a(cpu.regs.l());
         },
@@ -1340,8 +1344,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::LdReg8Addr(Reg8::A, Addr::Reg16(Reg16::HL)),
         param_type: ParamType::None,
-        cycles: 2,
-        branch_cycles: None,
+        _cycles: 2,
+        _branch_cycles: None,
         operation: |cpu| {
             let val = cpu.read_byte(cpu.regs.hl());
             cpu.regs.set_a(val);
@@ -1351,16 +1355,16 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::LdReg8Reg8(Reg8::A, Reg8::A),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |_| {},
     },
     // 0x80
     Instruction {
         mnemonic: Mnemonic::AddAReg8(Reg8::B),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             helpers::add(cpu, cpu.regs.b());
         },
@@ -1369,8 +1373,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::AddAReg8(Reg8::C),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             helpers::add(cpu, cpu.regs.c());
         },
@@ -1379,8 +1383,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::AddAReg8(Reg8::D),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             helpers::add(cpu, cpu.regs.d());
         },
@@ -1389,8 +1393,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::AddAReg8(Reg8::E),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             helpers::add(cpu, cpu.regs.e());
         },
@@ -1399,8 +1403,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::AddAReg8(Reg8::H),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             helpers::add(cpu, cpu.regs.h());
         },
@@ -1409,8 +1413,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::AddAReg8(Reg8::L),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             helpers::add(cpu, cpu.regs.l());
         },
@@ -1419,8 +1423,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::AddAHlAddr, // Mnemonic("ADD", Some(Opd::Reg(A)), Some(Opd::Addr(FromReg(HL)))),
         param_type: ParamType::None,
-        cycles: 2,
-        branch_cycles: None,
+        _cycles: 2,
+        _branch_cycles: None,
         operation: |cpu| {
             let val = cpu.read_byte(cpu.regs.hl());
             helpers::add(cpu, val);
@@ -1430,8 +1434,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::AddAReg8(Reg8::A),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             helpers::add(cpu, cpu.regs.a());
         },
@@ -1440,8 +1444,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::AdcAReg8(Reg8::B),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             helpers::adc(cpu, cpu.regs.b());
         },
@@ -1450,8 +1454,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::AdcAReg8(Reg8::C),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             helpers::adc(cpu, cpu.regs.c());
         },
@@ -1460,8 +1464,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::AdcAReg8(Reg8::D),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             helpers::adc(cpu, cpu.regs.d());
         },
@@ -1470,8 +1474,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::AdcAReg8(Reg8::E),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             helpers::adc(cpu, cpu.regs.e());
         },
@@ -1480,8 +1484,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::AdcAReg8(Reg8::H),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             helpers::adc(cpu, cpu.regs.h());
         },
@@ -1490,8 +1494,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::AdcAReg8(Reg8::L),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             helpers::adc(cpu, cpu.regs.l());
         },
@@ -1500,8 +1504,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::AdcAHlAddr, // Mnemonic("ADC", Some(Opd::Reg(A)), Some(Opd::Addr(FromReg(HL)))),
         param_type: ParamType::None,
-        cycles: 2,
-        branch_cycles: None,
+        _cycles: 2,
+        _branch_cycles: None,
         operation: |cpu| {
             let val = cpu.read_byte(cpu.regs.hl());
             helpers::adc(cpu, val);
@@ -1511,8 +1515,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::AdcAReg8(Reg8::A),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             helpers::adc(cpu, cpu.regs.a());
         },
@@ -1521,8 +1525,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::SubAReg8(Reg8::B),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             helpers::sub(cpu, cpu.regs.b());
         },
@@ -1531,8 +1535,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::SubAReg8(Reg8::C),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             helpers::sub(cpu, cpu.regs.c());
         },
@@ -1541,8 +1545,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::SubAReg8(Reg8::D),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             helpers::sub(cpu, cpu.regs.d());
         },
@@ -1551,8 +1555,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::SubAReg8(Reg8::E),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             helpers::sub(cpu, cpu.regs.e());
         },
@@ -1561,8 +1565,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::SubAReg8(Reg8::H),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             helpers::sub(cpu, cpu.regs.h());
         },
@@ -1571,8 +1575,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::SubAReg8(Reg8::L),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             helpers::sub(cpu, cpu.regs.l());
         },
@@ -1581,8 +1585,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::SubAHlAddr, // Mnemonic("SUB", Some(Opd::Reg(A)), Some(Opd::Addr(FromReg(HL)))),
         param_type: ParamType::None,
-        cycles: 2,
-        branch_cycles: None,
+        _cycles: 2,
+        _branch_cycles: None,
         operation: |cpu| {
             let val = cpu.read_byte(cpu.regs.hl());
             helpers::sub(cpu, val);
@@ -1592,8 +1596,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::SubAReg8(Reg8::A),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             helpers::sub(cpu, cpu.regs.a());
         },
@@ -1602,8 +1606,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::SbcAReg8(Reg8::B),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             helpers::sbc(cpu, cpu.regs.b());
         },
@@ -1612,8 +1616,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::SbcAReg8(Reg8::C),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             helpers::sbc(cpu, cpu.regs.c());
         },
@@ -1622,8 +1626,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::SbcAReg8(Reg8::D),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             helpers::sbc(cpu, cpu.regs.d());
         },
@@ -1632,8 +1636,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::SbcAReg8(Reg8::E),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             helpers::sbc(cpu, cpu.regs.e());
         },
@@ -1642,8 +1646,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::SbcAReg8(Reg8::H),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             helpers::sbc(cpu, cpu.regs.h());
         },
@@ -1652,8 +1656,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::SbcAReg8(Reg8::L),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             helpers::sbc(cpu, cpu.regs.l());
         },
@@ -1662,8 +1666,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::SbcAHlAddr, // Mnemonic("SBC", Some(Opd::Reg(A)), Some(Opd::Addr(FromReg(HL)))),
         param_type: ParamType::None,
-        cycles: 2,
-        branch_cycles: None,
+        _cycles: 2,
+        _branch_cycles: None,
         operation: |cpu| {
             let val = cpu.read_byte(cpu.regs.hl());
             helpers::sbc(cpu, val);
@@ -1673,8 +1677,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::SbcAReg8(Reg8::A),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             helpers::sbc(cpu, cpu.regs.a());
         },
@@ -1683,8 +1687,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::AndAReg8(Reg8::B),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             helpers::and(cpu, cpu.regs.b());
         },
@@ -1693,8 +1697,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::AndAReg8(Reg8::C),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             helpers::and(cpu, cpu.regs.c());
         },
@@ -1703,8 +1707,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::AndAReg8(Reg8::D),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             helpers::and(cpu, cpu.regs.d());
         },
@@ -1713,8 +1717,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::AndAReg8(Reg8::E),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             helpers::and(cpu, cpu.regs.e());
         },
@@ -1723,8 +1727,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::AndAReg8(Reg8::H),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             helpers::and(cpu, cpu.regs.h());
         },
@@ -1733,8 +1737,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::AndAReg8(Reg8::L),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             helpers::and(cpu, cpu.regs.l());
         },
@@ -1743,8 +1747,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::AndAHlAddr, // Mnemonic("AND", Some(Opd::Reg(A)), Some(Opd::Addr(FromReg(HL)))),
         param_type: ParamType::None,
-        cycles: 2,
-        branch_cycles: None,
+        _cycles: 2,
+        _branch_cycles: None,
         operation: |cpu| {
             let val = cpu.read_byte(cpu.regs.hl());
             helpers::and(cpu, val);
@@ -1754,8 +1758,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::AndAReg8(Reg8::A),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             helpers::and(cpu, cpu.regs.a());
         },
@@ -1764,8 +1768,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::XorAReg8(Reg8::B),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             helpers::xor(cpu, cpu.regs.b());
         },
@@ -1774,8 +1778,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::XorAReg8(Reg8::C),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             helpers::xor(cpu, cpu.regs.c());
         },
@@ -1784,8 +1788,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::XorAReg8(Reg8::D),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             helpers::xor(cpu, cpu.regs.d());
         },
@@ -1794,8 +1798,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::XorAReg8(Reg8::E),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             helpers::xor(cpu, cpu.regs.e());
         },
@@ -1804,8 +1808,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::XorAReg8(Reg8::H),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             helpers::xor(cpu, cpu.regs.h());
         },
@@ -1814,8 +1818,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::XorAReg8(Reg8::L),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             helpers::xor(cpu, cpu.regs.l());
         },
@@ -1824,8 +1828,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::XorAHlAddr, // Mnemonic("XOR", Some(Opd::Reg(A)), Some(Opd::Addr(FromReg(HL)))),
         param_type: ParamType::None,
-        cycles: 2,
-        branch_cycles: None,
+        _cycles: 2,
+        _branch_cycles: None,
         operation: |cpu| {
             let val = cpu.read_byte(cpu.regs.hl());
             helpers::xor(cpu, val);
@@ -1835,8 +1839,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::XorAReg8(Reg8::A),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             helpers::xor(cpu, cpu.regs.a());
         },
@@ -1845,8 +1849,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::OrAReg8(Reg8::B),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             helpers::or(cpu, cpu.regs.b());
         },
@@ -1855,8 +1859,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::OrAReg8(Reg8::C),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             helpers::or(cpu, cpu.regs.c());
         },
@@ -1865,8 +1869,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::OrAReg8(Reg8::D),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             helpers::or(cpu, cpu.regs.d());
         },
@@ -1875,8 +1879,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::OrAReg8(Reg8::E),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             helpers::or(cpu, cpu.regs.e());
         },
@@ -1885,8 +1889,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::OrAReg8(Reg8::H),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             helpers::or(cpu, cpu.regs.h());
         },
@@ -1895,8 +1899,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::OrAReg8(Reg8::L),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             helpers::or(cpu, cpu.regs.l());
         },
@@ -1905,8 +1909,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::OrAHlAddr, // Mnemonic("OR", Some(Opd::Reg(A)), Some(Opd::Addr(FromReg(HL)))),
         param_type: ParamType::None,
-        cycles: 2,
-        branch_cycles: None,
+        _cycles: 2,
+        _branch_cycles: None,
         operation: |cpu| {
             let val = cpu.read_byte(cpu.regs.hl());
             helpers::or(cpu, val);
@@ -1916,8 +1920,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::OrAReg8(Reg8::A),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             helpers::or(cpu, cpu.regs.a());
         },
@@ -1926,8 +1930,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::CpAReg8(Reg8::B),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             helpers::cp(cpu, cpu.regs.b());
         },
@@ -1936,8 +1940,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::CpAReg8(Reg8::C),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             helpers::cp(cpu, cpu.regs.c());
         },
@@ -1946,8 +1950,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::CpAReg8(Reg8::D),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             helpers::cp(cpu, cpu.regs.d());
         },
@@ -1956,8 +1960,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::CpAReg8(Reg8::E),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             helpers::cp(cpu, cpu.regs.e());
         },
@@ -1966,8 +1970,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::CpAReg8(Reg8::H),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             helpers::cp(cpu, cpu.regs.h());
         },
@@ -1976,8 +1980,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::CpAReg8(Reg8::L),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             helpers::cp(cpu, cpu.regs.l());
         },
@@ -1986,8 +1990,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::CpAHlAddr, // Mnemonic("CP", Some(Opd::Reg(A)), Some(Opd::Addr(FromReg(HL)))),
         param_type: ParamType::None,
-        cycles: 2,
-        branch_cycles: None,
+        _cycles: 2,
+        _branch_cycles: None,
         operation: |cpu| {
             let val = cpu.read_byte(cpu.regs.hl());
             helpers::cp(cpu, val);
@@ -1997,8 +2001,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::CpAReg8(Reg8::A),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             helpers::cp(cpu, cpu.regs.a());
         },
@@ -2007,8 +2011,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::RetCond(Cond::NZ), // Mnemonic("RET", Some(Opd::Cond(NotZero)), None),
         param_type: ParamType::None,
-        cycles: 2,
-        branch_cycles: Some(3),
+        _cycles: 2,
+        _branch_cycles: Some(3),
         operation: |cpu| {
             cpu.cycle();
             if !cpu.regs.flags().z() {
@@ -2021,8 +2025,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::Pop(Reg16::BC), // Mnemonic::Pop(Reg16::BC),
         param_type: ParamType::None,
-        cycles: 3,
-        branch_cycles: None,
+        _cycles: 3,
+        _branch_cycles: None,
         operation: |cpu| {
             let val = cpu.stack_pop();
             cpu.regs.set_bc(val);
@@ -2032,8 +2036,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::JpCond(Cond::NZ, Imm::Unknown), // Mnemonic("JP", Some(Opd::Cond(NotZero)), Some(Opd::Param(U16))),
         param_type: ParamType::Word,
-        cycles: 3,
-        branch_cycles: Some(1),
+        _cycles: 3,
+        _branch_cycles: Some(1),
         operation: |cpu| {
             let val = cpu.fetch_word();
             if !cpu.regs.flags().z() {
@@ -2046,8 +2050,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::Jp(Imm::Unknown), // Mnemonic("JP", Some(Opd::Param(U16)), None),
         param_type: ParamType::Word,
-        cycles: 4,
-        branch_cycles: None,
+        _cycles: 4,
+        _branch_cycles: None,
         operation: |cpu| {
             let val = cpu.fetch_word();
             cpu.cycle();
@@ -2058,8 +2062,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::CallCond(Cond::NZ, Imm::Unknown), // Mnemonic("CALL", Some(Opd::Cond(NotZero)), Some(Opd::Param(U16))),
         param_type: ParamType::Word,
-        cycles: 3,
-        branch_cycles: Some(3),
+        _cycles: 3,
+        _branch_cycles: Some(3),
         operation: |cpu| {
             let val = cpu.fetch_word();
             if !cpu.regs.flags().z() {
@@ -2072,8 +2076,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::Push(Reg16::BC), // Mnemonic::Push(Reg16::BC),
         param_type: ParamType::None,
-        cycles: 4,
-        branch_cycles: None,
+        _cycles: 4,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.cycle();
             cpu.stack_push(cpu.regs.bc());
@@ -2083,8 +2087,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::AddAImm(Imm::Unknown), // Mnemonic("ADD", Some(Opd::Reg(A)), Some(Opd::Param(U8))),
         param_type: ParamType::Byte,
-        cycles: 2,
-        branch_cycles: None,
+        _cycles: 2,
+        _branch_cycles: None,
         operation: |cpu| {
             let val = cpu.fetch_byte();
             helpers::add(cpu, val);
@@ -2094,8 +2098,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::Rst(Imm::Known(0x00)),
         param_type: ParamType::None,
-        cycles: 4,
-        branch_cycles: None,
+        _cycles: 4,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.cycle();
             helpers::call(cpu, 0x0000);
@@ -2105,8 +2109,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::RetCond(Cond::Z), // Mnemonic("RET", Some(Opd::Cond(Zero)), None),
         param_type: ParamType::None,
-        cycles: 2,
-        branch_cycles: Some(3),
+        _cycles: 2,
+        _branch_cycles: Some(3),
         operation: |cpu| {
             cpu.cycle();
             if cpu.regs.flags().z() {
@@ -2119,8 +2123,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::Ret, //Mnemonic("RET", None, None),
         param_type: ParamType::None,
-        cycles: 4,
-        branch_cycles: None,
+        _cycles: 4,
+        _branch_cycles: None,
         operation: |cpu| {
             helpers::ret(cpu);
             cpu.cycle();
@@ -2130,8 +2134,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::JpCond(Cond::Z, Imm::Unknown), // Mnemonic("JP", Some(Opd::Cond(Zero)), Some(Opd::Param(U16))),
         param_type: ParamType::Word,
-        cycles: 3,
-        branch_cycles: Some(1),
+        _cycles: 3,
+        _branch_cycles: Some(1),
         operation: |cpu| {
             let val = cpu.fetch_word();
             if cpu.regs.flags().z() {
@@ -2144,16 +2148,16 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::Invalid, // Mnemonic("INVALID", None, None),
         param_type: ParamType::None,
-        cycles: 0,
-        branch_cycles: None,
+        _cycles: 0,
+        _branch_cycles: None,
         operation: |_| helpers::invalid(),
     },
     // 0xcc
     Instruction {
         mnemonic: Mnemonic::CallCond(Cond::Z, Imm::Unknown), // Mnemonic("CALL", Some(Opd::Cond(Zero)), Some(Opd::Param(U16))),
         param_type: ParamType::Word,
-        cycles: 3,
-        branch_cycles: Some(3),
+        _cycles: 3,
+        _branch_cycles: Some(3),
         operation: |cpu| {
             let val = cpu.fetch_word();
             if cpu.regs.flags().z() {
@@ -2166,8 +2170,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::Call(Imm::Unknown), // Mnemonic("CALL", Some(Opd::Param(U16)), None),
         param_type: ParamType::Word,
-        cycles: 6,
-        branch_cycles: None,
+        _cycles: 6,
+        _branch_cycles: None,
         operation: |cpu| {
             let val = cpu.fetch_word();
             cpu.cycle();
@@ -2178,8 +2182,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::AdcAImm(Imm::Unknown), // Mnemonic("ADC", Some(Opd::Reg(A)), Some(Opd::Param(U8))),
         param_type: ParamType::Byte,
-        cycles: 2,
-        branch_cycles: None,
+        _cycles: 2,
+        _branch_cycles: None,
         operation: |cpu| {
             let val = cpu.fetch_byte();
             helpers::adc(cpu, val);
@@ -2189,8 +2193,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::Rst(Imm::Known(0x08)),
         param_type: ParamType::None,
-        cycles: 4,
-        branch_cycles: None,
+        _cycles: 4,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.cycle();
             helpers::call(cpu, 0x0008);
@@ -2200,8 +2204,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::RetCond(Cond::NC), // Mnemonic("RET", Some(Opd::Cond(NotCarry)), None),
         param_type: ParamType::None,
-        cycles: 2,
-        branch_cycles: Some(3),
+        _cycles: 2,
+        _branch_cycles: Some(3),
         operation: |cpu| {
             cpu.cycle();
             if !cpu.regs.flags().c() {
@@ -2214,8 +2218,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::Pop(Reg16::DE), // Mnemonic::Pop(Reg16::DE),
         param_type: ParamType::None,
-        cycles: 3,
-        branch_cycles: None,
+        _cycles: 3,
+        _branch_cycles: None,
         operation: |cpu| {
             let val = cpu.stack_pop();
             cpu.regs.set_de(val);
@@ -2225,8 +2229,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::JpCond(Cond::NC, Imm::Unknown), // Mnemonic("JP", Some(Opd::Cond(NotCarry)), Some(Opd::Param(U16))),
         param_type: ParamType::Word,
-        cycles: 3,
-        branch_cycles: Some(1),
+        _cycles: 3,
+        _branch_cycles: Some(1),
         operation: |cpu| {
             let val = cpu.fetch_word();
             if !cpu.regs.flags().c() {
@@ -2239,8 +2243,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::Invalid, // Mnemonic("INVALID", None, None),
         param_type: ParamType::None,
-        cycles: 0,
-        branch_cycles: None,
+        _cycles: 0,
+        _branch_cycles: None,
         operation: |_| {
             helpers::invalid();
         },
@@ -2249,8 +2253,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::CallCond(Cond::NC, Imm::Unknown), // Mnemonic("CALL", Some(Opd::Cond(NotCarry)), Some(Opd::Param(U16))),
         param_type: ParamType::Word,
-        cycles: 3,
-        branch_cycles: Some(3),
+        _cycles: 3,
+        _branch_cycles: Some(3),
         operation: |cpu| {
             let val = cpu.fetch_word();
             if !cpu.regs.flags().c() {
@@ -2263,8 +2267,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::Push(Reg16::DE),
         param_type: ParamType::None,
-        cycles: 4,
-        branch_cycles: None,
+        _cycles: 4,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.cycle();
             cpu.stack_push(cpu.regs.de());
@@ -2274,8 +2278,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::SubAImm(Imm::Unknown), // Mnemonic("SUB", Some(Opd::Reg(A)), Some(Opd::Param(U8))),
         param_type: ParamType::Byte,
-        cycles: 2,
-        branch_cycles: None,
+        _cycles: 2,
+        _branch_cycles: None,
         operation: |cpu| {
             let val = cpu.fetch_byte();
             helpers::sub(cpu, val);
@@ -2285,8 +2289,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::Rst(Imm::Known(0x10)),
         param_type: ParamType::None,
-        cycles: 4,
-        branch_cycles: None,
+        _cycles: 4,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.cycle();
             helpers::call(cpu, 0x0010);
@@ -2296,8 +2300,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::RetCond(Cond::C), // Mnemonic("RET", Some(Opd::Cond(Carry)), None),
         param_type: ParamType::None,
-        cycles: 2,
-        branch_cycles: Some(3),
+        _cycles: 2,
+        _branch_cycles: Some(3),
         operation: |cpu| {
             cpu.cycle();
             if cpu.regs.flags().c() {
@@ -2310,8 +2314,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::Reti, // Mnemonic("RETI", None, None),
         param_type: ParamType::None,
-        cycles: 4,
-        branch_cycles: None,
+        _cycles: 4,
+        _branch_cycles: None,
         operation: |cpu| {
             helpers::ret(cpu);
             cpu.cycle();
@@ -2322,8 +2326,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::JpCond(Cond::C, Imm::Unknown), // Mnemonic("JP", Some(Opd::Cond(Carry)), Some(Opd::Param(U16))),
         param_type: ParamType::Word,
-        cycles: 3,
-        branch_cycles: Some(1),
+        _cycles: 3,
+        _branch_cycles: Some(1),
         operation: |cpu| {
             let val = cpu.fetch_word();
             if cpu.regs.flags().c() {
@@ -2336,8 +2340,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::Invalid, // Mnemonic("INVALID", None, None),
         param_type: ParamType::None,
-        cycles: 0,
-        branch_cycles: None,
+        _cycles: 0,
+        _branch_cycles: None,
         operation: |_| {
             helpers::invalid();
         },
@@ -2346,8 +2350,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::CallCond(Cond::C, Imm::Unknown), // Mnemonic("CALL", Some(Opd::Cond(Carry)), Some(Opd::Param(U16))),
         param_type: ParamType::Word,
-        cycles: 3,
-        branch_cycles: Some(3),
+        _cycles: 3,
+        _branch_cycles: Some(3),
         operation: |cpu| {
             let val = cpu.fetch_word();
             if cpu.regs.flags().c() {
@@ -2360,8 +2364,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::Invalid, // Mnemonic("INVALID", None, None),
         param_type: ParamType::None,
-        cycles: 0,
-        branch_cycles: None,
+        _cycles: 0,
+        _branch_cycles: None,
         operation: |_| {
             helpers::invalid();
         },
@@ -2370,8 +2374,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::SbcAImm(Imm::Unknown), // Mnemonic("SBC", Some(Opd::Reg(A)), Some(Opd::Param(U8))),
         param_type: ParamType::Byte,
-        cycles: 2,
-        branch_cycles: None,
+        _cycles: 2,
+        _branch_cycles: None,
         operation: |cpu| {
             let val = cpu.fetch_byte();
             helpers::sbc(cpu, val);
@@ -2381,8 +2385,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::Rst(Imm::Known(0x18)),
         param_type: ParamType::None,
-        cycles: 4,
-        branch_cycles: None,
+        _cycles: 4,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.cycle();
             helpers::call(cpu, 0x0018);
@@ -2392,8 +2396,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::LdAddrReg8(Addr::Imm8(Imm::Unknown), Reg8::A), // Mnemonic("LD", Some(Opd::Addr(FromParam(U8))), Some(Opd::Reg(A))),
         param_type: ParamType::Byte,
-        cycles: 3,
-        branch_cycles: None,
+        _cycles: 3,
+        _branch_cycles: None,
         operation: |cpu| {
             let addr = 0xff00 + cpu.fetch_byte() as u16;
             cpu.write_byte(addr, cpu.regs.a());
@@ -2403,8 +2407,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::Pop(Reg16::HL),
         param_type: ParamType::None,
-        cycles: 3,
-        branch_cycles: None,
+        _cycles: 3,
+        _branch_cycles: None,
         operation: |cpu| {
             let val = cpu.stack_pop();
             cpu.regs.set_hl(val);
@@ -2414,8 +2418,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::LdAddrReg8(Addr::Reg8(Reg8::C), Reg8::A), // Mnemonic("LD", Some(Opd::Addr(FromReg(C))), Some(Opd::Reg(A))),
         param_type: ParamType::None,
-        cycles: 2,
-        branch_cycles: None,
+        _cycles: 2,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.write_byte(0xff00 + cpu.regs.c() as u16, cpu.regs.a());
         },
@@ -2424,8 +2428,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::Invalid, // Mnemonic("INVALID", None, None),
         param_type: ParamType::None,
-        cycles: 0,
-        branch_cycles: None,
+        _cycles: 0,
+        _branch_cycles: None,
         operation: |_| {
             helpers::invalid();
         },
@@ -2434,8 +2438,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::Invalid, // Mnemonic("INVALID", None, None),
         param_type: ParamType::None,
-        cycles: 0,
-        branch_cycles: None,
+        _cycles: 0,
+        _branch_cycles: None,
         operation: |_| {
             helpers::invalid();
         },
@@ -2444,8 +2448,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::Push(Reg16::HL),
         param_type: ParamType::None,
-        cycles: 4,
-        branch_cycles: None,
+        _cycles: 4,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.cycle();
             cpu.stack_push(cpu.regs.hl());
@@ -2455,8 +2459,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::AndAImm(Imm::Unknown), // Mnemonic("AND", Some(Opd::Reg(A)), Some(Opd::Param(U8))),
         param_type: ParamType::Byte,
-        cycles: 2,
-        branch_cycles: None,
+        _cycles: 2,
+        _branch_cycles: None,
         operation: |cpu| {
             let val = cpu.fetch_byte();
             helpers::and(cpu, val);
@@ -2466,8 +2470,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::Rst(Imm::Known(0x20)),
         param_type: ParamType::None,
-        cycles: 4,
-        branch_cycles: None,
+        _cycles: 4,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.cycle();
             helpers::call(cpu, 0x0020);
@@ -2477,8 +2481,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::AddSpImm(Imm::Unknown), // Mnemonic("ADD", Some(Opd::Reg(SP)), Some(Opd::Param(I8))),
         param_type: ParamType::Byte,
-        cycles: 4,
-        branch_cycles: None,
+        _cycles: 4,
+        _branch_cycles: None,
         operation: |cpu| {
             let val = cpu.fetch_byte() as i8;
             let sp = helpers::add_sp(cpu, val);
@@ -2491,8 +2495,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::JpHl, // Mnemonic("JP", Some(Opd::Reg(HL)), None),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             helpers::jp(cpu, cpu.regs.hl());
         },
@@ -2501,8 +2505,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::LdAddrReg8(Addr::Imm16(Imm::Unknown), Reg8::A), // Mnemonic("LD", Some(Opd::Addr(FromParam(U16))), Some(Opd::Reg(A))),
         param_type: ParamType::Word,
-        cycles: 4,
-        branch_cycles: None,
+        _cycles: 4,
+        _branch_cycles: None,
         operation: |cpu| {
             let addr = cpu.fetch_word();
             cpu.write_byte(addr, cpu.regs.a());
@@ -2512,8 +2516,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::Invalid, // Mnemonic("INVALID", None, None),
         param_type: ParamType::None,
-        cycles: 0,
-        branch_cycles: None,
+        _cycles: 0,
+        _branch_cycles: None,
         operation: |_| {
             helpers::invalid();
         },
@@ -2522,8 +2526,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::Invalid, // Mnemonic("INVALID", None, None),
         param_type: ParamType::None,
-        cycles: 0,
-        branch_cycles: None,
+        _cycles: 0,
+        _branch_cycles: None,
         operation: |_| {
             helpers::invalid();
         },
@@ -2532,8 +2536,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::Invalid, // Mnemonic("INVALID", None, None),
         param_type: ParamType::None,
-        cycles: 0,
-        branch_cycles: None,
+        _cycles: 0,
+        _branch_cycles: None,
         operation: |_| {
             helpers::invalid();
         },
@@ -2542,8 +2546,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::XorAImm(Imm::Unknown), // Mnemonic("XOR", Some(Opd::Reg(A)), Some(Opd::Param(U8))),
         param_type: ParamType::Byte,
-        cycles: 2,
-        branch_cycles: None,
+        _cycles: 2,
+        _branch_cycles: None,
         operation: |cpu| {
             let val = cpu.fetch_byte();
             helpers::xor(cpu, val);
@@ -2553,8 +2557,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::Rst(Imm::Known(0x28)),
         param_type: ParamType::None,
-        cycles: 4,
-        branch_cycles: None,
+        _cycles: 4,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.cycle();
             helpers::call(cpu, 0x0028);
@@ -2564,8 +2568,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::LdReg8Addr(Reg8::A, Addr::Imm8(Imm::Unknown)), // Mnemonic("LD", Some(Opd::Reg(A)), Some(Opd::Addr(FromParam(U8)))),
         param_type: ParamType::Byte,
-        cycles: 3,
-        branch_cycles: None,
+        _cycles: 3,
+        _branch_cycles: None,
         operation: |cpu| {
             let addr = 0xff00 + cpu.fetch_byte() as u16;
             let val = cpu.read_byte(addr);
@@ -2576,8 +2580,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::Pop(Reg16::AF),
         param_type: ParamType::None,
-        cycles: 3,
-        branch_cycles: None,
+        _cycles: 3,
+        _branch_cycles: None,
         operation: |cpu| {
             let val = cpu.stack_pop();
             cpu.regs.set_af(val);
@@ -2587,8 +2591,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::LdReg8Addr(Reg8::A, Addr::Reg8(Reg8::C)), // Mnemonic("LD", Some(Opd::Reg(A)), Some(Opd::Addr(FromReg(C)))),
         param_type: ParamType::None,
-        cycles: 2,
-        branch_cycles: None,
+        _cycles: 2,
+        _branch_cycles: None,
         operation: |cpu| {
             let val = cpu.read_byte(0xff00 + cpu.regs.c() as u16);
             cpu.regs.set_a(val);
@@ -2598,8 +2602,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::Di, // Mnemonic("DI", None, None),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.ime = ImeState::Disabled;
         },
@@ -2608,8 +2612,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::Invalid, // Mnemonic("INVALID", None, None),
         param_type: ParamType::None,
-        cycles: 0,
-        branch_cycles: None,
+        _cycles: 0,
+        _branch_cycles: None,
         operation: |_| {
             helpers::invalid();
         },
@@ -2618,8 +2622,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::Push(Reg16::AF),
         param_type: ParamType::None,
-        cycles: 4,
-        branch_cycles: None,
+        _cycles: 4,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.cycle();
             cpu.stack_push(cpu.regs.af());
@@ -2629,8 +2633,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::OrAImm(Imm::Unknown), // Mnemonic("OR", Some(Opd::Reg(A)), Some(Opd::Param(U8))),
         param_type: ParamType::Byte,
-        cycles: 2,
-        branch_cycles: None,
+        _cycles: 2,
+        _branch_cycles: None,
         operation: |cpu| {
             let val = cpu.fetch_byte();
             helpers::or(cpu, val);
@@ -2640,8 +2644,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::Rst(Imm::Known(0x30)),
         param_type: ParamType::None,
-        cycles: 4,
-        branch_cycles: None,
+        _cycles: 4,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.cycle();
             helpers::call(cpu, 0x0030);
@@ -2651,8 +2655,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::LdHlAddSpImm(Imm::Unknown), // Mnemonic("LD", Some(Opd::Reg(HL)), Some(Opd::Sum(SP, I8))),
         param_type: ParamType::Byte,
-        cycles: 3,
-        branch_cycles: None,
+        _cycles: 3,
+        _branch_cycles: None,
         operation: |cpu| {
             let val = cpu.fetch_byte() as i8;
             let hl = helpers::add_sp(cpu, val);
@@ -2664,8 +2668,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::LdSpHl, // Mnemonic("LD", Some(Opd::Reg(SP)), Some(Opd::Reg(HL))),
         param_type: ParamType::None,
-        cycles: 2,
-        branch_cycles: None,
+        _cycles: 2,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.cycle();
             cpu.regs.set_sp(cpu.regs.hl());
@@ -2675,8 +2679,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::LdReg8Addr(Reg8::A, Addr::Imm16(Imm::Unknown)), // Mnemonic("LD", Some(Opd::Reg(A)), Some(Opd::Addr(FromParam(U16)))),
         param_type: ParamType::Word,
-        cycles: 4,
-        branch_cycles: None,
+        _cycles: 4,
+        _branch_cycles: None,
         operation: |cpu| {
             let addr = cpu.fetch_word();
             let val = cpu.read_byte(addr);
@@ -2687,8 +2691,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::Ei, // Mnemonic("EI", None, None),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             log::debug!("CPU: Enabling IME");
             cpu.ime = ImeState::Enabling;
@@ -2698,8 +2702,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::Invalid, // Mnemonic("INVALID", None, None),
         param_type: ParamType::None,
-        cycles: 0,
-        branch_cycles: None,
+        _cycles: 0,
+        _branch_cycles: None,
         operation: |_| {
             helpers::invalid();
         },
@@ -2708,8 +2712,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::Invalid, // Mnemonic("INVALID", None, None),
         param_type: ParamType::None,
-        cycles: 0,
-        branch_cycles: None,
+        _cycles: 0,
+        _branch_cycles: None,
         operation: |_| {
             helpers::invalid();
         },
@@ -2718,8 +2722,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::CpAImm(Imm::Unknown), // Mnemonic("CP", Some(Opd::Reg(A)), Some(Opd::Param(U8))),
         param_type: ParamType::Byte,
-        cycles: 2,
-        branch_cycles: None,
+        _cycles: 2,
+        _branch_cycles: None,
         operation: |cpu| {
             let val = cpu.fetch_byte();
             helpers::cp(cpu, val);
@@ -2729,8 +2733,8 @@ pub const BASE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::Rst(Imm::Known(0x38)),
         param_type: ParamType::None,
-        cycles: 4,
-        branch_cycles: None,
+        _cycles: 4,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.cycle();
             helpers::call(cpu, 0x0038);

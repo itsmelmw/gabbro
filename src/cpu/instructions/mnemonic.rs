@@ -12,6 +12,7 @@ pub trait HasImmediate {
 // to use for generalizing instruction operations. Will mean
 // rewriting all instructions and part of the cpu though.
 /// The visual representation of an instruction.
+#[derive(Clone, Copy)]
 pub enum Mnemonic {
     // Misc
     /// `NOP`
@@ -209,6 +210,7 @@ pub enum Mnemonic {
     Invalid,
 }
 
+#[derive(Clone, Copy)]
 pub enum Addr {
     /// `(FF00+u8)`
     Imm8(Imm<u8>),
@@ -224,6 +226,7 @@ pub enum Addr {
     Reg16Dec(Reg16),
 }
 
+#[derive(Clone, Copy)]
 pub enum Reg8 {
     A,
     B,
@@ -234,6 +237,7 @@ pub enum Reg8 {
     L,
 }
 
+#[derive(Clone, Copy)]
 pub enum Reg16 {
     AF,
     BC,
@@ -242,6 +246,7 @@ pub enum Reg16 {
     SP,
 }
 
+#[derive(Clone, Copy)]
 pub enum Cond {
     /// Condition that is satisfied if the Zero flag is set.
     Z,
@@ -270,55 +275,55 @@ impl Display for Mnemonic {
                 Self::Halt => "HALT".to_string(),
                 Self::Di => "DI".to_string(),
                 Self::Ei => "EI".to_string(),
-                Self::LdReg8Reg8(r1, r2) => format!("LD {},{}", r1, r2),
-                Self::LdReg8Addr(r, a) => format!("LD {},{}", r, a),
-                Self::LdAddrReg8(a, r) => format!("LD {},{}", a, r),
-                Self::LdReg8Imm(r, i) => format!("LD {},{}", r, i),
-                Self::LdHlAddrImm(i) => format!("LD {},{}", Addr::Reg16(Reg16::HL), i),
-                Self::LdReg16Imm(r, i) => format!("LD {},{}", r, i),
-                Self::LdImmAddrSp(i) => format!("LD {},{}", Addr::Imm16(*i), Reg16::SP),
-                Self::LdSpHl => format!("LD {},{}", Reg16::SP, Reg16::HL),
-                Self::Push(r) => format!("PUSH {}", r),
-                Self::Pop(r) => format!("POP {}", r),
-                Self::Jr(i) => format!("JR {}", i),
-                Self::JrCond(c, i) => format!("JR {},{}", c, i),
-                Self::Jp(i) => format!("JP {}", i),
-                Self::JpCond(c, i) => format!("JP {},{}", c, i),
-                Self::JpHl => format!("JP {}", Reg16::HL),
-                Self::Call(i) => format!("CALL {}", i),
-                Self::CallCond(c, i) => format!("CALL {},{}", c, i),
+                Self::LdReg8Reg8(r1, r2) => format!("{:04} {},{}", "LD", r1, r2),
+                Self::LdReg8Addr(r, a) => format!("{:04} {},{}", "LD", r, a),
+                Self::LdAddrReg8(a, r) => format!("{:04} {},{}", "LD", a, r),
+                Self::LdReg8Imm(r, i) => format!("{:04} {},{}", "LD", r, i),
+                Self::LdHlAddrImm(i) => format!("{:04} {},{}", "LD", Addr::Reg16(Reg16::HL), i),
+                Self::LdReg16Imm(r, i) => format!("{:04} {},{}", "LD", r, i),
+                Self::LdImmAddrSp(i) => format!("{:04} {},{}", "LD", Addr::Imm16(*i), Reg16::SP),
+                Self::LdSpHl => format!("{:04} {},{}", "LD", Reg16::SP, Reg16::HL),
+                Self::Push(r) => format!("{:04} {}", "PUSH", r),
+                Self::Pop(r) => format!("{:04} {}", "POP", r),
+                Self::Jr(i) => format!("{:04} {}", "JR", i),
+                Self::JrCond(c, i) => format!("{:04} {},{}", "JR", c, i),
+                Self::Jp(i) => format!("{:04} {}", "JP", i),
+                Self::JpCond(c, i) => format!("{:04} {},{}", "JP", c, i),
+                Self::JpHl => format!("{:04} {}", "JP", Reg16::HL),
+                Self::Call(i) => format!("{:04} {}", "CALL", i),
+                Self::CallCond(c, i) => format!("{:04} {},{}", "CALL", c, i),
                 Self::Ret => "RET".to_string(),
-                Self::RetCond(c) => format!("RET {}", c),
+                Self::RetCond(c) => format!("{:04} {}", "RET", c),
                 Self::Reti => "RETI".to_string(),
-                Self::Rst(i) => format!("RST {}h", i),
-                Self::IncReg8(r) => format!("INC {}", r),
-                Self::IncHlAddr => format!("INC {}", Addr::Reg16(Reg16::HL)),
-                Self::DecReg8(r) => format!("DEC {}", r),
-                Self::DecHlAddr => format!("DEC {}", Addr::Reg16(Reg16::HL)),
-                Self::AddAReg8(r) => format!("ADD {},{}", Reg8::A, r),
-                Self::AddAHlAddr => format!("ADD {},{}", Reg8::A, Addr::Reg16(Reg16::HL)),
-                Self::AddAImm(i) => format!("ADD {},{}", Reg8::A, i),
-                Self::AdcAReg8(r) => format!("ADC {},{}", Reg8::A, r),
-                Self::AdcAHlAddr => format!("ADC {},{}", Reg8::A, Addr::Reg16(Reg16::HL)),
-                Self::AdcAImm(i) => format!("ADC {},{}", Reg8::A, i),
-                Self::SubAReg8(r) => format!("SUB {},{}", Reg8::A, r),
-                Self::SubAHlAddr => format!("SUB {},{}", Reg8::A, Addr::Reg16(Reg16::HL)),
-                Self::SubAImm(i) => format!("SUB {},{}", Reg8::A, i),
-                Self::SbcAReg8(r) => format!("SBC {},{}", Reg8::A, r),
-                Self::SbcAHlAddr => format!("SBC {},{}", Reg8::A, Addr::Reg16(Reg16::HL)),
-                Self::SbcAImm(i) => format!("SBC {},{}", Reg8::A, i),
-                Self::AndAReg8(r) => format!("AND {},{}", Reg8::A, r),
-                Self::AndAHlAddr => format!("AND {},{}", Reg8::A, Addr::Reg16(Reg16::HL)),
-                Self::AndAImm(i) => format!("AND {},{}", Reg8::A, i),
-                Self::XorAReg8(r) => format!("XOR {},{}", Reg8::A, r),
-                Self::XorAHlAddr => format!("XOR {},{}", Reg8::A, Addr::Reg16(Reg16::HL)),
-                Self::XorAImm(i) => format!("XOR {},{}", Reg8::A, i),
-                Self::OrAReg8(r) => format!("OR {},{}", Reg8::A, r),
-                Self::OrAHlAddr => format!("OR {},{}", Reg8::A, Addr::Reg16(Reg16::HL)),
-                Self::OrAImm(i) => format!("OR {},{}", Reg8::A, i),
-                Self::CpAReg8(r) => format!("CP {},{}", Reg8::A, r),
-                Self::CpAHlAddr => format!("CP {},{}", Reg8::A, Addr::Reg16(Reg16::HL)),
-                Self::CpAImm(i) => format!("CP {},{}", Reg8::A, i),
+                Self::Rst(i) => format!("{:04} {}h", "RST", i),
+                Self::IncReg8(r) => format!("{:04} {}", "INC", r),
+                Self::IncHlAddr => format!("{:04} {}", "INC", Addr::Reg16(Reg16::HL)),
+                Self::DecReg8(r) => format!("{:04} {}", "DEC", r),
+                Self::DecHlAddr => format!("{:04} {}", "DEC", Addr::Reg16(Reg16::HL)),
+                Self::AddAReg8(r) => format!("{:04} {},{}", "ADD", Reg8::A, r),
+                Self::AddAHlAddr => format!("{:04} {},{}", "ADD", Reg8::A, Addr::Reg16(Reg16::HL)),
+                Self::AddAImm(i) => format!("{:04} {},{}", "ADD", Reg8::A, i),
+                Self::AdcAReg8(r) => format!("{:04} {},{}", "ADC", Reg8::A, r),
+                Self::AdcAHlAddr => format!("{:04} {},{}", "ADC", Reg8::A, Addr::Reg16(Reg16::HL)),
+                Self::AdcAImm(i) => format!("{:04} {},{}", "ADC", Reg8::A, i),
+                Self::SubAReg8(r) => format!("{:04} {},{}", "SUB", Reg8::A, r),
+                Self::SubAHlAddr => format!("{:04} {},{}", "SUB", Reg8::A, Addr::Reg16(Reg16::HL)),
+                Self::SubAImm(i) => format!("{:04} {},{}", "SUB", Reg8::A, i),
+                Self::SbcAReg8(r) => format!("{:04} {},{}", "SBC", Reg8::A, r),
+                Self::SbcAHlAddr => format!("{:04} {},{}", "SBC", Reg8::A, Addr::Reg16(Reg16::HL)),
+                Self::SbcAImm(i) => format!("{:04} {},{}", "SBC", Reg8::A, i),
+                Self::AndAReg8(r) => format!("{:04} {},{}", "AND", Reg8::A, r),
+                Self::AndAHlAddr => format!("{:04} {},{}", "AND", Reg8::A, Addr::Reg16(Reg16::HL)),
+                Self::AndAImm(i) => format!("{:04} {},{}", "AND", Reg8::A, i),
+                Self::XorAReg8(r) => format!("{:04} {},{}", "XOR", Reg8::A, r),
+                Self::XorAHlAddr => format!("{:04} {},{}", "XOR", Reg8::A, Addr::Reg16(Reg16::HL)),
+                Self::XorAImm(i) => format!("{:04} {},{}", "XOR", Reg8::A, i),
+                Self::OrAReg8(r) => format!("{:04} {},{}", "OR", Reg8::A, r),
+                Self::OrAHlAddr => format!("{:04} {},{}", "OR", Reg8::A, Addr::Reg16(Reg16::HL)),
+                Self::OrAImm(i) => format!("{:04} {},{}", "OR", Reg8::A, i),
+                Self::CpAReg8(r) => format!("{:04} {},{}", "CP", Reg8::A, r),
+                Self::CpAHlAddr => format!("{:04} {},{}", "CP", Reg8::A, Addr::Reg16(Reg16::HL)),
+                Self::CpAImm(i) => format!("{:04} {},{}", "CP", Reg8::A, i),
                 Self::Daa => "DAA".to_string(),
                 Self::Cpl => "CPL".to_string(),
                 Self::Scf => "SCF".to_string(),
@@ -327,33 +332,33 @@ impl Display for Mnemonic {
                 Self::Rrca => "RRCA".to_string(),
                 Self::Rla => "RLA".to_string(),
                 Self::Rra => "RRA".to_string(),
-                Self::RlcReg8(r) => format!("RLC {}", r),
-                Self::RlcHlAddr => format!("RLC {}", Addr::Reg16(Reg16::HL)),
-                Self::RrcReg8(r) => format!("RRC {}", r),
-                Self::RrcHlAddr => format!("RRC {}", Addr::Reg16(Reg16::HL)),
-                Self::RlReg8(r) => format!("RL {}", r),
-                Self::RlHlAddr => format!("RL {}", Addr::Reg16(Reg16::HL)),
-                Self::RrReg8(r) => format!("RR {}", r),
-                Self::RrHlAddr => format!("RR {}", Addr::Reg16(Reg16::HL)),
-                Self::SlaReg8(r) => format!("SLA {}", r),
-                Self::SlaHlAddr => format!("SLA {}", Addr::Reg16(Reg16::HL)),
-                Self::SraReg8(r) => format!("SRA {}", r),
-                Self::SraHlAddr => format!("SRA {}", Addr::Reg16(Reg16::HL)),
-                Self::SwapReg8(r) => format!("SWAP {}", r),
-                Self::SwapHlAddr => format!("SWAP {}", Addr::Reg16(Reg16::HL)),
-                Self::SrlReg8(r) => format!("SRL {}", r),
-                Self::SrlHlAddr => format!("SRL {}", Addr::Reg16(Reg16::HL)),
-                Self::BitReg8(i, r) => format!("BIT {},{}", i, r),
-                Self::BitHlAddr(i) => format!("BIT {},{}", i, Addr::Reg16(Reg16::HL)),
-                Self::ResReg8(i, r) => format!("RES {},{}", i, r),
-                Self::ResHlAddr(i) => format!("RES {},{}", i, Addr::Reg16(Reg16::HL)),
-                Self::SetReg8(i, r) => format!("SET {},{}", i, r),
-                Self::SetHlAddr(i) => format!("SET {},{}", i, Addr::Reg16(Reg16::HL)),
-                Self::IncReg16(r) => format!("INC {}", r),
-                Self::DecReg16(r) => format!("DEC {}", r),
-                Self::AddHlReg16(r) => format!("ADD {},{}", Reg16::HL, r),
-                Self::AddSpImm(i) => format!("ADD {},{}", Reg16::SP, i),
-                Self::LdHlAddSpImm(i) => format!("LD {},{}+{}", Reg16::HL, Reg16::SP, i),
+                Self::RlcReg8(r) => format!("{:04} {}", "RLC", r),
+                Self::RlcHlAddr => format!("{:04} {}", "RLC", Addr::Reg16(Reg16::HL)),
+                Self::RrcReg8(r) => format!("{:04} {}", "RRC", r),
+                Self::RrcHlAddr => format!("{:04} {}", "RRC", Addr::Reg16(Reg16::HL)),
+                Self::RlReg8(r) => format!("{:04} {}", "RL", r),
+                Self::RlHlAddr => format!("{:04} {}", "RL", Addr::Reg16(Reg16::HL)),
+                Self::RrReg8(r) => format!("{:04} {}", "RR", r),
+                Self::RrHlAddr => format!("{:04} {}", "RR", Addr::Reg16(Reg16::HL)),
+                Self::SlaReg8(r) => format!("{:04} {}", "SLA", r),
+                Self::SlaHlAddr => format!("{:04} {}", "SLA", Addr::Reg16(Reg16::HL)),
+                Self::SraReg8(r) => format!("{:04} {}", "SRA", r),
+                Self::SraHlAddr => format!("{:04} {}", "SRA", Addr::Reg16(Reg16::HL)),
+                Self::SwapReg8(r) => format!("{:04} {}", "SWAP", r),
+                Self::SwapHlAddr => format!("{:04} {}", "SWAP", Addr::Reg16(Reg16::HL)),
+                Self::SrlReg8(r) => format!("{:04} {}", "SRL", r),
+                Self::SrlHlAddr => format!("{:04} {}", "SRL", Addr::Reg16(Reg16::HL)),
+                Self::BitReg8(i, r) => format!("{:04} {},{}", "BIT", i, r),
+                Self::BitHlAddr(i) => format!("{:04} {},{}", "BIT", i, Addr::Reg16(Reg16::HL)),
+                Self::ResReg8(i, r) => format!("{:04} {},{}", "RES", i, r),
+                Self::ResHlAddr(i) => format!("{:04} {},{}", "RES", i, Addr::Reg16(Reg16::HL)),
+                Self::SetReg8(i, r) => format!("{:04} {},{}", "SET", i, r),
+                Self::SetHlAddr(i) => format!("{:04} {},{}", "SET", i, Addr::Reg16(Reg16::HL)),
+                Self::IncReg16(r) => format!("{:04} {}", "INC", r),
+                Self::DecReg16(r) => format!("{:04} {}", "DEC", r),
+                Self::AddHlReg16(r) => format!("{:04} {},{}", "ADD", Reg16::HL, r),
+                Self::AddSpImm(i) => format!("{:04} {},{}", "ADD", Reg16::SP, i),
+                Self::LdHlAddSpImm(i) => format!("{:04} {},{}+{}", "LD", Reg16::HL, Reg16::SP, i),
                 Self::Invalid => "INVALID".to_string(),
             }
         )
@@ -363,6 +368,8 @@ impl Display for Mnemonic {
 impl HasImmediate for Mnemonic {
     fn with_immediate(self, bytes: &[u8]) -> Self {
         match self {
+            Self::LdReg8Addr(r, a) => Self::LdReg8Addr(r, a.with_immediate(bytes)),
+            Self::LdAddrReg8(a, r) => Self::LdAddrReg8(a.with_immediate(bytes), r),
             Self::LdReg8Imm(r, i) => Self::LdReg8Imm(r, i.with_immediate(bytes)),
             Self::LdHlAddrImm(i) => Self::LdHlAddrImm(i.with_immediate(bytes)),
             Self::LdReg16Imm(r, i) => Self::LdReg16Imm(r, i.with_immediate(bytes)),
@@ -394,12 +401,12 @@ impl Display for Addr {
             f,
             "({})",
             match self {
-                Self::Imm8(i) => format!("FF00+{}", i.to_string()),
+                Self::Imm8(i) => format!("ff00+{}", i),
                 Self::Imm16(i) => i.to_string(),
-                Self::Reg8(r) => format!("FF00+{}", r.to_string()),
+                Self::Reg8(r) => format!("ff00+{}", r),
                 Self::Reg16(r) => r.to_string(),
-                Self::Reg16Inc(r) => format!("{}+", r.to_string()),
-                Self::Reg16Dec(r) => format!("{}-", r.to_string()),
+                Self::Reg16Inc(r) => format!("{}+", r),
+                Self::Reg16Dec(r) => format!("{}-", r),
             }
         )
     }
@@ -479,7 +486,7 @@ impl Display for Imm<u16> {
 
 impl HasImmediate for Imm<u16> {
     fn with_immediate(self, bytes: &[u8]) -> Self {
-        Self::Known((bytes[1] as u16) | (bytes[0] as u16) << 8)
+        Self::Known((bytes[0] as u16) | (bytes[1] as u16) << 8)
     }
 }
 

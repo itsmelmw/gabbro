@@ -9,8 +9,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::RlcReg8(Reg8::B),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             let res = helpers::rlc(cpu, cpu.regs.b());
             cpu.regs.set_b(res);
@@ -20,8 +20,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::RlcReg8(Reg8::C),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             let res = helpers::rlc(cpu, cpu.regs.c());
             cpu.regs.set_c(res);
@@ -31,8 +31,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::RlcReg8(Reg8::D),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             let res = helpers::rlc(cpu, cpu.regs.d());
             cpu.regs.set_d(res);
@@ -42,8 +42,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::RlcReg8(Reg8::E),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             let res = helpers::rlc(cpu, cpu.regs.e());
             cpu.regs.set_e(res);
@@ -53,8 +53,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::RlcReg8(Reg8::H),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             let res = helpers::rlc(cpu, cpu.regs.h());
             cpu.regs.set_h(res);
@@ -64,8 +64,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::RlcReg8(Reg8::L),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             let res = helpers::rlc(cpu, cpu.regs.l());
             cpu.regs.set_l(res);
@@ -75,8 +75,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::RlcHlAddr, // Mnemonic("RLC", Some(Opd::Addr(FromReg(HL))), None),
         param_type: ParamType::None,
-        cycles: 3,
-        branch_cycles: None,
+        _cycles: 3,
+        _branch_cycles: None,
         operation: |cpu| {
             let val = cpu.read_byte(cpu.regs.hl());
             let res = helpers::rlc(cpu, val);
@@ -87,8 +87,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::RlcReg8(Reg8::A),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             let res = helpers::rlc(cpu, cpu.regs.a());
             cpu.regs.set_a(res);
@@ -98,8 +98,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::RrcReg8(Reg8::B),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             let res = helpers::rrc(cpu, cpu.regs.b());
             cpu.regs.set_b(res);
@@ -109,8 +109,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::RrcReg8(Reg8::C),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             let res = helpers::rrc(cpu, cpu.regs.c());
             cpu.regs.set_c(res);
@@ -120,8 +120,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::RrcReg8(Reg8::D),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             let res = helpers::rrc(cpu, cpu.regs.d());
             cpu.regs.set_d(res);
@@ -131,8 +131,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::RrcReg8(Reg8::E),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             let res = helpers::rrc(cpu, cpu.regs.e());
             cpu.regs.set_e(res);
@@ -142,8 +142,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::RrcReg8(Reg8::H),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             let res = helpers::rrc(cpu, cpu.regs.h());
             cpu.regs.set_h(res);
@@ -153,8 +153,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::RrcReg8(Reg8::L),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             let res = helpers::rrc(cpu, cpu.regs.l());
             cpu.regs.set_l(res);
@@ -164,8 +164,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::RrcHlAddr, // Mnemonic("RRC", Some(Opd::Addr(FromReg(HL))), None),
         param_type: ParamType::None,
-        cycles: 3,
-        branch_cycles: None,
+        _cycles: 3,
+        _branch_cycles: None,
         operation: |cpu| {
             let val = cpu.read_byte(cpu.regs.hl());
             let res = helpers::rrc(cpu, val);
@@ -176,8 +176,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::RrcReg8(Reg8::A),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             let res = helpers::rrc(cpu, cpu.regs.a());
             cpu.regs.set_a(res);
@@ -187,8 +187,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::RlReg8(Reg8::B),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             let res = helpers::rl(cpu, cpu.regs.b());
             cpu.regs.set_b(res);
@@ -198,8 +198,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::RlReg8(Reg8::C),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             let res = helpers::rl(cpu, cpu.regs.c());
             cpu.regs.set_c(res);
@@ -209,8 +209,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::RlReg8(Reg8::D),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             let res = helpers::rl(cpu, cpu.regs.d());
             cpu.regs.set_d(res);
@@ -220,8 +220,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::RlReg8(Reg8::E),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             let res = helpers::rl(cpu, cpu.regs.e());
             cpu.regs.set_e(res);
@@ -231,8 +231,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::RlReg8(Reg8::H),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             let res = helpers::rl(cpu, cpu.regs.h());
             cpu.regs.set_h(res);
@@ -242,8 +242,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::RlReg8(Reg8::L),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             let res = helpers::rl(cpu, cpu.regs.l());
             cpu.regs.set_l(res);
@@ -253,8 +253,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::RlHlAddr, // Mnemonic("RL", Some(Opd::Addr(FromReg(HL))), None),
         param_type: ParamType::None,
-        cycles: 3,
-        branch_cycles: None,
+        _cycles: 3,
+        _branch_cycles: None,
         operation: |cpu| {
             let val = cpu.read_byte(cpu.regs.hl());
             let res = helpers::rl(cpu, val);
@@ -265,8 +265,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::RlReg8(Reg8::A),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             let res = helpers::rl(cpu, cpu.regs.a());
             cpu.regs.set_a(res);
@@ -276,8 +276,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::RrReg8(Reg8::B),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             let res = helpers::rr(cpu, cpu.regs.b());
             cpu.regs.set_b(res);
@@ -287,8 +287,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::RrReg8(Reg8::C),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             let res = helpers::rr(cpu, cpu.regs.c());
             cpu.regs.set_c(res);
@@ -298,8 +298,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::RrReg8(Reg8::D),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             let res = helpers::rr(cpu, cpu.regs.d());
             cpu.regs.set_d(res);
@@ -309,8 +309,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::RrReg8(Reg8::E),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             let res = helpers::rr(cpu, cpu.regs.e());
             cpu.regs.set_e(res);
@@ -320,8 +320,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::RrReg8(Reg8::H),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             let res = helpers::rr(cpu, cpu.regs.h());
             cpu.regs.set_h(res);
@@ -331,8 +331,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::RrReg8(Reg8::L),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             let res = helpers::rr(cpu, cpu.regs.l());
             cpu.regs.set_l(res);
@@ -342,8 +342,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::RrHlAddr, // Mnemonic("RR", Some(Opd::Addr(FromReg(HL))), None),
         param_type: ParamType::None,
-        cycles: 3,
-        branch_cycles: None,
+        _cycles: 3,
+        _branch_cycles: None,
         operation: |cpu| {
             let val = cpu.read_byte(cpu.regs.hl());
             let res = helpers::rr(cpu, val);
@@ -354,8 +354,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::RrReg8(Reg8::A),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             let res = helpers::rr(cpu, cpu.regs.a());
             cpu.regs.set_a(res);
@@ -365,8 +365,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::SlaReg8(Reg8::B),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             let res = helpers::sla(cpu, cpu.regs.b());
             cpu.regs.set_b(res);
@@ -376,8 +376,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::SlaReg8(Reg8::C),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             let res = helpers::sla(cpu, cpu.regs.c());
             cpu.regs.set_c(res);
@@ -387,8 +387,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::SlaReg8(Reg8::D),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             let res = helpers::sla(cpu, cpu.regs.d());
             cpu.regs.set_d(res);
@@ -398,8 +398,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::SlaReg8(Reg8::E),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             let res = helpers::sla(cpu, cpu.regs.e());
             cpu.regs.set_e(res);
@@ -409,8 +409,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::SlaReg8(Reg8::H),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             let res = helpers::sla(cpu, cpu.regs.h());
             cpu.regs.set_h(res);
@@ -420,8 +420,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::SlaReg8(Reg8::L),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             let res = helpers::sla(cpu, cpu.regs.l());
             cpu.regs.set_l(res);
@@ -431,8 +431,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::SlaHlAddr, // Mnemonic("SLA", Some(Opd::Addr(FromReg(HL))), None),
         param_type: ParamType::None,
-        cycles: 3,
-        branch_cycles: None,
+        _cycles: 3,
+        _branch_cycles: None,
         operation: |cpu| {
             let val = cpu.read_byte(cpu.regs.hl());
             let res = helpers::sla(cpu, val);
@@ -443,8 +443,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::SlaReg8(Reg8::A),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             let res = helpers::sla(cpu, cpu.regs.a());
             cpu.regs.set_a(res);
@@ -454,8 +454,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::SraReg8(Reg8::B),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             let res = helpers::sra(cpu, cpu.regs.b());
             cpu.regs.set_b(res);
@@ -465,8 +465,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::SraReg8(Reg8::C),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             let res = helpers::sra(cpu, cpu.regs.c());
             cpu.regs.set_c(res);
@@ -476,8 +476,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::SraReg8(Reg8::D),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             let res = helpers::sra(cpu, cpu.regs.d());
             cpu.regs.set_d(res);
@@ -487,8 +487,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::SraReg8(Reg8::E),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             let res = helpers::sra(cpu, cpu.regs.e());
             cpu.regs.set_e(res);
@@ -498,8 +498,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::SraReg8(Reg8::H),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             let res = helpers::sra(cpu, cpu.regs.h());
             cpu.regs.set_h(res);
@@ -509,8 +509,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::SraReg8(Reg8::L),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             let res = helpers::sra(cpu, cpu.regs.l());
             cpu.regs.set_l(res);
@@ -520,8 +520,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::SraHlAddr, // Mnemonic("SRA", Some(Opd::Addr(FromReg(HL))), None),
         param_type: ParamType::None,
-        cycles: 3,
-        branch_cycles: None,
+        _cycles: 3,
+        _branch_cycles: None,
         operation: |cpu| {
             let val = cpu.read_byte(cpu.regs.hl());
             let res = helpers::sra(cpu, val);
@@ -532,8 +532,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::SraReg8(Reg8::A),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             let res = helpers::sra(cpu, cpu.regs.a());
             cpu.regs.set_a(res);
@@ -543,8 +543,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::SwapReg8(Reg8::B),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             let res = helpers::swap(cpu, cpu.regs.b());
             cpu.regs.set_b(res);
@@ -554,8 +554,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::SwapReg8(Reg8::C),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             let res = helpers::swap(cpu, cpu.regs.c());
             cpu.regs.set_c(res);
@@ -565,8 +565,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::SwapReg8(Reg8::D),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             let res = helpers::swap(cpu, cpu.regs.d());
             cpu.regs.set_d(res);
@@ -576,8 +576,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::SwapReg8(Reg8::E),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             let res = helpers::swap(cpu, cpu.regs.e());
             cpu.regs.set_e(res);
@@ -587,8 +587,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::SwapReg8(Reg8::H),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             let res = helpers::swap(cpu, cpu.regs.h());
             cpu.regs.set_h(res);
@@ -598,8 +598,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::SwapReg8(Reg8::L),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             let res = helpers::swap(cpu, cpu.regs.l());
             cpu.regs.set_l(res);
@@ -609,8 +609,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::SwapHlAddr, // Mnemonic("SWAP", Some(Opd::Addr(FromReg(HL))), None),
         param_type: ParamType::None,
-        cycles: 3,
-        branch_cycles: None,
+        _cycles: 3,
+        _branch_cycles: None,
         operation: |cpu| {
             let val = cpu.read_byte(cpu.regs.hl());
             let res = helpers::swap(cpu, val);
@@ -621,8 +621,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::SwapReg8(Reg8::A),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             let res = helpers::swap(cpu, cpu.regs.a());
             cpu.regs.set_a(res);
@@ -632,8 +632,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::SrlReg8(Reg8::B),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             let res = helpers::srl(cpu, cpu.regs.b());
             cpu.regs.set_b(res);
@@ -643,8 +643,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::SrlReg8(Reg8::C),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             let res = helpers::srl(cpu, cpu.regs.c());
             cpu.regs.set_c(res);
@@ -654,8 +654,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::SrlReg8(Reg8::D),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             let res = helpers::srl(cpu, cpu.regs.d());
             cpu.regs.set_d(res);
@@ -665,8 +665,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::SrlReg8(Reg8::E),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             let res = helpers::srl(cpu, cpu.regs.e());
             cpu.regs.set_e(res);
@@ -676,8 +676,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::SrlReg8(Reg8::H),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             let res = helpers::srl(cpu, cpu.regs.h());
             cpu.regs.set_h(res);
@@ -687,8 +687,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::SrlReg8(Reg8::L),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             let res = helpers::srl(cpu, cpu.regs.l());
             cpu.regs.set_l(res);
@@ -698,8 +698,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::SrlHlAddr, // Mnemonic("SRL", Some(Opd::Addr(FromReg(HL))), None),
         param_type: ParamType::None,
-        cycles: 3,
-        branch_cycles: None,
+        _cycles: 3,
+        _branch_cycles: None,
         operation: |cpu| {
             let val = cpu.read_byte(cpu.regs.hl());
             let res = helpers::srl(cpu, val);
@@ -710,8 +710,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::SrlReg8(Reg8::A),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             let res = helpers::srl(cpu, cpu.regs.a());
             cpu.regs.set_a(res);
@@ -721,8 +721,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::BitReg8(Imm::Known(0), Reg8::B),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             helpers::bit(cpu, 0, cpu.regs.b());
         },
@@ -731,8 +731,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::BitReg8(Imm::Known(0), Reg8::C),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             helpers::bit(cpu, 0, cpu.regs.c());
         },
@@ -741,8 +741,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::BitReg8(Imm::Known(0), Reg8::D),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             helpers::bit(cpu, 0, cpu.regs.d());
         },
@@ -751,8 +751,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::BitReg8(Imm::Known(0), Reg8::E),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             helpers::bit(cpu, 0, cpu.regs.e());
         },
@@ -761,8 +761,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::BitReg8(Imm::Known(0), Reg8::H),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             helpers::bit(cpu, 0, cpu.regs.h());
         },
@@ -771,8 +771,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::BitReg8(Imm::Known(0), Reg8::L),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             helpers::bit(cpu, 0, cpu.regs.l());
         },
@@ -781,8 +781,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::BitHlAddr(Imm::Known(0)),
         param_type: ParamType::None,
-        cycles: 2,
-        branch_cycles: None,
+        _cycles: 2,
+        _branch_cycles: None,
         operation: |cpu| {
             let val = cpu.read_byte(cpu.regs.hl());
             helpers::bit(cpu, 0, val);
@@ -792,8 +792,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::BitReg8(Imm::Known(0), Reg8::A),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             helpers::bit(cpu, 0, cpu.regs.a());
         },
@@ -802,8 +802,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::BitReg8(Imm::Known(1), Reg8::B),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             helpers::bit(cpu, 1, cpu.regs.b());
         },
@@ -812,8 +812,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::BitReg8(Imm::Known(1), Reg8::C),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             helpers::bit(cpu, 1, cpu.regs.c());
         },
@@ -822,8 +822,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::BitReg8(Imm::Known(1), Reg8::D),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             helpers::bit(cpu, 1, cpu.regs.d());
         },
@@ -832,8 +832,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::BitReg8(Imm::Known(1), Reg8::E),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             helpers::bit(cpu, 1, cpu.regs.e());
         },
@@ -842,8 +842,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::BitReg8(Imm::Known(1), Reg8::H),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             helpers::bit(cpu, 1, cpu.regs.h());
         },
@@ -852,8 +852,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::BitReg8(Imm::Known(1), Reg8::L),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             helpers::bit(cpu, 1, cpu.regs.l());
         },
@@ -862,8 +862,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::BitHlAddr(Imm::Known(1)),
         param_type: ParamType::None,
-        cycles: 2,
-        branch_cycles: None,
+        _cycles: 2,
+        _branch_cycles: None,
         operation: |cpu| {
             let val = cpu.read_byte(cpu.regs.hl());
             helpers::bit(cpu, 1, val);
@@ -873,8 +873,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::BitReg8(Imm::Known(1), Reg8::A),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             helpers::bit(cpu, 1, cpu.regs.a());
         },
@@ -883,8 +883,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::BitReg8(Imm::Known(2), Reg8::B),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             helpers::bit(cpu, 2, cpu.regs.b());
         },
@@ -893,8 +893,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::BitReg8(Imm::Known(2), Reg8::C),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             helpers::bit(cpu, 2, cpu.regs.c());
         },
@@ -903,8 +903,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::BitReg8(Imm::Known(2), Reg8::D),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             helpers::bit(cpu, 2, cpu.regs.d());
         },
@@ -913,8 +913,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::BitReg8(Imm::Known(2), Reg8::E),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             helpers::bit(cpu, 2, cpu.regs.e());
         },
@@ -923,8 +923,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::BitReg8(Imm::Known(2), Reg8::H),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             helpers::bit(cpu, 2, cpu.regs.h());
         },
@@ -933,8 +933,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::BitReg8(Imm::Known(2), Reg8::L),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             helpers::bit(cpu, 2, cpu.regs.l());
         },
@@ -943,8 +943,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::BitHlAddr(Imm::Known(2)),
         param_type: ParamType::None,
-        cycles: 2,
-        branch_cycles: None,
+        _cycles: 2,
+        _branch_cycles: None,
         operation: |cpu| {
             let val = cpu.read_byte(cpu.regs.hl());
             helpers::bit(cpu, 2, val);
@@ -954,8 +954,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::BitReg8(Imm::Known(2), Reg8::A),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             helpers::bit(cpu, 2, cpu.regs.a());
         },
@@ -964,8 +964,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::BitReg8(Imm::Known(3), Reg8::B),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             helpers::bit(cpu, 3, cpu.regs.b());
         },
@@ -974,8 +974,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::BitReg8(Imm::Known(3), Reg8::C),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             helpers::bit(cpu, 3, cpu.regs.c());
         },
@@ -984,8 +984,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::BitReg8(Imm::Known(3), Reg8::D),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             helpers::bit(cpu, 3, cpu.regs.d());
         },
@@ -994,8 +994,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::BitReg8(Imm::Known(3), Reg8::E),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             helpers::bit(cpu, 3, cpu.regs.e());
         },
@@ -1004,8 +1004,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::BitReg8(Imm::Known(3), Reg8::H),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             helpers::bit(cpu, 3, cpu.regs.h());
         },
@@ -1014,8 +1014,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::BitReg8(Imm::Known(3), Reg8::L),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             helpers::bit(cpu, 3, cpu.regs.l());
         },
@@ -1024,8 +1024,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::BitHlAddr(Imm::Known(3)),
         param_type: ParamType::None,
-        cycles: 2,
-        branch_cycles: None,
+        _cycles: 2,
+        _branch_cycles: None,
         operation: |cpu| {
             let val = cpu.read_byte(cpu.regs.hl());
             helpers::bit(cpu, 3, val);
@@ -1035,8 +1035,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::BitReg8(Imm::Known(3), Reg8::A),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             helpers::bit(cpu, 3, cpu.regs.a());
         },
@@ -1045,8 +1045,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::BitReg8(Imm::Known(4), Reg8::B),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             helpers::bit(cpu, 4, cpu.regs.b());
         },
@@ -1055,8 +1055,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::BitReg8(Imm::Known(4), Reg8::C),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             helpers::bit(cpu, 4, cpu.regs.c());
         },
@@ -1065,8 +1065,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::BitReg8(Imm::Known(4), Reg8::D),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             helpers::bit(cpu, 4, cpu.regs.d());
         },
@@ -1075,8 +1075,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::BitReg8(Imm::Known(4), Reg8::E),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             helpers::bit(cpu, 4, cpu.regs.e());
         },
@@ -1085,8 +1085,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::BitReg8(Imm::Known(4), Reg8::H),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             helpers::bit(cpu, 4, cpu.regs.h());
         },
@@ -1095,8 +1095,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::BitReg8(Imm::Known(4), Reg8::L),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             helpers::bit(cpu, 4, cpu.regs.l());
         },
@@ -1105,8 +1105,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::BitHlAddr(Imm::Known(4)),
         param_type: ParamType::None,
-        cycles: 2,
-        branch_cycles: None,
+        _cycles: 2,
+        _branch_cycles: None,
         operation: |cpu| {
             let val = cpu.read_byte(cpu.regs.hl());
             helpers::bit(cpu, 4, val);
@@ -1116,8 +1116,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::BitReg8(Imm::Known(4), Reg8::A),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             helpers::bit(cpu, 4, cpu.regs.a());
         },
@@ -1126,8 +1126,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::BitReg8(Imm::Known(5), Reg8::B),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             helpers::bit(cpu, 5, cpu.regs.b());
         },
@@ -1136,8 +1136,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::BitReg8(Imm::Known(5), Reg8::C),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             helpers::bit(cpu, 5, cpu.regs.c());
         },
@@ -1146,8 +1146,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::BitReg8(Imm::Known(5), Reg8::D),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             helpers::bit(cpu, 5, cpu.regs.d());
         },
@@ -1156,8 +1156,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::BitReg8(Imm::Known(5), Reg8::E),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             helpers::bit(cpu, 5, cpu.regs.e());
         },
@@ -1166,8 +1166,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::BitReg8(Imm::Known(5), Reg8::H),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             helpers::bit(cpu, 5, cpu.regs.h());
         },
@@ -1176,8 +1176,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::BitReg8(Imm::Known(5), Reg8::L),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             helpers::bit(cpu, 5, cpu.regs.l());
         },
@@ -1186,8 +1186,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::BitHlAddr(Imm::Known(5)),
         param_type: ParamType::None,
-        cycles: 2,
-        branch_cycles: None,
+        _cycles: 2,
+        _branch_cycles: None,
         operation: |cpu| {
             let val = cpu.read_byte(cpu.regs.hl());
             helpers::bit(cpu, 5, val);
@@ -1197,8 +1197,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::BitReg8(Imm::Known(5), Reg8::A),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             helpers::bit(cpu, 5, cpu.regs.a());
         },
@@ -1207,8 +1207,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::BitReg8(Imm::Known(6), Reg8::B),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             helpers::bit(cpu, 6, cpu.regs.b());
         },
@@ -1217,8 +1217,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::BitReg8(Imm::Known(6), Reg8::C),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             helpers::bit(cpu, 6, cpu.regs.c());
         },
@@ -1227,8 +1227,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::BitReg8(Imm::Known(6), Reg8::D),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             helpers::bit(cpu, 6, cpu.regs.d());
         },
@@ -1237,8 +1237,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::BitReg8(Imm::Known(6), Reg8::E),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             helpers::bit(cpu, 6, cpu.regs.e());
         },
@@ -1247,8 +1247,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::BitReg8(Imm::Known(6), Reg8::H),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             helpers::bit(cpu, 6, cpu.regs.h());
         },
@@ -1257,8 +1257,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::BitReg8(Imm::Known(6), Reg8::L),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             helpers::bit(cpu, 6, cpu.regs.l());
         },
@@ -1267,8 +1267,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::BitHlAddr(Imm::Known(6)),
         param_type: ParamType::None,
-        cycles: 2,
-        branch_cycles: None,
+        _cycles: 2,
+        _branch_cycles: None,
         operation: |cpu| {
             let val = cpu.read_byte(cpu.regs.hl());
             helpers::bit(cpu, 6, val);
@@ -1278,8 +1278,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::BitReg8(Imm::Known(6), Reg8::A),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             helpers::bit(cpu, 6, cpu.regs.a());
         },
@@ -1288,8 +1288,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::BitReg8(Imm::Known(7), Reg8::B),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             helpers::bit(cpu, 7, cpu.regs.b());
         },
@@ -1298,8 +1298,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::BitReg8(Imm::Known(7), Reg8::C),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             helpers::bit(cpu, 7, cpu.regs.c());
         },
@@ -1308,8 +1308,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::BitReg8(Imm::Known(7), Reg8::D),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             helpers::bit(cpu, 7, cpu.regs.d());
         },
@@ -1318,8 +1318,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::BitReg8(Imm::Known(7), Reg8::E),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             helpers::bit(cpu, 7, cpu.regs.e());
         },
@@ -1328,8 +1328,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::BitReg8(Imm::Known(7), Reg8::H),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             helpers::bit(cpu, 7, cpu.regs.h());
         },
@@ -1338,8 +1338,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::BitReg8(Imm::Known(7), Reg8::L),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             helpers::bit(cpu, 7, cpu.regs.l());
         },
@@ -1348,8 +1348,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::BitHlAddr(Imm::Known(7)),
         param_type: ParamType::None,
-        cycles: 2,
-        branch_cycles: None,
+        _cycles: 2,
+        _branch_cycles: None,
         operation: |cpu| {
             let val = cpu.read_byte(cpu.regs.hl());
             helpers::bit(cpu, 7, val);
@@ -1359,8 +1359,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::BitReg8(Imm::Known(7), Reg8::A),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             helpers::bit(cpu, 7, cpu.regs.a());
         },
@@ -1369,8 +1369,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::ResReg8(Imm::Known(0), Reg8::B),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_b(helpers::res(0, cpu.regs.b()));
         },
@@ -1379,8 +1379,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::ResReg8(Imm::Known(0), Reg8::C),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_c(helpers::res(0, cpu.regs.c()));
         },
@@ -1389,8 +1389,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::ResReg8(Imm::Known(0), Reg8::D),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_d(helpers::res(0, cpu.regs.d()));
         },
@@ -1399,8 +1399,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::ResReg8(Imm::Known(0), Reg8::E),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_e(helpers::res(0, cpu.regs.e()));
         },
@@ -1409,8 +1409,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::ResReg8(Imm::Known(0), Reg8::H),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_h(helpers::res(0, cpu.regs.h()));
         },
@@ -1419,8 +1419,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::ResReg8(Imm::Known(0), Reg8::L),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_l(helpers::res(0, cpu.regs.l()));
         },
@@ -1429,8 +1429,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::ResHlAddr(Imm::Known(0)),
         param_type: ParamType::None,
-        cycles: 3,
-        branch_cycles: None,
+        _cycles: 3,
+        _branch_cycles: None,
         operation: |cpu| {
             let val = cpu.read_byte(cpu.regs.hl());
             cpu.write_byte(cpu.regs.hl(), helpers::res(0, val));
@@ -1440,8 +1440,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::ResReg8(Imm::Known(0), Reg8::A),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_a(helpers::res(0, cpu.regs.a()));
         },
@@ -1450,8 +1450,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::ResReg8(Imm::Known(1), Reg8::B),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_b(helpers::res(1, cpu.regs.b()));
         },
@@ -1460,8 +1460,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::ResReg8(Imm::Known(1), Reg8::C),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_c(helpers::res(1, cpu.regs.c()));
         },
@@ -1470,8 +1470,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::ResReg8(Imm::Known(1), Reg8::D),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_d(helpers::res(1, cpu.regs.d()));
         },
@@ -1480,8 +1480,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::ResReg8(Imm::Known(1), Reg8::E),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_e(helpers::res(1, cpu.regs.e()));
         },
@@ -1490,8 +1490,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::ResReg8(Imm::Known(1), Reg8::H),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_h(helpers::res(1, cpu.regs.h()));
         },
@@ -1500,8 +1500,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::ResReg8(Imm::Known(1), Reg8::L),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_l(helpers::res(1, cpu.regs.l()));
         },
@@ -1510,8 +1510,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::ResHlAddr(Imm::Known(1)),
         param_type: ParamType::None,
-        cycles: 3,
-        branch_cycles: None,
+        _cycles: 3,
+        _branch_cycles: None,
         operation: |cpu| {
             let val = cpu.read_byte(cpu.regs.hl());
             cpu.write_byte(cpu.regs.hl(), helpers::res(1, val));
@@ -1521,8 +1521,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::ResReg8(Imm::Known(1), Reg8::A),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_a(helpers::res(1, cpu.regs.a()));
         },
@@ -1531,8 +1531,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::ResReg8(Imm::Known(2), Reg8::B),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_b(helpers::res(2, cpu.regs.b()));
         },
@@ -1541,8 +1541,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::ResReg8(Imm::Known(2), Reg8::C),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_c(helpers::res(2, cpu.regs.c()));
         },
@@ -1551,8 +1551,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::ResReg8(Imm::Known(2), Reg8::D),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_d(helpers::res(2, cpu.regs.d()));
         },
@@ -1561,8 +1561,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::ResReg8(Imm::Known(2), Reg8::E),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_e(helpers::res(2, cpu.regs.e()));
         },
@@ -1571,8 +1571,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::ResReg8(Imm::Known(2), Reg8::H),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_h(helpers::res(2, cpu.regs.h()));
         },
@@ -1581,8 +1581,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::ResReg8(Imm::Known(2), Reg8::L),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_l(helpers::res(2, cpu.regs.l()));
         },
@@ -1591,8 +1591,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::ResHlAddr(Imm::Known(2)),
         param_type: ParamType::None,
-        cycles: 3,
-        branch_cycles: None,
+        _cycles: 3,
+        _branch_cycles: None,
         operation: |cpu| {
             let val = cpu.read_byte(cpu.regs.hl());
             cpu.write_byte(cpu.regs.hl(), helpers::res(2, val));
@@ -1602,8 +1602,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::ResReg8(Imm::Known(2), Reg8::A),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_a(helpers::res(2, cpu.regs.a()));
         },
@@ -1612,8 +1612,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::ResReg8(Imm::Known(3), Reg8::B),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_b(helpers::res(3, cpu.regs.b()));
         },
@@ -1622,8 +1622,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::ResReg8(Imm::Known(3), Reg8::C),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_c(helpers::res(3, cpu.regs.c()));
         },
@@ -1632,8 +1632,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::ResReg8(Imm::Known(3), Reg8::D),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_d(helpers::res(3, cpu.regs.d()));
         },
@@ -1642,8 +1642,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::ResReg8(Imm::Known(3), Reg8::E),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_e(helpers::res(3, cpu.regs.e()));
         },
@@ -1652,8 +1652,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::ResReg8(Imm::Known(3), Reg8::H),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_h(helpers::res(3, cpu.regs.h()));
         },
@@ -1662,8 +1662,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::ResReg8(Imm::Known(3), Reg8::L),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_l(helpers::res(3, cpu.regs.l()));
         },
@@ -1672,8 +1672,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::ResHlAddr(Imm::Known(3)),
         param_type: ParamType::None,
-        cycles: 3,
-        branch_cycles: None,
+        _cycles: 3,
+        _branch_cycles: None,
         operation: |cpu| {
             let val = cpu.read_byte(cpu.regs.hl());
             cpu.write_byte(cpu.regs.hl(), helpers::res(3, val));
@@ -1683,8 +1683,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::ResReg8(Imm::Known(3), Reg8::A),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_a(helpers::res(3, cpu.regs.a()));
         },
@@ -1693,8 +1693,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::ResReg8(Imm::Known(4), Reg8::B),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_b(helpers::res(4, cpu.regs.b()));
         },
@@ -1703,8 +1703,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::ResReg8(Imm::Known(4), Reg8::C),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_c(helpers::res(4, cpu.regs.c()));
         },
@@ -1713,8 +1713,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::ResReg8(Imm::Known(4), Reg8::D),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_d(helpers::res(4, cpu.regs.d()));
         },
@@ -1723,8 +1723,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::ResReg8(Imm::Known(4), Reg8::E),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_e(helpers::res(4, cpu.regs.e()));
         },
@@ -1733,8 +1733,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::ResReg8(Imm::Known(4), Reg8::H),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_h(helpers::res(4, cpu.regs.h()));
         },
@@ -1743,8 +1743,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::ResReg8(Imm::Known(4), Reg8::L),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_l(helpers::res(4, cpu.regs.l()));
         },
@@ -1753,8 +1753,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::ResHlAddr(Imm::Known(4)),
         param_type: ParamType::None,
-        cycles: 3,
-        branch_cycles: None,
+        _cycles: 3,
+        _branch_cycles: None,
         operation: |cpu| {
             let val = cpu.read_byte(cpu.regs.hl());
             cpu.write_byte(cpu.regs.hl(), helpers::res(4, val));
@@ -1764,8 +1764,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::ResReg8(Imm::Known(4), Reg8::A),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_a(helpers::res(4, cpu.regs.a()));
         },
@@ -1774,8 +1774,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::ResReg8(Imm::Known(5), Reg8::B),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_b(helpers::res(5, cpu.regs.b()));
         },
@@ -1784,8 +1784,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::ResReg8(Imm::Known(5), Reg8::C),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_c(helpers::res(5, cpu.regs.c()));
         },
@@ -1794,8 +1794,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::ResReg8(Imm::Known(5), Reg8::D),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_d(helpers::res(5, cpu.regs.d()));
         },
@@ -1804,8 +1804,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::ResReg8(Imm::Known(5), Reg8::E),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_e(helpers::res(5, cpu.regs.e()));
         },
@@ -1814,8 +1814,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::ResReg8(Imm::Known(5), Reg8::H),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_h(helpers::res(5, cpu.regs.h()));
         },
@@ -1824,8 +1824,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::ResReg8(Imm::Known(5), Reg8::L),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_l(helpers::res(5, cpu.regs.l()));
         },
@@ -1834,8 +1834,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::ResHlAddr(Imm::Known(5)),
         param_type: ParamType::None,
-        cycles: 3,
-        branch_cycles: None,
+        _cycles: 3,
+        _branch_cycles: None,
         operation: |cpu| {
             let val = cpu.read_byte(cpu.regs.hl());
             cpu.write_byte(cpu.regs.hl(), helpers::res(5, val));
@@ -1845,8 +1845,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::ResReg8(Imm::Known(5), Reg8::A),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_a(helpers::res(5, cpu.regs.a()));
         },
@@ -1855,8 +1855,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::ResReg8(Imm::Known(6), Reg8::B),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_b(helpers::res(6, cpu.regs.b()));
         },
@@ -1865,8 +1865,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::ResReg8(Imm::Known(6), Reg8::C),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_c(helpers::res(6, cpu.regs.c()));
         },
@@ -1875,8 +1875,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::ResReg8(Imm::Known(6), Reg8::D),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_d(helpers::res(6, cpu.regs.d()));
         },
@@ -1885,8 +1885,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::ResReg8(Imm::Known(6), Reg8::E),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_e(helpers::res(6, cpu.regs.e()));
         },
@@ -1895,8 +1895,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::ResReg8(Imm::Known(6), Reg8::H),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_h(helpers::res(6, cpu.regs.h()));
         },
@@ -1905,8 +1905,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::ResReg8(Imm::Known(6), Reg8::L),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_l(helpers::res(6, cpu.regs.l()));
         },
@@ -1915,8 +1915,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::ResHlAddr(Imm::Known(6)),
         param_type: ParamType::None,
-        cycles: 3,
-        branch_cycles: None,
+        _cycles: 3,
+        _branch_cycles: None,
         operation: |cpu| {
             let val = cpu.read_byte(cpu.regs.hl());
             cpu.write_byte(cpu.regs.hl(), helpers::res(6, val));
@@ -1926,8 +1926,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::ResReg8(Imm::Known(6), Reg8::A),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_a(helpers::res(6, cpu.regs.a()));
         },
@@ -1936,8 +1936,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::ResReg8(Imm::Known(7), Reg8::B),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_b(helpers::res(7, cpu.regs.b()));
         },
@@ -1946,8 +1946,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::ResReg8(Imm::Known(7), Reg8::C),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_c(helpers::res(7, cpu.regs.c()));
         },
@@ -1956,8 +1956,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::ResReg8(Imm::Known(7), Reg8::D),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_d(helpers::res(7, cpu.regs.d()));
         },
@@ -1966,8 +1966,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::ResReg8(Imm::Known(7), Reg8::E),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_e(helpers::res(7, cpu.regs.e()));
         },
@@ -1976,8 +1976,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::ResReg8(Imm::Known(7), Reg8::H),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_h(helpers::res(7, cpu.regs.h()));
         },
@@ -1986,8 +1986,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::ResReg8(Imm::Known(7), Reg8::L),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_l(helpers::res(7, cpu.regs.l()));
         },
@@ -1996,8 +1996,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::ResHlAddr(Imm::Known(7)),
         param_type: ParamType::None,
-        cycles: 3,
-        branch_cycles: None,
+        _cycles: 3,
+        _branch_cycles: None,
         operation: |cpu| {
             let val = cpu.read_byte(cpu.regs.hl());
             cpu.write_byte(cpu.regs.hl(), helpers::res(7, val));
@@ -2007,8 +2007,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::ResReg8(Imm::Known(7), Reg8::A),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_a(helpers::res(7, cpu.regs.a()));
         },
@@ -2017,8 +2017,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::SetReg8(Imm::Known(0), Reg8::B),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_b(helpers::set(0, cpu.regs.b()));
         },
@@ -2027,8 +2027,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::SetReg8(Imm::Known(0), Reg8::C),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_c(helpers::set(0, cpu.regs.c()));
         },
@@ -2037,8 +2037,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::SetReg8(Imm::Known(0), Reg8::D),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_d(helpers::set(0, cpu.regs.d()));
         },
@@ -2047,8 +2047,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::SetReg8(Imm::Known(0), Reg8::E),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_e(helpers::set(0, cpu.regs.e()));
         },
@@ -2057,8 +2057,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::SetReg8(Imm::Known(0), Reg8::H),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_h(helpers::set(0, cpu.regs.h()));
         },
@@ -2067,8 +2067,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::SetReg8(Imm::Known(0), Reg8::L),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_l(helpers::set(0, cpu.regs.l()));
         },
@@ -2077,8 +2077,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::SetHlAddr(Imm::Known(0)),
         param_type: ParamType::None,
-        cycles: 3,
-        branch_cycles: None,
+        _cycles: 3,
+        _branch_cycles: None,
         operation: |cpu| {
             let val = cpu.read_byte(cpu.regs.hl());
             cpu.write_byte(cpu.regs.hl(), helpers::set(0, val));
@@ -2088,8 +2088,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::SetReg8(Imm::Known(0), Reg8::A),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_a(helpers::set(0, cpu.regs.a()));
         },
@@ -2098,8 +2098,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::SetReg8(Imm::Known(1), Reg8::B),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_b(helpers::set(1, cpu.regs.b()));
         },
@@ -2108,8 +2108,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::SetReg8(Imm::Known(1), Reg8::C),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_c(helpers::set(1, cpu.regs.c()));
         },
@@ -2118,8 +2118,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::SetReg8(Imm::Known(1), Reg8::D),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_d(helpers::set(1, cpu.regs.d()));
         },
@@ -2128,8 +2128,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::SetReg8(Imm::Known(1), Reg8::E),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_e(helpers::set(1, cpu.regs.e()));
         },
@@ -2138,8 +2138,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::SetReg8(Imm::Known(1), Reg8::H),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_h(helpers::set(1, cpu.regs.h()));
         },
@@ -2148,8 +2148,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::SetReg8(Imm::Known(1), Reg8::L),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_l(helpers::set(1, cpu.regs.l()));
         },
@@ -2158,8 +2158,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::SetHlAddr(Imm::Known(1)),
         param_type: ParamType::None,
-        cycles: 3,
-        branch_cycles: None,
+        _cycles: 3,
+        _branch_cycles: None,
         operation: |cpu| {
             let val = cpu.read_byte(cpu.regs.hl());
             cpu.write_byte(cpu.regs.hl(), helpers::set(1, val));
@@ -2169,8 +2169,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::SetReg8(Imm::Known(1), Reg8::A),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_a(helpers::set(1, cpu.regs.a()));
         },
@@ -2179,8 +2179,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::SetReg8(Imm::Known(2), Reg8::B),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_b(helpers::set(2, cpu.regs.b()));
         },
@@ -2189,8 +2189,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::SetReg8(Imm::Known(2), Reg8::C),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_c(helpers::set(2, cpu.regs.c()));
         },
@@ -2199,8 +2199,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::SetReg8(Imm::Known(2), Reg8::D),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_d(helpers::set(2, cpu.regs.d()));
         },
@@ -2209,8 +2209,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::SetReg8(Imm::Known(2), Reg8::E),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_e(helpers::set(2, cpu.regs.e()));
         },
@@ -2219,8 +2219,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::SetReg8(Imm::Known(2), Reg8::H),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_h(helpers::set(2, cpu.regs.h()));
         },
@@ -2229,8 +2229,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::SetReg8(Imm::Known(2), Reg8::L),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_l(helpers::set(2, cpu.regs.l()));
         },
@@ -2239,8 +2239,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::SetHlAddr(Imm::Known(2)),
         param_type: ParamType::None,
-        cycles: 3,
-        branch_cycles: None,
+        _cycles: 3,
+        _branch_cycles: None,
         operation: |cpu| {
             let val = cpu.read_byte(cpu.regs.hl());
             cpu.write_byte(cpu.regs.hl(), helpers::set(2, val));
@@ -2250,8 +2250,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::SetReg8(Imm::Known(2), Reg8::A),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_a(helpers::set(2, cpu.regs.a()));
         },
@@ -2260,8 +2260,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::SetReg8(Imm::Known(3), Reg8::B),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_b(helpers::set(3, cpu.regs.b()));
         },
@@ -2270,8 +2270,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::SetReg8(Imm::Known(3), Reg8::C),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_c(helpers::set(3, cpu.regs.c()));
         },
@@ -2280,8 +2280,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::SetReg8(Imm::Known(3), Reg8::D),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_d(helpers::set(3, cpu.regs.d()));
         },
@@ -2290,8 +2290,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::SetReg8(Imm::Known(3), Reg8::E),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_e(helpers::set(3, cpu.regs.e()));
         },
@@ -2300,8 +2300,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::SetReg8(Imm::Known(3), Reg8::H),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_h(helpers::set(3, cpu.regs.h()));
         },
@@ -2310,8 +2310,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::SetReg8(Imm::Known(3), Reg8::L),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_l(helpers::set(3, cpu.regs.l()));
         },
@@ -2320,8 +2320,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::SetHlAddr(Imm::Known(3)),
         param_type: ParamType::None,
-        cycles: 3,
-        branch_cycles: None,
+        _cycles: 3,
+        _branch_cycles: None,
         operation: |cpu| {
             let val = cpu.read_byte(cpu.regs.hl());
             cpu.write_byte(cpu.regs.hl(), helpers::set(3, val));
@@ -2331,8 +2331,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::SetReg8(Imm::Known(3), Reg8::A),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_a(helpers::set(3, cpu.regs.a()));
         },
@@ -2341,8 +2341,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::SetReg8(Imm::Known(4), Reg8::B),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_b(helpers::set(4, cpu.regs.b()));
         },
@@ -2351,8 +2351,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::SetReg8(Imm::Known(4), Reg8::C),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_c(helpers::set(4, cpu.regs.c()));
         },
@@ -2361,8 +2361,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::SetReg8(Imm::Known(4), Reg8::D),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_d(helpers::set(4, cpu.regs.d()));
         },
@@ -2371,8 +2371,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::SetReg8(Imm::Known(4), Reg8::E),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_e(helpers::set(4, cpu.regs.e()));
         },
@@ -2381,8 +2381,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::SetReg8(Imm::Known(4), Reg8::H),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_h(helpers::set(4, cpu.regs.h()));
         },
@@ -2391,8 +2391,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::SetReg8(Imm::Known(4), Reg8::L),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_l(helpers::set(4, cpu.regs.l()));
         },
@@ -2401,8 +2401,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::SetHlAddr(Imm::Known(4)),
         param_type: ParamType::None,
-        cycles: 3,
-        branch_cycles: None,
+        _cycles: 3,
+        _branch_cycles: None,
         operation: |cpu| {
             let val = cpu.read_byte(cpu.regs.hl());
             cpu.write_byte(cpu.regs.hl(), helpers::set(4, val));
@@ -2412,8 +2412,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::SetReg8(Imm::Known(4), Reg8::A),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_a(helpers::set(4, cpu.regs.a()));
         },
@@ -2422,8 +2422,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::SetReg8(Imm::Known(5), Reg8::B),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_b(helpers::set(5, cpu.regs.b()));
         },
@@ -2432,8 +2432,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::SetReg8(Imm::Known(5), Reg8::C),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_c(helpers::set(5, cpu.regs.c()));
         },
@@ -2442,8 +2442,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::SetReg8(Imm::Known(5), Reg8::D),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_d(helpers::set(5, cpu.regs.d()));
         },
@@ -2452,8 +2452,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::SetReg8(Imm::Known(5), Reg8::E),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_e(helpers::set(5, cpu.regs.e()));
         },
@@ -2462,8 +2462,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::SetReg8(Imm::Known(5), Reg8::H),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_h(helpers::set(5, cpu.regs.h()));
         },
@@ -2472,8 +2472,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::SetReg8(Imm::Known(5), Reg8::L),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_l(helpers::set(5, cpu.regs.l()));
         },
@@ -2482,8 +2482,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::SetHlAddr(Imm::Known(5)),
         param_type: ParamType::None,
-        cycles: 3,
-        branch_cycles: None,
+        _cycles: 3,
+        _branch_cycles: None,
         operation: |cpu| {
             let val = cpu.read_byte(cpu.regs.hl());
             cpu.write_byte(cpu.regs.hl(), helpers::set(5, val));
@@ -2493,8 +2493,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::SetReg8(Imm::Known(5), Reg8::A),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_a(helpers::set(5, cpu.regs.a()));
         },
@@ -2503,8 +2503,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::SetReg8(Imm::Known(6), Reg8::B),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_b(helpers::set(6, cpu.regs.b()));
         },
@@ -2513,8 +2513,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::SetReg8(Imm::Known(6), Reg8::C),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_c(helpers::set(6, cpu.regs.c()));
         },
@@ -2523,8 +2523,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::SetReg8(Imm::Known(6), Reg8::D),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_d(helpers::set(6, cpu.regs.d()));
         },
@@ -2533,8 +2533,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::SetReg8(Imm::Known(6), Reg8::E),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_e(helpers::set(6, cpu.regs.e()));
         },
@@ -2543,8 +2543,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::SetReg8(Imm::Known(6), Reg8::H),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_h(helpers::set(6, cpu.regs.h()));
         },
@@ -2553,8 +2553,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::SetReg8(Imm::Known(6), Reg8::L),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_l(helpers::set(6, cpu.regs.l()));
         },
@@ -2563,8 +2563,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::SetHlAddr(Imm::Known(6)),
         param_type: ParamType::None,
-        cycles: 3,
-        branch_cycles: None,
+        _cycles: 3,
+        _branch_cycles: None,
         operation: |cpu| {
             let val = cpu.read_byte(cpu.regs.hl());
             cpu.write_byte(cpu.regs.hl(), helpers::set(6, val));
@@ -2574,8 +2574,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::SetReg8(Imm::Known(6), Reg8::A),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_a(helpers::set(6, cpu.regs.a()));
         },
@@ -2584,8 +2584,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::SetReg8(Imm::Known(7), Reg8::B),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_b(helpers::set(7, cpu.regs.b()));
         },
@@ -2594,8 +2594,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::SetReg8(Imm::Known(7), Reg8::C),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_c(helpers::set(7, cpu.regs.c()));
         },
@@ -2604,8 +2604,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::SetReg8(Imm::Known(7), Reg8::D),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_d(helpers::set(7, cpu.regs.d()));
         },
@@ -2614,8 +2614,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::SetReg8(Imm::Known(7), Reg8::E),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_e(helpers::set(7, cpu.regs.e()));
         },
@@ -2624,8 +2624,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::SetReg8(Imm::Known(7), Reg8::H),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_h(helpers::set(7, cpu.regs.h()));
         },
@@ -2634,8 +2634,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::SetReg8(Imm::Known(7), Reg8::L),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_l(helpers::set(7, cpu.regs.l()));
         },
@@ -2644,8 +2644,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::SetHlAddr(Imm::Known(7)),
         param_type: ParamType::None,
-        cycles: 3,
-        branch_cycles: None,
+        _cycles: 3,
+        _branch_cycles: None,
         operation: |cpu| {
             let val = cpu.read_byte(cpu.regs.hl());
             cpu.write_byte(cpu.regs.hl(), helpers::set(7, val));
@@ -2655,8 +2655,8 @@ pub const BITWISE_INSTRS: InstrSet = [
     Instruction {
         mnemonic: Mnemonic::SetReg8(Imm::Known(7), Reg8::A),
         param_type: ParamType::None,
-        cycles: 1,
-        branch_cycles: None,
+        _cycles: 1,
+        _branch_cycles: None,
         operation: |cpu| {
             cpu.regs.set_a(helpers::set(7, cpu.regs.a()));
         },
