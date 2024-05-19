@@ -256,7 +256,7 @@ impl PixelFetcher {
     /// Emulates a step of the Pixel Fetcher when it should fetch the low pixel data of a tile.
     fn fetch_tile_low(&mut self) {
         let line_idx = match self.target {
-            FetchTarget::Bck => (self.ly + self.scy) as usize % 8,
+            FetchTarget::Bck => (self.ly.wrapping_add(self.scy)) as usize % 8,
             FetchTarget::Win => self.window_line as usize % 8,
         };
         let line = self.vram.tile_line(
@@ -273,7 +273,7 @@ impl PixelFetcher {
     /// Emulates a step of the Pixel Fetcher when it should fetch the high pixel data of a tile.
     fn fetch_tile_high(&mut self) {
         let line_idx = match self.target {
-            FetchTarget::Bck => (self.ly + self.scy) as usize % 8,
+            FetchTarget::Bck => (self.ly.wrapping_add(self.scy)) as usize % 8,
             FetchTarget::Win => self.window_line as usize % 8,
         };
         let line = self.vram.tile_line(

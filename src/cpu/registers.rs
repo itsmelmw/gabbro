@@ -1,5 +1,3 @@
-use std::fmt;
-
 /// The CPU flags register `F`. Stores the `Z`, `N`, `H` and `C` flags.
 #[derive(Clone, Copy)]
 pub struct Flags {
@@ -76,6 +74,7 @@ pub union Regs {
 
 impl Regs {
     /// Initializes a new set of CPU registers.
+    #[allow(clippy::new_without_default)]
     pub fn new() -> Self {
         Self {
             r16: R16 {
@@ -100,7 +99,12 @@ impl Regs {
     }
 
     /// Retrieves the `Flags` containing the flags in the `F` register.
-    pub fn flags(&mut self) -> &mut Flags {
+    pub fn flags(&self) -> &Flags {
+        unsafe { &self.flags }
+    }
+
+    /// Retrieves a mutable reference to `Flags` containing the flags in the `F` register.
+    pub fn flags_mut(&mut self) -> &mut Flags {
         unsafe { &mut self.flags }
     }
 
@@ -224,76 +228,28 @@ impl Regs {
         self.r16.sp = val
     }
 
-    /// Increments `PC` and returns the **original** value.
-    pub fn inc_pc(&mut self) -> u16 {
-        unsafe {
-            let addr = self.r16.pc;
-            self.r16.pc = self.r16.pc.wrapping_add(1);
-            addr
-        }
+    /// Increments `PC`.
+    pub(super) fn inc_pc(&mut self) {
+        unsafe { self.r16.pc = self.r16.pc.wrapping_add(1) }
     }
 
-    /// Increments `SP` and returns the **original** value.
-    pub fn inc_sp(&mut self) -> u16 {
-        unsafe {
-            let addr = self.r16.sp;
-            self.r16.sp = self.r16.sp.wrapping_add(1);
-            addr
-        }
+    /// Increments `SP`.
+    pub(super) fn inc_sp(&mut self) {
+        unsafe { self.r16.sp = self.r16.sp.wrapping_add(1) }
     }
 
-    /// Decrements `SP` and returns the **new** value.
-    pub fn dec_sp(&mut self) -> u16 {
-        unsafe {
-            self.r16.sp = self.r16.sp.wrapping_sub(1);
-            self.r16.sp
-        }
+    /// Decrements `SP`.
+    pub(super) fn dec_sp(&mut self) {
+        unsafe { self.r16.sp = self.r16.sp.wrapping_sub(1) }
     }
 
-    /// Increments `HL` and returns the **original** value.
-    pub fn inc_hl(&mut self) -> u16 {
-        unsafe {
-            let addr = self.r16.hl;
-            self.r16.hl = self.r16.hl.wrapping_add(1);
-            addr
-        }
+    /// Increments `HL`.
+    pub(super) fn inc_hl(&mut self) {
+        unsafe { self.r16.hl = self.r16.hl.wrapping_add(1) }
     }
 
-    /// Decrements `HL` and returns the **original** value.
-    pub fn dec_hl(&mut self) -> u16 {
-        unsafe {
-            let addr = self.r16.hl;
-            self.r16.hl -= 1;
-            addr
-        }
-    }
-}
-
-impl fmt::Display for Regs {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        unsafe {
-            write!(
-                f,
-                "A:  {:#04x}      F:  {:#04x}      {} {} {} {}\n\
-                 B:  {:#04x}      C:  {:#04x}\n\
-                 D:  {:#04x}      E:  {:#04x}\n\
-                 H:  {:#04x}      L:  {:#04x}\n\
-                 PC: {:#06x}    SP: {:#06x}",
-                self.r8.a,
-                self.r8.f,
-                if self.flags.z() { 'Z' } else { '-' },
-                if self.flags.n() { 'N' } else { '-' },
-                if self.flags.h() { 'H' } else { '-' },
-                if self.flags.c() { 'C' } else { '-' },
-                self.r8.b,
-                self.r8.c,
-                self.r8.d,
-                self.r8.e,
-                self.r8.h,
-                self.r8.l,
-                self.r16.pc,
-                self.r16.sp,
-            )
-        }
+    /// Decrements `HL`.
+    pub(super) fn dec_hl(&mut self) {
+        unsafe { self.r16.hl = self.r16.hl.wrapping_sub(1) }
     }
 }

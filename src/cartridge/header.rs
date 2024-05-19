@@ -52,7 +52,7 @@ pub fn get_mbc(
 ) -> Result<Box<dyn Mbc>, &'static str> {
     match rom[0x0147] {
         0x00 | 0x08 | 0x09 => Ok(Box::new(NoMbc::new(rom))),
-        0x01 | 0x02 | 0x03 => Ok(Box::new(Mbc1::new(rom, rom_banks))),
+        0x01..= 0x03 => Ok(Box::new(Mbc1::new(rom, rom_banks))),
         _ => Err("Invalid or unsupported MBC type. Only ROM-only and MBC1 cartridges are supported at the moment."),
     }
 }

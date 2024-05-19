@@ -14,10 +14,14 @@ edition = "2021"
 log = { version = "0.4.17", features = ["max_level_trace", "release_max_level_info"] }
 env_logger = { version = "0.10.0", optional = true }
 sdl2 = { version = "0.35.2", optional = true }
+tui = { version = "0.19", optional = true }
+crossterm = { version = "0.25", optional = true }
 
 [features]
-sdl2 = ["dep:sdl2"]
+default = ["logger"]
 logger = ["dep:env_logger"]
+sdl2 = ["dep:sdl2"]
+debug = ["dep:tui", "dep:crossterm"]
 
 [[bin]]
 name = "gabbro"
@@ -27,3 +31,8 @@ required-features = ["sdl2"]
 [[bin]]
 name = "gabbro-headless"
 path = "src/bin/headless.rs"
+
+[[bin]]
+name = "gabbro-db"
+path = "src/bin/debug/main.rs"
+required-features = ["debug"]
