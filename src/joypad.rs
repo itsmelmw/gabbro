@@ -1,4 +1,4 @@
-use crate::{cpu::IntReg, interfaces::GameboyJoypad};
+use crate::{cpu::interrupts::IntReg, peripherals::Joypad};
 
 /// An enum representing a directional button.
 #[repr(u8)]
@@ -63,14 +63,20 @@ impl P1 {
 }
 
 /// Emulates the Game Boy joypad.
-pub struct JoypadController {
+pub struct JoypadController<J>
+where
+    J: Joypad,
+{
     pub p1: P1,
-    joypad: Box<dyn GameboyJoypad>,
+    joypad: J,
 }
 
-impl JoypadController {
+impl<J> JoypadController<J>
+where
+    J: Joypad,
+{
     /// Initializes a new joypad controller.
-    pub fn new(joypad: Box<dyn GameboyJoypad>) -> Self {
+    pub fn new(joypad: J) -> Self {
         Self {
             p1: P1::new(),
             joypad,

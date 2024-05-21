@@ -1,13 +1,16 @@
-mod dma;
-mod fetcher;
-mod fifo;
-mod oam;
-mod vram;
-use crate::cpu::IntReg;
-use crate::interfaces::GameboyLcd;
-pub use dma::Dma;
-
-use self::fetcher::{FetchTarget, PixelFetcher};
+pub mod dma;
+pub mod fetcher;
+pub mod fifo;
+pub mod oam;
+pub mod vram;
+use crate::{
+    cpu::interrupts::IntReg,
+    peripherals::Lcd,
+    ppu::{
+        dma::Dma,
+        fetcher::{FetchTarget, PixelFetcher},
+    },
+};
 
 pub const LCD_WIDTH: usize = 160;
 pub const LCD_HEIGHT: usize = 144;
@@ -83,21 +86,27 @@ impl Stat {
 }
 
 /// Emulates the Game Boy Pixel Processing Unit.
-pub struct Ppu {
+pub struct Ppu<L>
+where
+    L: Lcd,
+{
     pub stat: Stat,
     pub lyc: u8,
 
     pub dma: Dma,
 
-    lcd: Box<dyn GameboyLcd>,
+    lcd: L,
     pub fetcher: PixelFetcher,
 
     line_dots: usize,
 }
 
-impl Ppu {
+impl<L> Ppu<L>
+where
+    L: Lcd,
+{
     /// Initializes a new PPU.
-    pub fn new(lcd: Box<dyn GameboyLcd>) -> Self {
+    pub fn new(lcd: L) -> Self {
         Self {
             stat: Stat::new(),
             lyc: 0x00,

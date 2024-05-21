@@ -1,37 +1,42 @@
-use crate::apu::Apu;
-use crate::cartridge::Cartridge;
-use crate::cpu::InterruptControl;
-use crate::interfaces::GameboyJoypad;
-use crate::interfaces::GameboyLcd;
-use crate::interfaces::GameboySerial;
-use crate::joypad::JoypadController;
-use crate::ppu::Ppu;
-use crate::serial::SerialController;
-use crate::timer::Timer;
+use crate::{
+    apu::Apu,
+    cartridge::Cartridge,
+    cpu::interrupts::InterruptControl,
+    joypad::JoypadController,
+    peripherals::{Joypad, Lcd, Serial},
+    ppu::Ppu,
+    serial::SerialController,
+    timer::Timer,
+};
 
 /// The bus which handles all reads and writes from/to memory.
 /// Also used to access all parts of the Game Boy besides the CPU.
-pub struct Bus {
+pub struct Bus<L, J, S>
+where
+    L: Lcd,
+    J: Joypad,
+    S: Serial,
+{
     cart: Cartridge,
     ram: [u8; 0x2000],
     hram: [u8; 0x7f],
-    joypad: JoypadController,
-    serial: SerialController,
+    joypad: JoypadController<J>,
+    serial: SerialController<S>,
     timer: Timer,
     audio: Apu,
-    ppu: Ppu,
+    ppu: Ppu<L>,
     pub interrupts: InterruptControl,
 }
 
-impl Bus {
+impl<L, J, S> Bus<L, J, S>
+where
+    L: Lcd,
+    J: Joypad,
+    S: Serial,
+{
     /// Initializes all the emulated hardware and the memory of the Game Boy.
     /// Also prints information contained in the ROM header.
-    pub fn new(
-        rom: Vec<u8>,
-        lcd: Box<dyn GameboyLcd>,
-        joypad: Box<dyn GameboyJoypad>,
-        serial: Box<dyn GameboySerial>,
-    ) -> Self {
+    pub fn new(rom: Vec<u8>, lcd: L, joypad: J, serial: S) -> Self {
         let cart = Cartridge::new(rom)
             .map_err(|e| log::error!("Failed to parse ROM header: {}", e))
             .unwrap();

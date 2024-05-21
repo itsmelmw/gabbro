@@ -1,7 +1,4 @@
-use gabbro::{
-    interfaces::sdl2::{Sdl2Joypad, Sdl2Lcd},
-    Gameboy,
-};
+use gabbro::{Gameboy, Sdl2Joypad, Sdl2Lcd};
 use std::{env, fs};
 
 fn main() {
@@ -19,10 +16,8 @@ fn main() {
             .map_err(|_| log::error!("ROM file could not be opened"))
             .unwrap();
 
-        let mut gb = Gameboy::builder(rom)
-            .attach_joypad(Box::new(joypad))
-            .attach_lcd(Box::new(lcd))
-            .build();
+        let mut gb = Gameboy::builder(rom).joypad(joypad).lcd(lcd).build();
+
         gb.run();
     } else {
         log::error!("Please provide a path to a valid Game Boy ROM.");

@@ -1,4 +1,4 @@
-use super::{ButtonState, GameboyJoypad, GameboyLcd, LcdColor};
+use super::{ButtonState, Joypad, Lcd, LcdColor};
 use crate::{LCD_HEIGHT, LCD_WIDTH};
 use sdl2::pixels::PixelFormatEnum;
 use sdl2::render::{Canvas, Texture, TextureCreator};
@@ -27,7 +27,7 @@ impl Sdl2Joypad {
     }
 }
 
-impl GameboyJoypad for Sdl2Joypad {
+impl Joypad for Sdl2Joypad {
     fn get_button_state(&mut self) -> ButtonState {
         for event in self.events.poll_iter() {
             match event {
@@ -130,7 +130,7 @@ impl Sdl2Lcd {
     }
 }
 
-impl GameboyLcd for Sdl2Lcd {
+impl Lcd for Sdl2Lcd {
     fn push_pixel(&mut self, color: LcdColor) {
         let val = self.palette[color as usize];
         self.buffer[self.ptr] = val;

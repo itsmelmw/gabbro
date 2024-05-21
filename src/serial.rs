@@ -1,15 +1,21 @@
-use crate::{cpu::IntReg, interfaces::GameboySerial};
+use crate::{cpu::interrupts::IntReg, peripherals::Serial};
 
 /// A temporary simple implementation of the serial controller.
 /// Made only to be used for Blargg's Game Boy CPU tests.
-pub struct SerialController {
-    serial: Box<dyn GameboySerial>,
+pub struct SerialController<S>
+where
+    S: Serial,
+{
+    serial: S,
     pub sb: u8,
     pub sc: u8,
 }
 
-impl SerialController {
-    pub fn new(serial: Box<dyn GameboySerial>) -> Self {
+impl<S> SerialController<S>
+where
+    S: Serial,
+{
+    pub fn new(serial: S) -> Self {
         Self {
             serial,
             sb: 0x00,

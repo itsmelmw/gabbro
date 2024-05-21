@@ -1,4 +1,42 @@
+pub mod base;
+pub mod bitwise;
+
 use std::fmt::{Display, Formatter, Result};
+
+/// The size of the parameter expected by an instruction.
+#[derive(Clone, Copy)]
+pub enum ParamType {
+    None,
+    Byte,
+    Word,
+}
+
+#[derive(Clone, Copy)]
+pub enum Cycles {
+    Normal(usize),
+    Branch(usize, usize),
+}
+
+/// Stores information about a Game Boy instruction.
+pub struct InstrInfo {
+    mnemonic: Mnemonic,
+    param_type: ParamType,
+    #[allow(dead_code)]
+    cycles: Cycles,
+}
+
+impl InstrInfo {
+    pub fn mnemonic(&self) -> &Mnemonic {
+        &self.mnemonic
+    }
+    pub fn param_type(&self) -> ParamType {
+        self.param_type
+    }
+    #[allow(dead_code)]
+    pub fn cycles(&self) -> &Cycles {
+        &self.cycles
+    }
+}
 
 pub trait HasImmediate {
     /// Fills in `Imm::Unknown` values with `Imm::Known(T)` based on

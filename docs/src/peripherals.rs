@@ -1,4 +1,4 @@
-use gabbro::interfaces::{ButtonState, GameboyJoypad, GameboyLcd, GameboySerial, LcdColor};
+use gabbro::peripherals::{ButtonState, Joypad, Lcd, Serial, LcdColor};
 use js_sys::{Atomics, Date, Int32Array, SharedArrayBuffer, Uint8Array};
 use wasm_bindgen::prelude::*;
 
@@ -24,7 +24,7 @@ impl WasmJoypad {
     }
 }
 
-impl GameboyJoypad for WasmJoypad {
+impl Joypad for WasmJoypad {
     fn get_button_state(&mut self) -> ButtonState {
         ButtonState {
             right: self.buffer.get_index(0) != 0,
@@ -63,7 +63,7 @@ impl WasmLcd {
     }
 }
 
-impl GameboyLcd for WasmLcd {
+impl Lcd for WasmLcd {
     fn push_pixel(&mut self, color: LcdColor) {
         let val = match color {
             LcdColor::White => [0xff, 0xff, 0xff, 0xff],
@@ -100,7 +100,7 @@ impl WasmBlarggSerial {
         }
     }
 }
-impl GameboySerial for WasmBlarggSerial {
+impl Serial for WasmBlarggSerial {
     fn transfer(&mut self, val: u8) {
         self.buffer.push(val as char);
         clear();

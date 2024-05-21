@@ -1,13 +1,11 @@
-mod instructions;
-mod interrupts;
-mod registers;
-pub use self::instructions::{
-    HasImmediate, Mnemonic, ParamType, BASE_INSTRS, BITWISE_INSTRS, BITWISE_PREFIX,
+pub mod instructions;
+pub mod interrupts;
+pub mod registers;
+use crate::{
+    bus::Bus,
+    cpu::{instructions::bitwise::BITWISE_PREFIX, registers::Regs},
+    peripherals::{Joypad, Lcd, Serial},
 };
-use crate::bus::Bus;
-use crate::interfaces::{GameboyJoypad, GameboyLcd, GameboySerial};
-pub use interrupts::{IntReg, InterruptControl};
-pub use registers::Regs;
 
 /// State of the Interrupt Master Enable (IME).
 /// - Disabled: All interrupts are disabled.
@@ -21,21 +19,26 @@ enum ImeState {
 }
 
 /// Emulates the Game Boy CPU.
-pub struct Cpu {
-    bus: Bus,
+pub struct Cpu<L, J, S>
+where
+    L: Lcd,
+    J: Joypad,
+    S: Serial,
+{
+    bus: Bus<L, J, S>,
     regs: Regs,
     ime: ImeState,
     halted: bool,
 }
 
-impl Cpu {
+impl<L, J, S> Cpu<L, J, S>
+where
+    L: Lcd,
+    J: Joypad,
+    S: Serial,
+{
     /// Initializes a new CPU.
-    pub(crate) fn new(
-        rom: Vec<u8>,
-        lcd: Box<dyn GameboyLcd>,
-        joypad: Box<dyn GameboyJoypad>,
-        serial: Box<dyn GameboySerial>,
-    ) -> Self {
+    pub(crate) fn new(rom: Vec<u8>, lcd: L, joypad: J, serial: S) -> Self {
         Self {
             bus: Bus::new(rom, lcd, joypad, serial),
             regs: Regs::new(),
@@ -71,15 +74,13 @@ impl Cpu {
     /// Executes the instruction currently at `(PC)`.
     fn execute_next(&mut self) {
         let opcode = self.fetch_byte();
-        let instr = match opcode {
+        match opcode {
             BITWISE_PREFIX => {
                 let opcode = self.fetch_byte();
-                &BITWISE_INSTRS[opcode as usize]
+                self.execute_bitwise(opcode);
             }
-            _ => &BASE_INSTRS[opcode as usize],
-        };
-        log::trace!("CPU: Executing `{}`", instr.mnemonic());
-        instr.execute(self);
+            _ => self.execute_base(opcode),
+        }
     }
 
     /// Handles an interrupt. Takes 5 machine cycles.
@@ -165,7 +166,7 @@ impl Cpu {
         &self.regs
     }
 
-    pub(crate) fn bus(&self) -> &Bus {
+    pub(crate) fn bus(&self) -> &Bus<L, J, S> {
         &self.bus
     }
 }

@@ -1,29 +1,47 @@
 use crate::{
-    cpu::{
-        Cpu, HasImmediate, Mnemonic, ParamType, Regs, BASE_INSTRS, BITWISE_INSTRS, BITWISE_PREFIX,
+    cpu::Cpu,
+    peripherals::{Joypad, Lcd, Serial},
+};
+
+#[cfg(feature = "debug")]
+use crate::cpu::{
+    instructions::{
+        bitwise::BITWISE_PREFIX,
+        debug::{
+            base::BASE_INSTR_INFO, bitwise::BITWISE_INSTR_INFO, HasImmediate, Mnemonic, ParamType,
+        },
     },
-    interfaces::{
-        core::{NoJoypad, NoLcd, NoSerial},
-        GameboyJoypad, GameboyLcd, GameboySerial,
-    },
+    registers::Regs,
 };
 
 /// Represents an emulated Game Boy.
-pub struct Gameboy {
-    cpu: Cpu,
+pub struct Gameboy<L = (), J = (), S = ()>
+where
+    L: Lcd,
+    J: Joypad,
+    S: Serial,
+{
+    cpu: Cpu<L, J, S>,
 }
 
 impl Gameboy {
+    /// Creates a [`GameboyBuilder`], allowing peripherals for different input and output devices to be attached.
+    pub fn builder(rom: Vec<u8>) -> GameboyBuilder {
+        GameboyBuilder::new(rom)
+    }
+}
+
+impl<L, J, S> Gameboy<L, J, S>
+where
+    L: Lcd,
+    J: Joypad,
+    S: Serial,
+{
     /// Runs the Game Boy emulator in an infinite loop.
     pub fn run(&mut self) {
         loop {
             self.cpu.step();
         }
-    }
-
-    /// Creates a [`GameboyBuilder`], allowing interfaces for different input and output devices to be attached.
-    pub fn builder(rom: Vec<u8>) -> GameboyBuilder {
-        GameboyBuilder::new(rom)
     }
 
     /// Makes the Game Boy emulator execute a single instruction,
@@ -59,11 +77,11 @@ impl Gameboy {
                 // and no bytes containing immediates.
                 let opcode = self.cpu.bus().read(addr + 1);
                 bytes.push(opcode);
-                *BITWISE_INSTRS[opcode as usize].mnemonic()
+                *BITWISE_INSTR_INFO[opcode as usize].mnemonic()
             }
             _ => {
                 // Length can vary for other instructions.
-                let instr = &BASE_INSTRS[opcode as usize];
+                let instr = &BASE_INSTR_INFO[opcode as usize];
                 let imm = match instr.param_type() {
                     ParamType::None => vec![],
                     ParamType::Byte => {
@@ -86,12 +104,17 @@ impl Gameboy {
     }
 }
 
-/// A builder for a [`Gameboy`], allowing interfaces for different input and output devices to be attached.
-pub struct GameboyBuilder {
+/// A builder for a [`Gameboy`], allowing peripherals for different input and output devices to be attached.
+pub struct GameboyBuilder<L = (), J = (), S = ()>
+where
+    L: Lcd,
+    J: Joypad,
+    S: Serial,
+{
     rom: Vec<u8>,
-    lcd: Box<dyn GameboyLcd>,
-    joypad: Box<dyn GameboyJoypad>,
-    serial: Box<dyn GameboySerial>,
+    lcd: L,
+    joypad: J,
+    serial: S,
 }
 
 impl GameboyBuilder {
@@ -99,28 +122,78 @@ impl GameboyBuilder {
     pub fn new(rom: Vec<u8>) -> Self {
         Self {
             rom,
-            lcd: Box::new(NoLcd),
-            joypad: Box::new(NoJoypad),
-            serial: Box::new(NoSerial),
+            lcd: (),
+            joypad: (),
+            serial: (),
         }
     }
-    /// Used to attach a [`GameboyLcd`], which defines how pixels pushed to the LCD should be handled.
-    pub fn attach_lcd(mut self, lcd: Box<dyn GameboyLcd>) -> Self {
-        self.lcd = lcd;
-        self
+}
+
+impl<J, S> GameboyBuilder<(), J, S>
+where
+    J: Joypad,
+    S: Serial,
+{
+    /// Used to attach a [`Lcd`], which defines how pixels pushed to the LCD should be handled.
+    pub fn lcd<L>(self, lcd: L) -> GameboyBuilder<L, J, S>
+    where
+        L: Lcd,
+    {
+        GameboyBuilder {
+            rom: self.rom,
+            lcd,
+            joypad: self.joypad,
+            serial: self.serial,
+        }
     }
-    /// Used to attach a [`GameboyJoypad`], which defines when buttons are considered pressed or released.
-    pub fn attach_joypad(mut self, joypad: Box<dyn GameboyJoypad>) -> Self {
-        self.joypad = joypad;
-        self
+}
+
+impl<L, S> GameboyBuilder<L, (), S>
+where
+    L: Lcd,
+    S: Serial,
+{
+    /// Used to attach a [`Joypad`], which defines when buttons are considered pressed or released.
+    pub fn joypad<J>(self, joypad: J) -> GameboyBuilder<L, J, S>
+    where
+        J: Joypad,
+    {
+        GameboyBuilder {
+            rom: self.rom,
+            lcd: self.lcd,
+            joypad,
+            serial: self.serial,
+        }
     }
-    /// Used to attach a [`GameboySerial`], which defines how a serial transfer should be handled.
-    pub fn attach_serial(mut self, serial: Box<dyn GameboySerial>) -> Self {
-        self.serial = serial;
-        self
+}
+
+impl<L, J> GameboyBuilder<L, J, ()>
+where
+    L: Lcd,
+    J: Joypad,
+{
+    /// Used to attach a [`Serial`], which defines how a serial transfer should be handled.
+    pub fn serial<S>(self, serial: S) -> GameboyBuilder<L, J, S>
+    where
+        S: Serial,
+    {
+        GameboyBuilder {
+            rom: self.rom,
+            lcd: self.lcd,
+            joypad: self.joypad,
+            serial,
+        }
     }
+}
+
+impl<L, J, S> GameboyBuilder<L, J, S>
+where
+    L: Lcd,
+    J: Joypad,
+    S: Serial,
+{
     /// Builds a new [`Gameboy`].
-    pub fn build(self) -> Gameboy {
+    pub fn build(self) -> Gameboy<L, J, S> {
         Gameboy {
             cpu: Cpu::new(self.rom, self.lcd, self.joypad, self.serial),
         }

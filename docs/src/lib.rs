@@ -2,8 +2,8 @@ use gabbro::{Gameboy, LCD_HEIGHT, LCD_WIDTH};
 use js_sys::{Uint8Array, Uint8ClampedArray};
 use wasm_bindgen::{prelude::*, Clamped};
 use web_sys::{CanvasRenderingContext2d, HtmlCanvasElement, ImageData};
-mod interfaces;
-use interfaces::{WasmJoypad, WasmLcd};
+mod peripherals;
+use peripherals::{WasmJoypad, WasmLcd};
 
 /// Starts the Game Boy Emulator. As it runs in an infinite loop,
 /// it is recommended to call this inside of a Web Worker.
@@ -12,13 +12,10 @@ pub fn run_gameboy(rom: Uint8Array, lcd_buffer: Uint8Array, joypad_buffer: Uint8
     console_error_panic_hook::set_once();
     let rom = rom.to_vec();
 
-    let lcd = Box::new(WasmLcd::new(lcd_buffer));
-    let joypad = Box::new(WasmJoypad::new(joypad_buffer));
+    let lcd = WasmLcd::new(lcd_buffer);
+    let joypad = WasmJoypad::new(joypad_buffer);
 
-    let mut gb = Gameboy::builder(rom)
-        .attach_lcd(lcd)
-        .attach_joypad(joypad)
-        .build();
+    let mut gb = Gameboy::builder(rom).lcd(lcd).joypad(joypad).build();
     gb.run();
 }
 

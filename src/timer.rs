@@ -1,4 +1,4 @@
-use crate::cpu::IntReg;
+use crate::cpu::interrupts::IntReg;
 
 /// An enum representing the mode of the timer.
 enum ClockMode {

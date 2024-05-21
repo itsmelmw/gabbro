@@ -12,12 +12,14 @@ pub enum LcdColor {
 }
 
 /// A trait with functions that the Game Boy PPU calls when updating the LCD.
-pub trait GameboyLcd {
+pub trait Lcd {
     /// Gets called when a new pixel is pushed to the LCD.
     fn push_pixel(&mut self, _color: LcdColor) {}
     /// Gets called when all pixels of a frame have been pushed to the LCD.
     fn frame_ready(&mut self) {}
 }
+
+impl Lcd for () {}
 
 /// Represents the current state of the pressed buttons of the Game Boy.
 /// If a button value is `true`, it is pressed. When it is `false`, it is released.
@@ -56,7 +58,7 @@ impl Default for ButtonState {
 }
 
 /// A trait the Game Boy uses to retrieve the current button state.
-pub trait GameboyJoypad {
+pub trait Joypad {
     /// Should return the current state of the buttons.
     /// If a button is pressed, its value should be `true`. If it is released, it should be `false`.
     fn get_button_state(&mut self) -> ButtonState {
@@ -64,12 +66,16 @@ pub trait GameboyJoypad {
     }
 }
 
+impl Joypad for () {}
+
 /// A temporary simple implementation of a serial interface.
 /// Serial transfer is currently not implemented properly.
 /// This currently only exists to use for Blargg's Game Boy CPU test ROMs.
-pub trait GameboySerial {
+pub trait Serial {
     /// A function called when a serial transfer should take place.
     /// Serial transfer is currently not implemented properly.
     /// This currently only exists to use for Blargg's Game Boy CPU test ROMs.
     fn transfer(&mut self, _val: u8) {}
 }
+
+impl Serial for () {}

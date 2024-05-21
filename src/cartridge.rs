@@ -1,4 +1,4 @@
-mod header;
+pub mod header;
 pub mod mbc1;
 pub mod nombc;
 pub use mbc1::Mbc1;

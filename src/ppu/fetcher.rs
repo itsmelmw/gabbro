@@ -1,6 +1,6 @@
 use std::collections::BinaryHeap;
 
-use crate::interfaces::LcdColor;
+use crate::peripherals::LcdColor;
 
 use super::{
     fifo::{FifoEntry, PixelFifo},
