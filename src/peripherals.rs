@@ -1,7 +1,3 @@
-pub mod core;
-#[cfg(feature = "sdl2")]
-pub mod sdl2;
-
 /// An enum representing the color of a pixel on the Game Boy LCD.
 #[derive(Clone, Copy, PartialEq, Eq)]
 pub enum LcdColor {

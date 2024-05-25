@@ -162,10 +162,12 @@ where
         self.read_byte(addr)
     }
 
+    #[cfg(feature = "debug")]
     pub(crate) fn regs(&self) -> &Regs {
         &self.regs
     }
 
+    #[cfg(feature = "debug")]
     pub(crate) fn bus(&self) -> &Bus<L, J, S> {
         &self.bus
     }

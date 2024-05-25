@@ -11,9 +11,12 @@ categories = ["emulators"]
 edition = "2021"
 
 [dependencies]
-log = { version = "0.4.17", features = ["max_level_trace", "release_max_level_info"] }
+log = { version = "0.4.17", features = [
+    "max_level_trace",
+    "release_max_level_info",
+] }
 env_logger = { version = "0.10.0", optional = true }
-sdl2 = { version = "0.35.2", optional = true }
+sdl2 = { version = "0.35.2", optional = true, features = ["bundled"] }
 tui = { version = "0.19", optional = true }
 crossterm = { version = "0.25", optional = true }
 
@@ -25,14 +28,10 @@ debug = ["dep:tui", "dep:crossterm"]
 
 [[bin]]
 name = "gabbro"
-path = "src/bin/sdl2.rs"
+path = "src/bin/gabbro/main.rs"
 required-features = ["sdl2"]
 
 [[bin]]
-name = "gabbro-headless"
-path = "src/bin/headless.rs"
-
-[[bin]]
 name = "gabbro-db"
-path = "src/bin/debug/main.rs"
+path = "src/bin/gabbro-db/main.rs"
 required-features = ["debug"]
