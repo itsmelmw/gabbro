@@ -1,15 +1,16 @@
 mod peripherals;
 
 use gabbro::{ButtonState, Gameboy, LcdColor, LCD_HEIGHT, LCD_WIDTH};
-use peripherals::{ChannelLcd, LcdMessage, MutexJoypad};
-use sdl2::{event::Event, keyboard::Scancode, pixels::PixelFormatEnum};
+use peripherals::{AudioReceiver, ChannelLcd, LcdMessage, MutexJoypad};
+use sdl2::{audio::AudioSpecDesired, event::Event, keyboard::Scancode, pixels::PixelFormatEnum};
 use std::{
     env, fs,
     sync::{mpsc, Arc, Mutex},
     thread,
 };
 
-const SCALE: usize = 4;
+const WINDOW_SCALE: usize = 4;
+const AUDIO_SAMPLE_RATE: usize = 22050;
 
 fn main() -> Result<(), String> {
     #[cfg(feature = "logger")]
@@ -27,8 +28,8 @@ fn main() -> Result<(), String> {
     let window = video_subsystem
         .window(
             "Gabbro Game Boy Emulator",
-            (LCD_WIDTH * SCALE) as u32,
-            (LCD_HEIGHT * SCALE) as u32,
+            (LCD_WIDTH * WINDOW_SCALE) as u32,
+            (LCD_HEIGHT * WINDOW_SCALE) as u32,
         )
         .position_centered()
         .build()
@@ -48,12 +49,23 @@ fn main() -> Result<(), String> {
         .create_texture_streaming(PixelFormatEnum::RGB888, LCD_WIDTH as u32, LCD_HEIGHT as u32)
         .map_err(|e| e.to_string())?;
 
+    // Set up the audio
+    let audio = sdl.audio()?;
+    let spec = AudioSpecDesired {
+        freq: Some(AUDIO_SAMPLE_RATE as i32),
+        channels: Some(2),
+        samples: Some(256),
+    };
+    let (audio_snd, audio_rcv) = mpsc::channel();
+    let player = audio.open_playback(None, &spec, |_| AudioReceiver::new(audio_rcv))?;
+    player.resume();
+
     // Set up the event pump
     let mut event_pump = sdl.event_pump()?;
 
     // Set up the emulator
     let joypad_state = Arc::new(Mutex::new(ButtonState::new()));
-    let (pixel_snd, pixel_rcv) = mpsc::channel::<LcdMessage>();
+    let (pixel_snd, pixel_rcv) = mpsc::channel();
     let mut pixel_buffer = [0u8; LCD_WIDTH * LCD_HEIGHT * 4];
     let mut pixel_ptr = 0;
 

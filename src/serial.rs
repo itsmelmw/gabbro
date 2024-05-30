@@ -1,23 +1,23 @@
-use crate::{cpu::interrupts::IntReg, peripherals::Serial};
+use crate::{cpu::interrupts::IntReg, peripherals::Cable};
 
 /// A temporary simple implementation of the serial controller.
 /// Made only to be used for Blargg's Game Boy CPU tests.
-pub struct SerialController<S>
+pub struct SerialController<C>
 where
-    S: Serial,
+    C: Cable,
 {
-    serial: S,
+    cable: C,
     pub sb: u8,
     pub sc: u8,
 }
 
-impl<S> SerialController<S>
+impl<C> SerialController<C>
 where
-    S: Serial,
+    C: Cable,
 {
-    pub fn new(serial: S) -> Self {
+    pub fn new(cable: C) -> Self {
         Self {
-            serial,
+            cable,
             sb: 0x00,
             sc: 0x7e,
         }
@@ -26,7 +26,7 @@ where
     pub fn step(&mut self, _ints: &mut IntReg) {
         if (self.sc >> 7) & 1 != 0 {
             self.sc &= !(1 << 7);
-            self.serial.transfer(self.sb);
+            self.cable.transfer(self.sb);
         }
     }
 }

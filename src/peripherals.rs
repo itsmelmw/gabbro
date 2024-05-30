@@ -67,11 +67,11 @@ impl Joypad for () {}
 /// A temporary simple implementation of a serial interface.
 /// Serial transfer is currently not implemented properly.
 /// This currently only exists to use for Blargg's Game Boy CPU test ROMs.
-pub trait Serial {
+pub trait Cable {
     /// A function called when a serial transfer should take place.
     /// Serial transfer is currently not implemented properly.
     /// This currently only exists to use for Blargg's Game Boy CPU test ROMs.
     fn transfer(&mut self, _val: u8) {}
 }
 
-impl Serial for () {}
+impl Cable for () {}

@@ -59,7 +59,7 @@ impl Stat {
     fn set_mode(&mut self, mode: PpuMode) {
         self.byte = (self.byte & !3) | (mode as u8)
     }
-    /// Sets the LY-compare bit, when `LY == LYC`/
+    /// Sets the LY-compare bit, when `LY == LYC`.
     fn set_lyc(&mut self) {
         self.byte |= 1 << 2
     }

@@ -1,10 +1,14 @@
 use std::{
-    sync::{mpsc::Sender, Arc, Mutex},
+    sync::{
+        mpsc::{Receiver, Sender},
+        Arc, Mutex,
+    },
     thread,
     time::{Duration, Instant},
 };
 
 use gabbro::{ButtonState, Joypad, Lcd, LcdColor};
+use sdl2::audio::AudioCallback;
 
 pub struct MutexJoypad {
     state: Arc<Mutex<ButtonState>>,
@@ -52,5 +56,23 @@ impl Lcd for ChannelLcd {
     }
     fn push_pixel(&mut self, color: LcdColor) {
         self.pixel_snd.send(LcdMessage::Pixel(color)).unwrap();
+    }
+}
+
+pub struct AudioReceiver {
+    audio_rcv: Receiver<f32>,
+}
+
+impl AudioReceiver {
+    pub fn new(audio_rcv: Receiver<f32>) -> Self {
+        Self { audio_rcv }
+    }
+}
+
+impl AudioCallback for AudioReceiver {
+    type Channel = f32;
+
+    fn callback(&mut self, out: &mut [f32]) {
+        // TODO
     }
 }

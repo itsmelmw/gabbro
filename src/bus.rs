@@ -3,7 +3,7 @@ use crate::{
     cartridge::Cartridge,
     cpu::interrupts::InterruptControl,
     joypad::JoypadController,
-    peripherals::{Joypad, Lcd, Serial},
+    peripherals::{Cable, Joypad, Lcd},
     ppu::Ppu,
     serial::SerialController,
     timer::Timer,
@@ -11,32 +11,32 @@ use crate::{
 
 /// The bus which handles all reads and writes from/to memory.
 /// Also used to access all parts of the Game Boy besides the CPU.
-pub struct Bus<L, J, S>
+pub struct Bus<L, J, C>
 where
     L: Lcd,
     J: Joypad,
-    S: Serial,
+    C: Cable,
 {
     cart: Cartridge,
     ram: [u8; 0x2000],
     hram: [u8; 0x7f],
     joypad: JoypadController<J>,
-    serial: SerialController<S>,
+    serial: SerialController<C>,
     timer: Timer,
-    audio: Apu,
+    apu: Apu,
     ppu: Ppu<L>,
     pub interrupts: InterruptControl,
 }
 
-impl<L, J, S> Bus<L, J, S>
+impl<L, J, C> Bus<L, J, C>
 where
     L: Lcd,
     J: Joypad,
-    S: Serial,
+    C: Cable,
 {
     /// Initializes all the emulated hardware and the memory of the Game Boy.
     /// Also prints information contained in the ROM header.
-    pub fn new(rom: Vec<u8>, lcd: L, joypad: J, serial: S) -> Self {
+    pub fn new(rom: Vec<u8>, lcd: L, joypad: J, cable: C) -> Self {
         let cart = Cartridge::new(rom)
             .map_err(|e| log::error!("Failed to parse ROM header: {}", e))
             .unwrap();
@@ -46,9 +46,9 @@ where
             ram: [0; 0x2000],
             hram: [0; 0x7f],
             joypad: JoypadController::new(joypad),
-            serial: SerialController::new(serial),
+            serial: SerialController::new(cable),
             timer: Timer::new(),
-            audio: Apu::new(),
+            apu: Apu::new(),
             ppu: Ppu::new(lcd),
             interrupts: InterruptControl::new(),
         }
@@ -83,7 +83,28 @@ where
             0xff06 => self.timer.tma,
             0xff07 => self.timer.tac.byte(),
             // APU
-            0xff10..=0xff26 => self.audio.mem[addr as usize - 0xff10],
+            0xff10 => self.apu.ch1.nrx0,
+            0xff11 => self.apu.ch1.nrx1,
+            0xff12 => self.apu.ch1.nrx2,
+            0xff13 => self.apu.ch1.nrx3,
+            0xff14 => self.apu.ch1.nrx4,
+            0xff16 => self.apu.ch2.nrx1,
+            0xff17 => self.apu.ch2.nrx2,
+            0xff18 => self.apu.ch2.nrx3,
+            0xff19 => self.apu.ch2.nrx4,
+            0xff1a => self.apu.ch3.nrx0,
+            0xff1b => self.apu.ch3.nrx1,
+            0xff1c => self.apu.ch3.nrx2,
+            0xff1d => self.apu.ch3.nrx3,
+            0xff1e => self.apu.ch3.nrx4,
+            0xff20 => self.apu.ch4.nrx1,
+            0xff21 => self.apu.ch4.nrx2,
+            0xff22 => self.apu.ch4.nrx3,
+            0xff23 => self.apu.ch4.nrx4,
+            0xff24 => self.apu.master.volume,
+            0xff25 => self.apu.master.panning,
+            0xff26 => self.apu.master.control,
+            0xff30..=0xff3f => self.apu.ch3.wave[addr as usize - 0xff30],
             // PPU
             0xff40 => self.ppu.fetcher.lcdc.byte(),
             0xff41 => self.ppu.stat.byte(),
@@ -138,7 +159,28 @@ where
             0xff06 => self.timer.tma = val,
             0xff07 => self.timer.tac.set_byte(val),
             // APU
-            0xff10..=0xff3f => self.audio.mem[addr as usize - 0xff10] = val,
+            0xff10 => self.apu.ch1.nrx0 = val,
+            0xff11 => self.apu.ch1.nrx1 = val,
+            0xff12 => self.apu.ch1.nrx2 = val,
+            0xff13 => self.apu.ch1.nrx3 = val,
+            0xff14 => self.apu.ch1.nrx4 = val,
+            0xff16 => self.apu.ch2.nrx1 = val,
+            0xff17 => self.apu.ch2.nrx2 = val,
+            0xff18 => self.apu.ch2.nrx3 = val,
+            0xff19 => self.apu.ch2.nrx4 = val,
+            0xff1a => self.apu.ch3.nrx0 = val,
+            0xff1b => self.apu.ch3.nrx1 = val,
+            0xff1c => self.apu.ch3.nrx2 = val,
+            0xff1d => self.apu.ch3.nrx3 = val,
+            0xff1e => self.apu.ch3.nrx4 = val,
+            0xff20 => self.apu.ch4.nrx1 = val,
+            0xff21 => self.apu.ch4.nrx2 = val,
+            0xff22 => self.apu.ch4.nrx3 = val,
+            0xff23 => self.apu.ch4.nrx4 = val,
+            0xff24 => self.apu.master.volume = val,
+            0xff25 => self.apu.master.panning = val,
+            0xff26 => self.apu.master.control = val,
+            0xff30..=0xff3f => self.apu.ch3.wave[addr as usize - 0xff30] = val,
             // PPU
             0xff40 => self.ppu.fetcher.lcdc.set_byte(val),
             0xff41 => self.ppu.stat.set_byte(val),
@@ -167,8 +209,9 @@ where
         self.dma_step();
 
         let ints = &mut self.interrupts.flags;
-        self.ppu.step(ints);
         self.joypad.step(ints);
+        self.ppu.step(ints);
+        self.apu.step();
         self.serial.step(ints);
         self.timer.step(ints);
     }
