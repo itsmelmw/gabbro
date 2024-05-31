@@ -1,6 +1,6 @@
 use crate::{
     cpu::Cpu,
-    peripherals::{Cable, Joypad, Lcd},
+    peripherals::{Cable, Joypad, Lcd, Speaker},
 };
 
 #[cfg(feature = "debug")]
@@ -15,13 +15,14 @@ use crate::cpu::{
 };
 
 /// Represents an emulated Game Boy.
-pub struct Gameboy<L = (), J = (), C = ()>
+pub struct Gameboy<L = (), S = (), J = (), C = ()>
 where
     L: Lcd,
+    S: Speaker,
     J: Joypad,
     C: Cable,
 {
-    cpu: Cpu<L, J, C>,
+    cpu: Cpu<L, S, J, C>,
 }
 
 impl Gameboy {
@@ -31,9 +32,10 @@ impl Gameboy {
     }
 }
 
-impl<L, J, C> Gameboy<L, J, C>
+impl<L, S, J, C> Gameboy<L, S, J, C>
 where
     L: Lcd,
+    S: Speaker,
     J: Joypad,
     C: Cable,
 {
@@ -105,14 +107,16 @@ where
 }
 
 /// A builder for a [`Gameboy`], allowing peripherals for different input and output devices to be attached.
-pub struct GameboyBuilder<L = (), J = (), C = ()>
+pub struct GameboyBuilder<L = (), S = (), J = (), C = ()>
 where
     L: Lcd,
+    S: Speaker,
     J: Joypad,
     C: Cable,
 {
     rom: Vec<u8>,
     lcd: L,
+    speaker: S,
     joypad: J,
     cable: C,
 }
@@ -123,79 +127,108 @@ impl GameboyBuilder {
         Self {
             rom,
             lcd: (),
+            speaker: (),
             joypad: (),
             cable: (),
         }
     }
 }
 
-impl<J, C> GameboyBuilder<(), J, C>
+impl<S, J, C> GameboyBuilder<(), S, J, C>
 where
+    S: Speaker,
     J: Joypad,
     C: Cable,
 {
     /// Used to attach a [`Lcd`], which defines how pixels pushed to the LCD should be handled.
-    pub fn lcd<L>(self, lcd: L) -> GameboyBuilder<L, J, C>
+    pub fn lcd<L>(self, lcd: L) -> GameboyBuilder<L, S, J, C>
     where
         L: Lcd,
     {
         GameboyBuilder {
             rom: self.rom,
             lcd,
+            speaker: self.speaker,
             joypad: self.joypad,
             cable: self.cable,
         }
     }
 }
 
-impl<L, C> GameboyBuilder<L, (), C>
+impl<L, J, C> GameboyBuilder<L, (), J, C>
 where
     L: Lcd,
+    J: Joypad,
+    C: Cable,
+{
+    /// Used to attach a [`Speaker`], which defines how audio samples should be processed.
+    pub fn speaker<S>(self, speaker: S) -> GameboyBuilder<L, S, J, C>
+    where
+        S: Speaker,
+    {
+        GameboyBuilder {
+            rom: self.rom,
+            lcd: self.lcd,
+            speaker,
+            joypad: self.joypad,
+            cable: self.cable,
+        }
+    }
+}
+
+impl<L, S, C> GameboyBuilder<L, S, (), C>
+where
+    L: Lcd,
+    S: Speaker,
     C: Cable,
 {
     /// Used to attach a [`Joypad`], which defines when buttons are considered pressed or released.
-    pub fn joypad<J>(self, joypad: J) -> GameboyBuilder<L, J, C>
+    pub fn joypad<J>(self, joypad: J) -> GameboyBuilder<L, S, J, C>
     where
         J: Joypad,
     {
         GameboyBuilder {
             rom: self.rom,
             lcd: self.lcd,
+            speaker: self.speaker,
             joypad,
             cable: self.cable,
         }
     }
 }
 
-impl<L, J> GameboyBuilder<L, J, ()>
+impl<L, S, J> GameboyBuilder<L, S, J, ()>
 where
     L: Lcd,
+    S: Speaker,
     J: Joypad,
 {
     /// Used to attach a [`Cable`], which defines how a serial transfer should be handled.
-    pub fn cable<C>(self, cable: C) -> GameboyBuilder<L, J, C>
+    pub fn cable<C>(self, cable: C) -> GameboyBuilder<L, S, J, C>
     where
         C: Cable,
     {
         GameboyBuilder {
             rom: self.rom,
             lcd: self.lcd,
+            speaker: self.speaker,
             joypad: self.joypad,
             cable,
         }
     }
 }
 
-impl<L, J, C> GameboyBuilder<L, J, C>
+impl<L, S, J, C> GameboyBuilder<L, S, J, C>
 where
     L: Lcd,
+    S: Speaker,
     J: Joypad,
     C: Cable,
 {
     /// Builds a new [`Gameboy`].
-    pub fn build(self) -> Gameboy<L, J, C> {
+    pub fn build(self) -> Gameboy<L, S, J, C> {
         Gameboy {
-            cpu: Cpu::new(self.rom, self.lcd, self.joypad, self.cable),
+            cpu: Cpu::new(self.rom, self.lcd, self.speaker, self.joypad, self.cable),
         }
     }
 }

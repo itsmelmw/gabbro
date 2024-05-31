@@ -1,14 +1,14 @@
 use crate::{
-    cpu::instructions::helpers,
-    cpu::Cpu,
-    peripherals::{Cable, Joypad, Lcd},
+    cpu::{instructions::helpers, Cpu},
+    peripherals::{Cable, Joypad, Lcd, Speaker},
 };
 
 pub const BITWISE_PREFIX: u8 = 0xcb;
 
-impl<L, J, C> Cpu<L, J, C>
+impl<L, S, J, C> Cpu<L, S, J, C>
 where
     L: Lcd,
+    S: Speaker,
     J: Joypad,
     C: Cable,
 {

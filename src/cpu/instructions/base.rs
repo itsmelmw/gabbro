@@ -1,12 +1,12 @@
 use crate::{
-    cpu::instructions::helpers,
-    cpu::{Cpu, ImeState},
-    peripherals::{Cable, Joypad, Lcd},
+    cpu::{instructions::helpers, Cpu, ImeState},
+    peripherals::{Cable, Joypad, Lcd, Speaker},
 };
 
-impl<L, J, C> Cpu<L, J, C>
+impl<L, S, J, C> Cpu<L, S, J, C>
 where
     L: Lcd,
+    S: Speaker,
     J: Joypad,
     C: Cable,
 {

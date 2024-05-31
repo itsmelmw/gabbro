@@ -1,7 +1,7 @@
 mod peripherals;
 
 use gabbro::{ButtonState, Gameboy, LcdColor, LCD_HEIGHT, LCD_WIDTH};
-use peripherals::{AudioReceiver, ChannelLcd, LcdMessage, MutexJoypad};
+use peripherals::{AudioReceiver, AudioSender, ChannelLcd, LcdMessage, MutexJoypad};
 use sdl2::{audio::AudioSpecDesired, event::Event, keyboard::Scancode, pixels::PixelFormatEnum};
 use std::{
     env, fs,
@@ -71,9 +71,14 @@ fn main() -> Result<(), String> {
 
     let lcd = ChannelLcd::new(pixel_snd);
     let joypad = MutexJoypad::new(joypad_state.clone());
+    let speaker = AudioSender::new(audio_snd);
 
     thread::spawn(move || {
-        let mut gb = Gameboy::builder(rom).lcd(lcd).joypad(joypad).build();
+        let mut gb = Gameboy::builder(rom)
+            .lcd(lcd)
+            .joypad(joypad)
+            .speaker(speaker)
+            .build();
         gb.run();
     });
 

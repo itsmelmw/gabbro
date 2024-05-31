@@ -3,7 +3,7 @@ use crate::{
     cartridge::Cartridge,
     cpu::interrupts::InterruptControl,
     joypad::JoypadController,
-    peripherals::{Cable, Joypad, Lcd},
+    peripherals::{Cable, Joypad, Lcd, Speaker},
     ppu::Ppu,
     serial::SerialController,
     timer::Timer,
@@ -11,9 +11,10 @@ use crate::{
 
 /// The bus which handles all reads and writes from/to memory.
 /// Also used to access all parts of the Game Boy besides the CPU.
-pub struct Bus<L, J, C>
+pub struct Bus<L, S, J, C>
 where
     L: Lcd,
+    S: Speaker,
     J: Joypad,
     C: Cable,
 {
@@ -23,20 +24,21 @@ where
     joypad: JoypadController<J>,
     serial: SerialController<C>,
     timer: Timer,
-    apu: Apu,
+    apu: Apu<S>,
     ppu: Ppu<L>,
     pub interrupts: InterruptControl,
 }
 
-impl<L, J, C> Bus<L, J, C>
+impl<L, S, J, C> Bus<L, S, J, C>
 where
     L: Lcd,
+    S: Speaker,
     J: Joypad,
     C: Cable,
 {
     /// Initializes all the emulated hardware and the memory of the Game Boy.
     /// Also prints information contained in the ROM header.
-    pub fn new(rom: Vec<u8>, lcd: L, joypad: J, cable: C) -> Self {
+    pub fn new(rom: Vec<u8>, lcd: L, speaker: S, joypad: J, cable: C) -> Self {
         let cart = Cartridge::new(rom)
             .map_err(|e| log::error!("Failed to parse ROM header: {}", e))
             .unwrap();
@@ -48,7 +50,7 @@ where
             joypad: JoypadController::new(joypad),
             serial: SerialController::new(cable),
             timer: Timer::new(),
-            apu: Apu::new(),
+            apu: Apu::new(speaker),
             ppu: Ppu::new(lcd),
             interrupts: InterruptControl::new(),
         }
@@ -163,11 +165,21 @@ where
             0xff11 => self.apu.ch1.nrx1 = val,
             0xff12 => self.apu.ch1.nrx2 = val,
             0xff13 => self.apu.ch1.nrx3 = val,
-            0xff14 => self.apu.ch1.nrx4 = val,
+            0xff14 => {
+                self.apu.ch1.nrx4 = val;
+                if (val >> 7) & 1 != 0 {
+                    self.apu.ch1.start();
+                }
+            }
             0xff16 => self.apu.ch2.nrx1 = val,
             0xff17 => self.apu.ch2.nrx2 = val,
             0xff18 => self.apu.ch2.nrx3 = val,
-            0xff19 => self.apu.ch2.nrx4 = val,
+            0xff19 => {
+                self.apu.ch2.nrx4 = val;
+                if (val >> 7) & 1 != 0 {
+                    self.apu.ch2.start();
+                }
+            }
             0xff1a => self.apu.ch3.nrx0 = val,
             0xff1b => self.apu.ch3.nrx1 = val,
             0xff1c => self.apu.ch3.nrx2 = val,

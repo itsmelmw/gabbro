@@ -7,8 +7,10 @@ use std::{
     time::{Duration, Instant},
 };
 
-use gabbro::{ButtonState, Joypad, Lcd, LcdColor};
+use gabbro::{ButtonState, Joypad, Lcd, LcdColor, Speaker};
 use sdl2::audio::AudioCallback;
+
+use crate::AUDIO_SAMPLE_RATE;
 
 pub struct MutexJoypad {
     state: Arc<Mutex<ButtonState>>,
@@ -60,11 +62,11 @@ impl Lcd for ChannelLcd {
 }
 
 pub struct AudioReceiver {
-    audio_rcv: Receiver<f32>,
+    audio_rcv: Receiver<(f32, f32)>,
 }
 
 impl AudioReceiver {
-    pub fn new(audio_rcv: Receiver<f32>) -> Self {
+    pub fn new(audio_rcv: Receiver<(f32, f32)>) -> Self {
         Self { audio_rcv }
     }
 }
@@ -73,6 +75,29 @@ impl AudioCallback for AudioReceiver {
     type Channel = f32;
 
     fn callback(&mut self, out: &mut [f32]) {
-        // TODO
+        for i in 0..out.len() / 2 {
+            let (left, right) = self.audio_rcv.recv().unwrap();
+            out[i * 2] = left;
+            out[i * 2 + 1] = right;
+        }
+    }
+}
+
+pub struct AudioSender {
+    audio_snd: Sender<(f32, f32)>,
+}
+
+impl AudioSender {
+    pub fn new(audio_snd: Sender<(f32, f32)>) -> Self {
+        Self { audio_snd }
+    }
+}
+
+impl Speaker for AudioSender {
+    fn sampling_rate(&self) -> usize {
+        AUDIO_SAMPLE_RATE
+    }
+    fn push_sample(&mut self, left: f32, right: f32) {
+        self.audio_snd.send((left, right)).unwrap()
     }
 }

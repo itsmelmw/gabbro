@@ -17,59 +17,23 @@ impl MasterControl {
         (self.control >> 7) & 1 != 0
     }
 
-    pub fn ch1_enabled(&self) -> bool {
-        self.control & 1 != 0
+    pub fn channel_enabled(&self, ch_idx: usize) -> bool {
+        (self.control >> ch_idx as u8) & 1 != 0
     }
 
-    pub fn ch2_enabled(&self) -> bool {
-        (self.control >> 1) & 1 != 0
+    pub fn channel_right(&self, ch_idx: usize) -> bool {
+        (self.panning >> ch_idx as u8) & 1 != 0
     }
 
-    pub fn ch3_enabled(&self) -> bool {
-        (self.control >> 2) & 1 != 0
-    }
-
-    pub fn ch4_enabled(&self) -> bool {
-        (self.control >> 3) & 1 != 0
-    }
-
-    pub fn ch1_right(&self) -> bool {
-        self.panning & 1 != 0
-    }
-
-    pub fn ch2_right(&self) -> bool {
-        (self.panning >> 1) & 1 != 0
-    }
-
-    pub fn ch3_right(&self) -> bool {
-        (self.panning >> 2) & 1 != 0
-    }
-
-    pub fn ch4_right(&self) -> bool {
-        (self.panning >> 3) & 1 != 0
-    }
-
-    pub fn ch1_left(&self) -> bool {
-        (self.panning >> 4) & 1 != 0
-    }
-
-    pub fn ch2_left(&self) -> bool {
-        (self.panning >> 5) & 1 != 0
-    }
-
-    pub fn ch3_left(&self) -> bool {
-        (self.panning >> 6) & 1 != 0
-    }
-
-    pub fn ch4_left(&self) -> bool {
-        (self.panning >> 7) & 1 != 0
+    pub fn channel_left(&self, ch_idx: usize) -> bool {
+        (self.panning >> (ch_idx as u8 + 4)) & 1 != 0
     }
 
     pub fn right_volume(&self) -> u8 {
-        self.volume & 0x07
+        (self.volume & 0x07) + 1
     }
 
     pub fn left_volume(&self) -> u8 {
-        (self.volume >> 4) & 0x07
+        ((self.volume >> 4) & 0x07) + 1
     }
 }
