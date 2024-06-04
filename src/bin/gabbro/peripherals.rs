@@ -63,11 +63,12 @@ impl Lcd for ChannelLcd {
 
 pub struct AudioReceiver {
     audio_rcv: Receiver<(f32, f32)>,
+    volume: f32,
 }
 
 impl AudioReceiver {
-    pub fn new(audio_rcv: Receiver<(f32, f32)>) -> Self {
-        Self { audio_rcv }
+    pub fn new(audio_rcv: Receiver<(f32, f32)>, volume: f32) -> Self {
+        Self { audio_rcv, volume }
     }
 }
 
@@ -77,8 +78,8 @@ impl AudioCallback for AudioReceiver {
     fn callback(&mut self, out: &mut [f32]) {
         for i in 0..out.len() / 2 {
             let (left, right) = self.audio_rcv.recv().unwrap();
-            out[i * 2] = left;
-            out[i * 2 + 1] = right;
+            out[i * 2] = left * self.volume;
+            out[i * 2 + 1] = right * self.volume;
         }
     }
 }

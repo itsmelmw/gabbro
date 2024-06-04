@@ -57,7 +57,7 @@ fn main() -> Result<(), String> {
         samples: Some(256),
     };
     let (audio_snd, audio_rcv) = mpsc::channel();
-    let player = audio.open_playback(None, &spec, |_| AudioReceiver::new(audio_rcv))?;
+    let player = audio.open_playback(None, &spec, |_| AudioReceiver::new(audio_rcv, 0.1))?;
     player.resume();
 
     // Set up the event pump

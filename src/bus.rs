@@ -188,7 +188,12 @@ where
             0xff20 => self.apu.ch4.nrx1 = val,
             0xff21 => self.apu.ch4.nrx2 = val,
             0xff22 => self.apu.ch4.nrx3 = val,
-            0xff23 => self.apu.ch4.nrx4 = val,
+            0xff23 => {
+                self.apu.ch4.nrx4 = val;
+                if (val >> 7) & 1 != 0 {
+                    self.apu.ch4.start();
+                }
+            }
             0xff24 => self.apu.master.volume = val,
             0xff25 => self.apu.master.panning = val,
             0xff26 => self.apu.master.control = val,

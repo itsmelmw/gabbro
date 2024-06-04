@@ -31,7 +31,7 @@ impl Wave {
         (self.nrx2 >> 5) & 0x03
     }
 
-    pub fn frequency(&self) -> u16 {
+    pub fn period(&self) -> u16 {
         let low = self.nrx3 as u16;
         let high = (self.nrx4 as u16 & 0x07) << 8;
         high | low

@@ -8,9 +8,7 @@ use crate::{
     peripherals::Speaker,
 };
 
-const TICK_RATE: usize = 1048576;
-const VOLUME_ENVELOPE_TICK_RATE: usize = TICK_RATE / 64;
-const LENGTH_TIMER_TICK_RATE: usize = TICK_RATE / 256;
+const APU_TICK_RATE: usize = 1048576;
 
 pub struct Apu<S>
 where
@@ -46,9 +44,11 @@ where
         samples[0] = self.ch1.sample();
         samples[1] = self.ch2.sample();
 
+        samples[3] = self.ch4.sample();
+
         if self.speaker.sampling_rate() > 0 {
             self.sample_counter += 1;
-            if self.sample_counter >= TICK_RATE / self.speaker.sampling_rate() {
+            if self.sample_counter >= APU_TICK_RATE / self.speaker.sampling_rate() {
                 let (mut left_sample, mut right_sample) = (0., 0.);
                 if self.master.apu_enabled() {
                     for (ch_idx, sample) in samples.iter().enumerate() {
@@ -69,11 +69,14 @@ where
     }
 }
 
+#[derive(Default)]
 pub enum SweepDir {
-    Increase,
+    #[default]
     Decrease,
+    Increase,
 }
 
+#[derive(Default)]
 pub struct LengthTimer {
     enabled: bool,
     length: u8,
@@ -81,13 +84,7 @@ pub struct LengthTimer {
 }
 
 impl LengthTimer {
-    pub fn new() -> Self {
-        Self {
-            enabled: false,
-            length: 0,
-            ticks: 0,
-        }
-    }
+    const TICK_RATE: usize = APU_TICK_RATE / 256;
 
     pub fn start(&mut self, length: u8, enabled: bool) {
         self.length = length;
@@ -99,11 +96,11 @@ impl LengthTimer {
         if !self.enabled {
             return false;
         }
-        if self.length == 0x80 {
+        if self.length >= 0x40 {
             return true;
         }
         self.ticks += 1;
-        if self.ticks >= LENGTH_TIMER_TICK_RATE {
+        if self.ticks >= Self::TICK_RATE {
             self.ticks = 0;
             self.length += 1;
         }
@@ -111,6 +108,7 @@ impl LengthTimer {
     }
 }
 
+#[derive(Default)]
 pub struct VolumeEnvelope {
     volume: u8,
     direction: SweepDir,
@@ -119,14 +117,7 @@ pub struct VolumeEnvelope {
 }
 
 impl VolumeEnvelope {
-    pub fn new() -> Self {
-        Self {
-            volume: 0,
-            direction: SweepDir::Decrease,
-            pace: 0,
-            ticks: 0,
-        }
-    }
+    const TICK_RATE: usize = APU_TICK_RATE / 64;
 
     pub fn start(&mut self, volume: u8, direction: SweepDir, pace: u8) {
         self.volume = volume;
@@ -136,47 +127,70 @@ impl VolumeEnvelope {
     }
 
     pub fn current_volume(&mut self) -> f32 {
-        if self.volume == 0 {
-            return 0.;
-        }
-        self.ticks += 1;
-        if self.ticks >= VOLUME_ENVELOPE_TICK_RATE * self.pace as usize {
-            self.ticks = 0;
-            match self.direction {
-                SweepDir::Increase => self.volume += 1,
-                SweepDir::Decrease => self.volume -= 1,
-            }
-            if self.volume > 15 {
-                self.volume = 0;
+        if self.pace > 0 {
+            self.ticks += 1;
+            if self.ticks >= Self::TICK_RATE * self.pace as usize {
+                self.ticks = 0;
+                match self.direction {
+                    SweepDir::Increase => {
+                        if self.volume < 15 {
+                            self.volume += 1
+                        }
+                    }
+                    SweepDir::Decrease => {
+                        if self.volume > 0 {
+                            self.volume -= 1
+                        }
+                    }
+                }
             }
         }
         self.volume as f32 / 15.
     }
 }
 
-pub struct FrequencySweep {
-    frequency: u16,
+#[derive(Default)]
+pub struct PeriodSweep {
+    period: u16,
     direction: SweepDir,
     pace: u8,
     step: u8,
+    ticks: usize,
 }
 
-impl FrequencySweep {
-    pub fn new() -> Self {
-        Self {
-            frequency: 0,
-            direction: SweepDir::Increase,
-            pace: 0,
-            step: 0,
-        }
-    }
+impl PeriodSweep {
+    const TICK_RATE: usize = APU_TICK_RATE / 128;
 
-    pub fn start(&mut self, frequency: u16, direction: SweepDir, pace: u8, step: u8) {
-        self.frequency = frequency;
+    pub fn start(&mut self, period: u16, direction: SweepDir, pace: u8, step: u8) {
+        self.period = period;
         self.direction = direction;
         self.pace = pace;
         self.step = step;
+        self.ticks = 0;
     }
 
-    // pub fn current_frequency(&mut self) -> u16 {}
+    pub fn current_period(&mut self) -> Option<u16> {
+        if self.period == 0 {
+            return None;
+        }
+        self.ticks += 1;
+        if self.pace > 0 && self.ticks >= Self::TICK_RATE * self.pace as usize {
+            self.ticks = 0;
+            let diff = self.period >> self.step;
+            self.period = match self.direction {
+                SweepDir::Increase => {
+                    let period = self.period.saturating_add(diff);
+                    if period > 0x7ff {
+                        0
+                    } else {
+                        period
+                    }
+                }
+                SweepDir::Decrease => self.period.wrapping_sub(diff),
+            };
+            Some(self.period)
+        } else {
+            None
+        }
+    }
 }
