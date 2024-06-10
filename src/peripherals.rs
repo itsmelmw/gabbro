@@ -18,15 +18,10 @@ pub trait Lcd {
 impl Lcd for () {}
 
 pub trait Speaker {
-    fn sampling_rate(&self) -> usize;
     fn push_sample(&mut self, _left: f32, _right: f32) {}
 }
 
-impl Speaker for () {
-    fn sampling_rate(&self) -> usize {
-        0
-    }
-}
+impl Speaker for () {}
 
 /// Represents the current state of the pressed buttons of the Game Boy.
 /// If a button value is `true`, it is pressed. When it is `false`, it is released.

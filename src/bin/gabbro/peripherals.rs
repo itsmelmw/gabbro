@@ -85,20 +85,33 @@ impl AudioCallback for AudioReceiver {
 }
 
 pub struct AudioSender {
+    sample_sum: (f32, f32),
+    sample_count: usize,
     audio_snd: Sender<(f32, f32)>,
 }
 
 impl AudioSender {
+    const SAMPLE_RATE: usize = 1048576 / AUDIO_SAMPLE_RATE;
     pub fn new(audio_snd: Sender<(f32, f32)>) -> Self {
-        Self { audio_snd }
+        Self {
+            sample_sum: (0., 0.),
+            sample_count: 0,
+            audio_snd,
+        }
     }
 }
 
 impl Speaker for AudioSender {
-    fn sampling_rate(&self) -> usize {
-        AUDIO_SAMPLE_RATE
-    }
     fn push_sample(&mut self, left: f32, right: f32) {
-        self.audio_snd.send((left, right)).unwrap()
+        self.sample_sum.0 += left;
+        self.sample_sum.1 += right;
+        self.sample_count += 1;
+        if self.sample_count >= Self::SAMPLE_RATE {
+            let left_sample = self.sample_sum.0 / Self::SAMPLE_RATE as f32;
+            let right_sample = self.sample_sum.1 / Self::SAMPLE_RATE as f32;
+            self.audio_snd.send((left_sample, right_sample)).unwrap();
+            self.sample_count = 0;
+            self.sample_sum = (0., 0.);
+        }
     }
 }

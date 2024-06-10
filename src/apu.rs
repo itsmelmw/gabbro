@@ -20,7 +20,6 @@ where
     pub ch3: Wave,
     pub ch4: Noise,
     speaker: S,
-    sample_counter: usize,
 }
 
 impl<S> Apu<S>
@@ -35,7 +34,6 @@ where
             ch3: Wave::new(),
             ch4: Noise::new(),
             speaker,
-            sample_counter: 0,
         }
     }
 
@@ -46,26 +44,20 @@ where
 
         samples[3] = self.ch4.sample();
 
-        if self.speaker.sampling_rate() > 0 {
-            self.sample_counter += 1;
-            if self.sample_counter >= APU_TICK_RATE / self.speaker.sampling_rate() {
-                let (mut left_sample, mut right_sample) = (0., 0.);
-                if self.master.apu_enabled() {
-                    for (ch_idx, sample) in samples.iter().enumerate() {
-                        if self.master.channel_left(ch_idx) {
-                            left_sample += sample;
-                        }
-                        if self.master.channel_right(ch_idx) {
-                            right_sample += sample;
-                        }
-                    }
+        let (mut left_sample, mut right_sample) = (0., 0.);
+        if self.master.apu_enabled() {
+            for (ch_idx, sample) in samples.iter().enumerate() {
+                if self.master.channel_left(ch_idx) {
+                    left_sample += sample;
                 }
-                left_sample *= self.master.left_volume() as f32 / 8.;
-                right_sample *= self.master.right_volume() as f32 / 8.;
-                self.speaker.push_sample(left_sample, right_sample);
-                self.sample_counter = 0;
+                if self.master.channel_right(ch_idx) {
+                    right_sample += sample;
+                }
             }
         }
+        left_sample *= self.master.left_volume() as f32 / 8.;
+        right_sample *= self.master.right_volume() as f32 / 8.;
+        self.speaker.push_sample(left_sample, right_sample);
     }
 }
 
