@@ -1,4 +1,4 @@
-use super::oam::SprPalette;
+use crate::ppu::oam::SprPalette;
 
 /// A bit queue used for Background and Window pixel information.
 pub struct BgwBitQueue {

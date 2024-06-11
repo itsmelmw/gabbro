@@ -1,11 +1,12 @@
 use std::collections::BinaryHeap;
 
-use crate::peripherals::LcdColor;
-
-use super::{
-    fifo::{FifoEntry, PixelFifo},
-    oam::{Oam, SprPalette, Sprite},
-    vram::{IdxType, TileType, Vram},
+use crate::{
+    peripherals::LcdColor,
+    ppu::{
+        fifo::{FifoEntry, PixelFifo},
+        oam::{Oam, SprPalette, Sprite},
+        vram::{IdxType, TileType, Vram},
+    },
 };
 
 /// The `LCDC` IO register, allowing control of the PPU.

@@ -1,6 +1,4 @@
-use crate::apu::SweepDir;
-
-use super::{LengthTimer, PeriodSweep, VolumeEnvelope};
+use crate::apu::{LengthTimer, PeriodSweep, SweepDir, VolumeEnvelope};
 
 pub struct Pulse<const FS: bool>
 where
@@ -9,7 +7,8 @@ where
     period_sweep: <Self as SweepControl>::SweepType,
     volume_envelope: VolumeEnvelope,
     length_timer: LengthTimer,
-    period_samples: usize,
+    waveform_idx: usize,
+    ticks: usize,
     pub nrx0: <Self as SweepControl>::SweepRegType,
     pub nrx1: u8,
     pub nrx2: u8,
@@ -21,12 +20,21 @@ impl<const FS: bool> Pulse<FS>
 where
     Self: SweepControl,
 {
+    const WAVEFORM_SIZE: usize = 8;
+    const WAVEFORMS: [[u8; 8]; 4] = [
+        [1, 1, 1, 1, 1, 1, 1, 0],
+        [0, 1, 1, 1, 1, 1, 1, 0],
+        [0, 1, 1, 1, 1, 0, 0, 0],
+        [1, 0, 0, 0, 0, 0, 0, 1],
+    ];
+
     pub fn new() -> Self {
         Self {
             period_sweep: <Self as SweepControl>::SweepType::default(),
             volume_envelope: VolumeEnvelope::default(),
             length_timer: LengthTimer::default(),
-            period_samples: 0,
+            waveform_idx: 0,
+            ticks: 0,
             nrx0: <Self as SweepControl>::SweepRegType::default(),
             nrx1: 0,
             nrx2: 0,
@@ -36,17 +44,11 @@ where
     }
 
     pub fn length_timer(&self) -> u8 {
-        self.nrx1 & 0x3f
+        0x40 - (self.nrx1 & 0x3f)
     }
 
-    pub fn duty_cycle(&self) -> f32 {
-        match (self.nrx1 >> 6) & 0x03 {
-            0 => 0.125,
-            1 => 0.25,
-            2 => 0.5,
-            3 => 0.75,
-            _ => unreachable!(),
-        }
+    pub fn waveform(&self) -> &[u8; 8] {
+        &Self::WAVEFORMS[(self.nrx1 >> 6) as usize]
     }
 
     pub fn envelope_pace(&self) -> u8 {
@@ -68,7 +70,7 @@ where
     pub fn period(&self) -> u16 {
         let low = self.nrx3 as u16;
         let high = (self.nrx4 as u16 & 0x07) << 8;
-        high | low
+        0x800 - (high | low)
     }
 
     pub fn length_enabled(&self) -> bool {
@@ -76,6 +78,8 @@ where
     }
 
     pub fn start(&mut self) {
+        self.ticks = 0;
+        self.waveform_idx = 0;
         self.length_timer
             .start(self.length_timer(), self.length_enabled());
         self.volume_envelope
@@ -84,26 +88,18 @@ where
     }
 
     pub fn sample(&mut self) -> f32 {
-        if self.length_timer.shut_down() {
+        if !self.length_timer.current_state() {
             return 0.;
         }
         let volume = self.volume_envelope.current_volume();
         self.update_period();
 
-        let period = (0x800 - self.period()) as usize * 8;
-        if self.period_samples >= period {
-            self.period_samples = 0;
+        self.ticks += 1;
+        if self.ticks >= self.period() as usize {
+            self.ticks = 0;
+            self.waveform_idx = (self.waveform_idx + 1) % Self::WAVEFORM_SIZE;
         }
-
-        let period_prog = self.period_samples as f32 / period as f32;
-        let duty_cycle = self.duty_cycle();
-        self.period_samples += 1;
-
-        if period_prog < duty_cycle {
-            volume
-        } else {
-            0.
-        }
+        volume * self.waveform()[self.waveform_idx] as f32
     }
 }
 
@@ -127,7 +123,7 @@ impl SweepControl for Pulse<true> {
 
     fn start_sweep(&mut self) {
         self.period_sweep.start(
-            self.period(),
+            0x800 - self.period(),
             self.sweep_direction(),
             self.sweep_pace(),
             self.sweep_step(),
@@ -135,9 +131,9 @@ impl SweepControl for Pulse<true> {
     }
 
     fn update_period(&mut self) {
-        if let Some(period) = self.period_sweep.current_period() {
-            self.nrx3 = (period & 0xff) as u8;
-            self.nrx4 = (self.nrx4 & 0xf8) | ((period >> 8) & 0x07) as u8;
+        if let Some(neg_period) = self.period_sweep.current_period() {
+            self.nrx3 = (neg_period & 0xff) as u8;
+            self.nrx4 = (self.nrx4 & 0xf8) | ((neg_period >> 8) & 0x07) as u8;
         }
     }
 }

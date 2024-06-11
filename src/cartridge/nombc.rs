@@ -1,4 +1,4 @@
-use super::Mbc;
+use crate::cartridge::Mbc;
 use std::fmt;
 
 pub struct NoMbc {

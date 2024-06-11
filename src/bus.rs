@@ -106,7 +106,7 @@ where
             0xff24 => self.apu.master.volume,
             0xff25 => self.apu.master.panning,
             0xff26 => self.apu.master.control,
-            0xff30..=0xff3f => self.apu.ch3.wave[addr as usize - 0xff30],
+            0xff30..=0xff3f => self.apu.ch3.waveform[addr as usize - 0xff30],
             // PPU
             0xff40 => self.ppu.fetcher.lcdc.byte(),
             0xff41 => self.ppu.stat.byte(),
@@ -184,7 +184,12 @@ where
             0xff1b => self.apu.ch3.nrx1 = val,
             0xff1c => self.apu.ch3.nrx2 = val,
             0xff1d => self.apu.ch3.nrx3 = val,
-            0xff1e => self.apu.ch3.nrx4 = val,
+            0xff1e => {
+                self.apu.ch3.nrx4 = val;
+                if (val >> 7) & 1 != 0 {
+                    self.apu.ch3.start();
+                }
+            }
             0xff20 => self.apu.ch4.nrx1 = val,
             0xff21 => self.apu.ch4.nrx2 = val,
             0xff22 => self.apu.ch4.nrx3 = val,
@@ -197,7 +202,7 @@ where
             0xff24 => self.apu.master.volume = val,
             0xff25 => self.apu.master.panning = val,
             0xff26 => self.apu.master.control = val,
-            0xff30..=0xff3f => self.apu.ch3.wave[addr as usize - 0xff30] = val,
+            0xff30..=0xff3f => self.apu.ch3.waveform[addr as usize - 0xff30] = val,
             // PPU
             0xff40 => self.ppu.fetcher.lcdc.set_byte(val),
             0xff41 => self.ppu.stat.set_byte(val),

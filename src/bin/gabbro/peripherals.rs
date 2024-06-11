@@ -7,7 +7,7 @@ use std::{
     time::{Duration, Instant},
 };
 
-use gabbro::{ButtonState, Joypad, Lcd, LcdColor, Speaker};
+use gabbro::{ButtonState, Joypad, Lcd, LcdColor, Speaker, APU_SAMPLE_RATE};
 use sdl2::audio::AudioCallback;
 
 use crate::AUDIO_SAMPLE_RATE;
@@ -91,7 +91,7 @@ pub struct AudioSender {
 }
 
 impl AudioSender {
-    const SAMPLE_RATE: usize = 1048576 / AUDIO_SAMPLE_RATE;
+    const SAMPLE_RATE: usize = APU_SAMPLE_RATE / AUDIO_SAMPLE_RATE;
     pub fn new(audio_snd: Sender<(f32, f32)>) -> Self {
         Self {
             sample_sum: (0., 0.),

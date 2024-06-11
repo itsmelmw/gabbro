@@ -8,7 +8,7 @@ use crate::{
     peripherals::Speaker,
 };
 
-const APU_TICK_RATE: usize = 1048576;
+pub const APU_SAMPLE_RATE: usize = 1048576;
 
 pub struct Apu<S>
 where
@@ -41,7 +41,7 @@ where
         let mut samples = [0.; 4];
         samples[0] = self.ch1.sample();
         samples[1] = self.ch2.sample();
-
+        samples[2] = self.ch3.sample();
         samples[3] = self.ch4.sample();
 
         let (mut left_sample, mut right_sample) = (0., 0.);
@@ -54,9 +54,9 @@ where
                     right_sample += sample;
                 }
             }
+            left_sample *= self.master.left_volume() as f32 / 8.;
+            right_sample *= self.master.right_volume() as f32 / 8.;
         }
-        left_sample *= self.master.left_volume() as f32 / 8.;
-        right_sample *= self.master.right_volume() as f32 / 8.;
         self.speaker.push_sample(left_sample, right_sample);
     }
 }
@@ -76,7 +76,7 @@ pub struct LengthTimer {
 }
 
 impl LengthTimer {
-    const TICK_RATE: usize = APU_TICK_RATE / 256;
+    const TICK_RATE: usize = APU_SAMPLE_RATE / 256;
 
     pub fn start(&mut self, length: u8, enabled: bool) {
         self.length = length;
@@ -84,19 +84,19 @@ impl LengthTimer {
         self.ticks = 0;
     }
 
-    pub fn shut_down(&mut self) -> bool {
+    pub fn current_state(&mut self) -> bool {
         if !self.enabled {
-            return false;
-        }
-        if self.length >= 0x40 {
             return true;
+        }
+        if self.length == 0 {
+            return false;
         }
         self.ticks += 1;
         if self.ticks >= Self::TICK_RATE {
             self.ticks = 0;
-            self.length += 1;
+            self.length -= 1;
         }
-        false
+        true
     }
 }
 
@@ -109,7 +109,7 @@ pub struct VolumeEnvelope {
 }
 
 impl VolumeEnvelope {
-    const TICK_RATE: usize = APU_TICK_RATE / 64;
+    const TICK_RATE: usize = APU_SAMPLE_RATE / 64;
 
     pub fn start(&mut self, volume: u8, direction: SweepDir, pace: u8) {
         self.volume = volume;
@@ -151,7 +151,7 @@ pub struct PeriodSweep {
 }
 
 impl PeriodSweep {
-    const TICK_RATE: usize = APU_TICK_RATE / 128;
+    const TICK_RATE: usize = APU_SAMPLE_RATE / 128;
 
     pub fn start(&mut self, period: u16, direction: SweepDir, pace: u8, step: u8) {
         self.period = period;

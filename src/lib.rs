@@ -8,6 +8,7 @@ mod peripherals;
 mod ppu;
 mod serial;
 mod timer;
+pub use apu::APU_SAMPLE_RATE;
 #[cfg(feature = "debug")]
 pub use cpu::{instructions::debug::Mnemonic, registers::Regs};
 pub use gameboy::Gameboy;

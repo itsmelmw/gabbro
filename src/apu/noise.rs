@@ -1,6 +1,4 @@
-use crate::apu::SweepDir;
-
-use super::{LengthTimer, VolumeEnvelope};
+use crate::apu::{LengthTimer, SweepDir, VolumeEnvelope};
 
 pub enum LfsrWidth {
     B15 = 0,
@@ -36,7 +34,7 @@ impl Noise {
     }
 
     pub fn length_timer(&self) -> u8 {
-        self.nrx1 & 0x3f
+        0x40 - (self.nrx1 & 0x3f)
     }
 
     pub fn envelope_pace(&self) -> u8 {
@@ -84,40 +82,23 @@ impl Noise {
     pub fn lfsr_step(&mut self) {
         let bit = !((self.lfsr & 0x01) ^ ((self.lfsr >> 1) & 0x01));
         self.lfsr |= bit << 15;
-        self.lfsr >>= 1;
         if let LfsrWidth::B7 = self.lfsr_width() {
-            self.lfsr = (self.lfsr & 0xffbf) | bit << 6;
+            self.lfsr = (self.lfsr & 0xff7f) | bit << 7;
         }
+        self.lfsr >>= 1;
     }
 
     pub fn start(&mut self) {
+        self.ticks = 0;
+        self.lfsr = 0;
         self.length_timer
             .start(self.length_timer(), self.length_enabled());
         self.volume_envelope
             .start(self.volume(), self.envelope_dir(), self.envelope_pace());
-        self.ticks = 0;
-        self.lfsr = 0;
-
-        println!("Noise start: period: {}, width: {:?}, shift: {}, divider: {}, length: {}, volume: {}, envelope dir: {:?}, envelope pace: {}",
-            self.period(),
-            match self.lfsr_width() {
-                LfsrWidth::B15 => "15",
-                LfsrWidth::B7 => "7",
-            },
-            self.clock_shift(),
-            self.clock_divider(),
-            self.length_timer(),
-            self.volume(),
-            match self.envelope_dir() {
-                SweepDir::Increase => "Increase",
-                SweepDir::Decrease => "Decrease",
-            },
-            self.envelope_pace(),
-        );
     }
 
     pub fn sample(&mut self) -> f32 {
-        if self.length_timer.shut_down() {
+        if !self.length_timer.current_state() {
             return 0.;
         }
         let volume = self.volume_envelope.current_volume();
@@ -127,11 +108,6 @@ impl Noise {
             self.ticks = 0;
             self.lfsr_step();
         }
-
-        if self.lfsr & 1 != 0 {
-            volume
-        } else {
-            0.
-        }
+        volume * (self.lfsr & 1) as f32
     }
 }
