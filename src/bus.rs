@@ -85,28 +85,7 @@ where
             0xff06 => self.timer.tma,
             0xff07 => self.timer.tac.byte(),
             // APU
-            0xff10 => self.apu.ch1.nrx0,
-            0xff11 => self.apu.ch1.nrx1,
-            0xff12 => self.apu.ch1.nrx2,
-            0xff13 => self.apu.ch1.nrx3,
-            0xff14 => self.apu.ch1.nrx4,
-            0xff16 => self.apu.ch2.nrx1,
-            0xff17 => self.apu.ch2.nrx2,
-            0xff18 => self.apu.ch2.nrx3,
-            0xff19 => self.apu.ch2.nrx4,
-            0xff1a => self.apu.ch3.nrx0,
-            0xff1b => self.apu.ch3.nrx1,
-            0xff1c => self.apu.ch3.nrx2,
-            0xff1d => self.apu.ch3.nrx3,
-            0xff1e => self.apu.ch3.nrx4,
-            0xff20 => self.apu.ch4.nrx1,
-            0xff21 => self.apu.ch4.nrx2,
-            0xff22 => self.apu.ch4.nrx3,
-            0xff23 => self.apu.ch4.nrx4,
-            0xff24 => self.apu.master.volume,
-            0xff25 => self.apu.master.panning,
-            0xff26 => self.apu.master.control,
-            0xff30..=0xff3f => self.apu.ch3.waveform[addr as usize - 0xff30],
+            0xff10..=0xff3f => self.apu.read(addr),
             // PPU
             0xff40 => self.ppu.fetcher.lcdc.byte(),
             0xff41 => self.ppu.stat.byte(),
@@ -161,48 +140,7 @@ where
             0xff06 => self.timer.tma = val,
             0xff07 => self.timer.tac.set_byte(val),
             // APU
-            0xff10 => self.apu.ch1.nrx0 = val,
-            0xff11 => self.apu.ch1.nrx1 = val,
-            0xff12 => self.apu.ch1.nrx2 = val,
-            0xff13 => self.apu.ch1.nrx3 = val,
-            0xff14 => {
-                self.apu.ch1.nrx4 = val;
-                if (val >> 7) & 1 != 0 {
-                    self.apu.ch1.start();
-                }
-            }
-            0xff16 => self.apu.ch2.nrx1 = val,
-            0xff17 => self.apu.ch2.nrx2 = val,
-            0xff18 => self.apu.ch2.nrx3 = val,
-            0xff19 => {
-                self.apu.ch2.nrx4 = val;
-                if (val >> 7) & 1 != 0 {
-                    self.apu.ch2.start();
-                }
-            }
-            0xff1a => self.apu.ch3.nrx0 = val,
-            0xff1b => self.apu.ch3.nrx1 = val,
-            0xff1c => self.apu.ch3.nrx2 = val,
-            0xff1d => self.apu.ch3.nrx3 = val,
-            0xff1e => {
-                self.apu.ch3.nrx4 = val;
-                if (val >> 7) & 1 != 0 {
-                    self.apu.ch3.start();
-                }
-            }
-            0xff20 => self.apu.ch4.nrx1 = val,
-            0xff21 => self.apu.ch4.nrx2 = val,
-            0xff22 => self.apu.ch4.nrx3 = val,
-            0xff23 => {
-                self.apu.ch4.nrx4 = val;
-                if (val >> 7) & 1 != 0 {
-                    self.apu.ch4.start();
-                }
-            }
-            0xff24 => self.apu.master.volume = val,
-            0xff25 => self.apu.master.panning = val,
-            0xff26 => self.apu.master.control = val,
-            0xff30..=0xff3f => self.apu.ch3.waveform[addr as usize - 0xff30] = val,
+            0xff10..=0xff3f => self.apu.write(addr, val),
             // PPU
             0xff40 => self.ppu.fetcher.lcdc.set_byte(val),
             0xff41 => self.ppu.stat.set_byte(val),

@@ -28,15 +28,15 @@ impl Wave {
         }
     }
 
-    //pub fn dac_enabled(&self) -> bool {
-    //    (self.nrx0 >> 7) & 1 != 0
-    //}
+    fn dac_enabled(&self) -> bool {
+        (self.nrx0 >> 7) & 1 != 0
+    }
 
-    pub fn length_timer(&self) -> u8 {
+    fn length_timer(&self) -> u8 {
         0xff - self.nrx1
     }
 
-    pub fn volume(&self) -> f32 {
+    fn volume(&self) -> f32 {
         match (self.nrx2 >> 5) & 0x03 {
             0 => 0.,
             1 => 1.,
@@ -46,17 +46,17 @@ impl Wave {
         }
     }
 
-    pub fn period(&self) -> u16 {
+    fn period(&self) -> u16 {
         let low = self.nrx3 as u16;
         let high = (self.nrx4 as u16 & 0x07) << 8;
         (0x800 - (high | low)) / 2
     }
 
-    pub fn length_enabled(&self) -> bool {
+    fn length_enabled(&self) -> bool {
         (self.nrx4 >> 6) & 1 != 0
     }
 
-    pub fn waveform_sample(&self, idx: usize) -> u8 {
+    fn waveform_sample(&self, idx: usize) -> u8 {
         let byte = self.waveform[idx / 2];
         if idx % 2 == 0 {
             (byte >> 4) & 0x0f
@@ -72,9 +72,9 @@ impl Wave {
             .start(self.length_timer(), self.length_enabled());
     }
 
-    pub fn sample(&mut self) -> f32 {
-        if !self.length_timer.current_state() {
-            return 0.;
+    pub fn sample(&mut self) -> Option<f32> {
+        if !self.dac_enabled() || !self.length_timer.current_state() {
+            return None;
         }
         let volume = self.volume();
 
@@ -83,6 +83,6 @@ impl Wave {
             self.ticks = 0;
             self.waveform_idx = (self.waveform_idx + 1) % Self::WAVEFORM_SIZE;
         }
-        volume * (self.waveform_sample(self.waveform_idx) as f32 / 15.)
+        Some(volume * (self.waveform_sample(self.waveform_idx) as f32 / 15.))
     }
 }

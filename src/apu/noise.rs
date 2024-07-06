@@ -33,15 +33,15 @@ impl Noise {
         }
     }
 
-    pub fn length_timer(&self) -> u8 {
+    fn length_timer(&self) -> u8 {
         0x40 - (self.nrx1 & 0x3f)
     }
 
-    pub fn envelope_pace(&self) -> u8 {
+    fn envelope_pace(&self) -> u8 {
         self.nrx2 & 0x07
     }
 
-    pub fn envelope_dir(&self) -> SweepDir {
+    fn envelope_dir(&self) -> SweepDir {
         match (self.nrx2 >> 3) & 1 {
             0 => SweepDir::Decrease,
             1 => SweepDir::Increase,
@@ -49,21 +49,21 @@ impl Noise {
         }
     }
 
-    pub fn volume(&self) -> u8 {
+    fn volume(&self) -> u8 {
         (self.nrx2 >> 4) & 0x0f
     }
 
-    pub fn period(&self) -> u16 {
+    fn period(&self) -> u16 {
         let shift = self.clock_shift() as u16;
         let divider = Self::DIVIDER_TABLE[self.clock_divider() as usize];
         divider << shift
     }
 
-    pub fn clock_divider(&self) -> u8 {
+    fn clock_divider(&self) -> u8 {
         self.nrx3 & 0x07
     }
 
-    pub fn lfsr_width(&self) -> LfsrWidth {
+    fn lfsr_width(&self) -> LfsrWidth {
         match (self.nrx3 >> 3) & 1 {
             0 => LfsrWidth::B15,
             1 => LfsrWidth::B7,
@@ -71,15 +71,15 @@ impl Noise {
         }
     }
 
-    pub fn clock_shift(&self) -> u8 {
+    fn clock_shift(&self) -> u8 {
         (self.nrx3 >> 4) & 0x0f
     }
 
-    pub fn length_enabled(&self) -> bool {
+    fn length_enabled(&self) -> bool {
         (self.nrx4 >> 6) & 1 != 0
     }
 
-    pub fn lfsr_step(&mut self) {
+    fn lfsr_step(&mut self) {
         let bit = !((self.lfsr & 0x01) ^ ((self.lfsr >> 1) & 0x01));
         self.lfsr |= bit << 15;
         if let LfsrWidth::B7 = self.lfsr_width() {
@@ -97,9 +97,9 @@ impl Noise {
             .start(self.volume(), self.envelope_dir(), self.envelope_pace());
     }
 
-    pub fn sample(&mut self) -> f32 {
-        if !self.length_timer.current_state() {
-            return 0.;
+    pub fn sample(&mut self) -> Option<f32> {
+        if self.nrx2 & 0xf8 == 0 || !self.length_timer.current_state() {
+            return None;
         }
         let volume = self.volume_envelope.current_volume();
 
@@ -108,6 +108,6 @@ impl Noise {
             self.ticks = 0;
             self.lfsr_step();
         }
-        volume * (self.lfsr & 1) as f32
+        Some(volume * (self.lfsr & 1) as f32)
     }
 }

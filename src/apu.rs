@@ -38,26 +38,123 @@ where
     }
 
     pub fn step(&mut self) {
-        let mut samples = [0.; 4];
-        samples[0] = self.ch1.sample();
-        samples[1] = self.ch2.sample();
-        samples[2] = self.ch3.sample();
-        samples[3] = self.ch4.sample();
-
         let (mut left_sample, mut right_sample) = (0., 0.);
+
         if self.master.apu_enabled() {
+            let samples = [
+                self.ch1.sample(),
+                self.ch2.sample(),
+                self.ch3.sample(),
+                self.ch4.sample(),
+            ];
+
             for (ch_idx, sample) in samples.iter().enumerate() {
-                if self.master.channel_left(ch_idx) {
-                    left_sample += sample;
-                }
-                if self.master.channel_right(ch_idx) {
-                    right_sample += sample;
+                match sample {
+                    Some(sample) => {
+                        if self.master.channel_left(ch_idx) {
+                            left_sample += sample;
+                        }
+                        if self.master.channel_right(ch_idx) {
+                            right_sample += sample;
+                        }
+                    }
+                    None => self.master.disable_channel(ch_idx),
                 }
             }
             left_sample *= self.master.left_volume() as f32 / 8.;
             right_sample *= self.master.right_volume() as f32 / 8.;
         }
+
         self.speaker.push_sample(left_sample, right_sample);
+    }
+
+    pub fn read(&self, addr: u16) -> u8 {
+        match addr {
+            0xff10 => self.ch1.nrx0 | 0x80,
+            0xff11 => self.ch1.nrx1 | 0x3f,
+            0xff12 => self.ch1.nrx2,
+            0xff13 => 0xff,
+            0xff14 => self.ch1.nrx4 | 0xbf,
+            0xff15 => 0xff,
+            0xff16 => self.ch2.nrx1 | 0x3f,
+            0xff17 => self.ch2.nrx2,
+            0xff18 => 0xff,
+            0xff19 => self.ch2.nrx4 | 0xbf,
+            0xff1a => self.ch3.nrx0 | 0x7f,
+            0xff1b => 0xff,
+            0xff1c => self.ch3.nrx2 | 0x9f,
+            0xff1d => 0xff,
+            0xff1e => self.ch3.nrx4 | 0xbf,
+            0xff1f => 0xff,
+            0xff20 => 0xff,
+            0xff21 => self.ch4.nrx2,
+            0xff22 => self.ch4.nrx3,
+            0xff23 => self.ch4.nrx4 | 0xbf,
+            0xff24 => self.master.volume,
+            0xff25 => self.master.panning,
+            0xff26 => self.master.control | 0x70,
+            0xff27..=0xff2f => 0xff,
+            0xff30..=0xff3f => self.ch3.waveform[addr as usize - 0xff30],
+            _ => unreachable!(),
+        }
+    }
+
+    pub fn write(&mut self, addr: u16, value: u8) {
+        if !self.master.apu_enabled() && addr != 0xff26 {
+            return;
+        }
+        match addr {
+            0xff10 => self.ch1.nrx0 = value & 0x7f,
+            0xff11 => self.ch1.nrx1 = value,
+            0xff12 => self.ch1.nrx2 = value,
+            0xff13 => self.ch1.nrx3 = value,
+            0xff14 => {
+                self.ch1.nrx4 = value & 0xc7;
+                if (value >> 7) & 1 != 0 {
+                    self.master.enable_channel(0);
+                    self.ch1.start();
+                }
+            }
+            0xff15 => {}
+            0xff16 => self.ch2.nrx1 = value,
+            0xff17 => self.ch2.nrx2 = value,
+            0xff18 => self.ch2.nrx3 = value,
+            0xff19 => {
+                self.ch2.nrx4 = value & 0xc7;
+                if (value >> 7) & 1 != 0 {
+                    self.master.enable_channel(1);
+                    self.ch2.start();
+                }
+            }
+            0xff1a => self.ch3.nrx0 = value & 0x80,
+            0xff1b => self.ch3.nrx1 = value,
+            0xff1c => self.ch3.nrx2 = value & 0x60,
+            0xff1d => self.ch3.nrx3 = value,
+            0xff1e => {
+                self.ch3.nrx4 = value & 0xc7;
+                if (value >> 7) & 1 != 0 {
+                    self.master.enable_channel(2);
+                    self.ch3.start();
+                }
+            }
+            0xff1f => {}
+            0xff20 => self.ch4.nrx1 = value & 0x3f,
+            0xff21 => self.ch4.nrx2 = value,
+            0xff22 => self.ch4.nrx3 = value,
+            0xff23 => {
+                self.ch4.nrx4 = value & 0xc0;
+                if (value >> 7) & 1 != 0 {
+                    self.master.enable_channel(3);
+                    self.ch4.start();
+                }
+            }
+            0xff24 => self.master.volume = value,
+            0xff25 => self.master.panning = value,
+            0xff26 => self.master.control = (self.master.control & 0x0f) | (value & 0x80),
+            0xff27..=0xff2f => {}
+            0xff30..=0xff3f => self.ch3.waveform[addr as usize - 0xff30] = value,
+            _ => unreachable!(),
+        }
     }
 }
 
@@ -162,6 +259,7 @@ impl PeriodSweep {
     }
 
     pub fn current_period(&mut self) -> Option<u16> {
+        // TODO: Update so that channel disables when period overflows.
         if self.period == 0 {
             return None;
         }

@@ -210,7 +210,7 @@ impl PixelFetcher {
         // Check if we should change the fetching target to the Window
         if self.target == FetchTarget::Bck
             && self.lcdc.win_enabled()
-            && self.drawn_line() as u8 >= self.wx - 7
+            && self.drawn_line() as u8 >= self.wx.saturating_sub(7)
             && self.ly >= self.wy
         {
             self.fifo.clear();

@@ -43,19 +43,19 @@ where
         }
     }
 
-    pub fn length_timer(&self) -> u8 {
+    fn length_timer(&self) -> u8 {
         0x40 - (self.nrx1 & 0x3f)
     }
 
-    pub fn waveform(&self) -> &[u8; 8] {
+    fn waveform(&self) -> &[u8; 8] {
         &Self::WAVEFORMS[(self.nrx1 >> 6) as usize]
     }
 
-    pub fn envelope_pace(&self) -> u8 {
+    fn envelope_pace(&self) -> u8 {
         self.nrx2 & 0x07
     }
 
-    pub fn envelope_dir(&self) -> SweepDir {
+    fn envelope_dir(&self) -> SweepDir {
         match (self.nrx2 >> 3) & 1 {
             0 => SweepDir::Decrease,
             1 => SweepDir::Increase,
@@ -63,17 +63,17 @@ where
         }
     }
 
-    pub fn volume(&self) -> u8 {
+    fn volume(&self) -> u8 {
         (self.nrx2 >> 4) & 0x0f
     }
 
-    pub fn period(&self) -> u16 {
+    fn period(&self) -> u16 {
         let low = self.nrx3 as u16;
         let high = (self.nrx4 as u16 & 0x07) << 8;
         0x800 - (high | low)
     }
 
-    pub fn length_enabled(&self) -> bool {
+    fn length_enabled(&self) -> bool {
         (self.nrx4 >> 6) & 1 != 0
     }
 
@@ -87,9 +87,9 @@ where
         self.start_sweep();
     }
 
-    pub fn sample(&mut self) -> f32 {
-        if !self.length_timer.current_state() {
-            return 0.;
+    pub fn sample(&mut self) -> Option<f32> {
+        if self.nrx2 & 0xf8 == 0 || !self.length_timer.current_state() {
+            return None;
         }
         let volume = self.volume_envelope.current_volume();
         self.update_period();
@@ -99,7 +99,7 @@ where
             self.ticks = 0;
             self.waveform_idx = (self.waveform_idx + 1) % Self::WAVEFORM_SIZE;
         }
-        volume * self.waveform()[self.waveform_idx] as f32
+        Some(volume * self.waveform()[self.waveform_idx] as f32)
     }
 }
 
@@ -132,18 +132,17 @@ impl SweepControl for Pulse<true> {
 
     fn update_period(&mut self) {
         if let Some(neg_period) = self.period_sweep.current_period() {
-            self.nrx3 = (neg_period & 0xff) as u8;
-            self.nrx4 = (self.nrx4 & 0xf8) | ((neg_period >> 8) & 0x07) as u8;
+            self.set_period(neg_period);
         }
     }
 }
 
 impl Pulse<true> {
-    pub fn sweep_step(&self) -> u8 {
+    fn sweep_step(&self) -> u8 {
         self.nrx0 & 0x07
     }
 
-    pub fn sweep_direction(&self) -> SweepDir {
+    fn sweep_direction(&self) -> SweepDir {
         match (self.nrx0 >> 3) & 1 {
             0 => SweepDir::Increase,
             1 => SweepDir::Decrease,
@@ -151,7 +150,12 @@ impl Pulse<true> {
         }
     }
 
-    pub fn sweep_pace(&self) -> u8 {
+    fn sweep_pace(&self) -> u8 {
         (self.nrx0 >> 4) & 0x07
+    }
+
+    fn set_period(&mut self, period: u16) {
+        self.nrx3 = (period & 0xff) as u8;
+        self.nrx4 = (self.nrx4 & 0xf8) | ((period >> 8) & 0x07) as u8;
     }
 }

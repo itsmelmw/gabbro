@@ -17,8 +17,12 @@ impl MasterControl {
         (self.control >> 7) & 1 != 0
     }
 
-    pub fn channel_enabled(&self, ch_idx: usize) -> bool {
-        (self.control >> ch_idx as u8) & 1 != 0
+    pub fn enable_channel(&mut self, ch_idx: usize) {
+        self.control |= 1 << ch_idx as u8;
+    }
+
+    pub fn disable_channel(&mut self, ch_idx: usize) {
+        self.control &= !(1 << ch_idx as u8);
     }
 
     pub fn channel_right(&self, ch_idx: usize) -> bool {
