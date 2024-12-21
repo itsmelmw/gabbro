@@ -95,11 +95,11 @@ where
     }
 
     pub fn sample(&mut self) -> Option<f32> {
-        if self.nrx2 & 0xf8 == 0 || !self.length_timer.current_state() {
+        if self.nrx2 & 0xf8 == 0 || !self.length_timer.step() {
             return None;
         }
-        let volume = self.volume_envelope.current_volume();
-        match self.period_sweep.current_period() {
+        let volume = self.volume_envelope.step();
+        match self.period_sweep.step() {
             PeriodSweepResult::Update(neg_period) => self.set_period(neg_period),
             PeriodSweepResult::Disable => return None,
             PeriodSweepResult::Nothing => {}
@@ -131,12 +131,15 @@ impl SweepRegs for Pulse<false> {
     fn sweep_step(&self) -> u8 {
         0
     }
+
     fn sweep_direction(&self) -> SweepDir {
         SweepDir::Increase
     }
+
     fn sweep_pace(&self) -> u8 {
         0
     }
+
     fn set_period(&mut self, _period: u16) {}
 }
 

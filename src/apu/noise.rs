@@ -98,10 +98,10 @@ impl Noise {
     }
 
     pub fn sample(&mut self) -> Option<f32> {
-        if self.nrx2 & 0xf8 == 0 || !self.length_timer.current_state() {
+        if self.nrx2 & 0xf8 == 0 || !self.length_timer.step() {
             return None;
         }
-        let volume = self.volume_envelope.current_volume();
+        let volume = self.volume_envelope.step();
 
         self.ticks += 1;
         if self.ticks >= self.period() as usize {

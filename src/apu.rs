@@ -100,9 +100,6 @@ where
     }
 
     pub fn write(&mut self, addr: u16, value: u8) {
-        if !self.master.apu_enabled() && addr != 0xff26 {
-            return;
-        }
         match addr {
             0xff10 => self.ch1.nrx0 = value & 0x7f,
             0xff11 => self.ch1.nrx1 = value,
@@ -181,7 +178,7 @@ impl LengthTimer {
         self.ticks = 0;
     }
 
-    pub fn current_state(&mut self) -> bool {
+    pub fn step(&mut self) -> bool {
         if !self.enabled {
             return true;
         }
@@ -215,7 +212,7 @@ impl VolumeEnvelope {
         self.ticks = 0;
     }
 
-    pub fn current_volume(&mut self) -> f32 {
+    pub fn step(&mut self) -> f32 {
         if self.pace > 0 {
             self.ticks += 1;
             if self.ticks >= Self::TICK_RATE * self.pace as usize {
@@ -246,13 +243,13 @@ pub enum PeriodSweepResult {
 
 pub trait SweepControl {
     fn start(&mut self, period: u16, direction: SweepDir, pace: u8, step: u8);
-    fn current_period(&mut self) -> PeriodSweepResult;
+    fn step(&mut self) -> PeriodSweepResult;
 }
 
 impl SweepControl for () {
     fn start(&mut self, _period: u16, _direction: SweepDir, _pace: u8, _step: u8) {}
 
-    fn current_period(&mut self) -> PeriodSweepResult {
+    fn step(&mut self) -> PeriodSweepResult {
         PeriodSweepResult::Nothing
     }
 }
@@ -279,7 +276,7 @@ impl SweepControl for PeriodSweep {
         self.ticks = 0;
     }
 
-    fn current_period(&mut self) -> PeriodSweepResult {
+    fn step(&mut self) -> PeriodSweepResult {
         if self.period == 0 {
             return PeriodSweepResult::Nothing;
         }

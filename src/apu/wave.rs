@@ -73,7 +73,7 @@ impl Wave {
     }
 
     pub fn sample(&mut self) -> Option<f32> {
-        if !self.dac_enabled() || !self.length_timer.current_state() {
+        if !self.dac_enabled() || !self.length_timer.step() {
             return None;
         }
         let volume = self.volume();
