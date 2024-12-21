@@ -238,6 +238,25 @@ impl VolumeEnvelope {
     }
 }
 
+pub enum PeriodSweepResult {
+    Update(u16),
+    Disable,
+    Nothing,
+}
+
+pub trait SweepControl {
+    fn start(&mut self, period: u16, direction: SweepDir, pace: u8, step: u8);
+    fn current_period(&mut self) -> PeriodSweepResult;
+}
+
+impl SweepControl for () {
+    fn start(&mut self, _period: u16, _direction: SweepDir, _pace: u8, _step: u8) {}
+
+    fn current_period(&mut self) -> PeriodSweepResult {
+        PeriodSweepResult::Nothing
+    }
+}
+
 #[derive(Default)]
 pub struct PeriodSweep {
     period: u16,
@@ -249,8 +268,10 @@ pub struct PeriodSweep {
 
 impl PeriodSweep {
     const TICK_RATE: usize = APU_SAMPLE_RATE / 128;
+}
 
-    pub fn start(&mut self, period: u16, direction: SweepDir, pace: u8, step: u8) {
+impl SweepControl for PeriodSweep {
+    fn start(&mut self, period: u16, direction: SweepDir, pace: u8, step: u8) {
         self.period = period;
         self.direction = direction;
         self.pace = pace;
@@ -258,29 +279,27 @@ impl PeriodSweep {
         self.ticks = 0;
     }
 
-    pub fn current_period(&mut self) -> Option<u16> {
-        // TODO: Update so that channel disables when period overflows.
+    fn current_period(&mut self) -> PeriodSweepResult {
         if self.period == 0 {
-            return None;
+            return PeriodSweepResult::Nothing;
         }
         self.ticks += 1;
         if self.pace > 0 && self.ticks >= Self::TICK_RATE * self.pace as usize {
             self.ticks = 0;
             let diff = self.period >> self.step;
-            self.period = match self.direction {
+            match self.direction {
                 SweepDir::Increase => {
-                    let period = self.period.saturating_add(diff);
-                    if period > 0x7ff {
-                        0
-                    } else {
-                        period
+                    self.period = self.period.saturating_add(diff);
+                    if self.period > 0x7ff {
+                        self.period = 0;
+                        return PeriodSweepResult::Disable;
                     }
                 }
-                SweepDir::Decrease => self.period.wrapping_sub(diff),
+                SweepDir::Decrease => self.period = self.period.wrapping_sub(diff),
             };
-            Some(self.period)
+            PeriodSweepResult::Update(self.period)
         } else {
-            None
+            PeriodSweepResult::Nothing
         }
     }
 }

@@ -1,15 +1,17 @@
-use crate::apu::{LengthTimer, PeriodSweep, SweepDir, VolumeEnvelope};
+use crate::apu::{
+    LengthTimer, PeriodSweep, PeriodSweepResult, SweepControl, SweepDir, VolumeEnvelope,
+};
 
 pub struct Pulse<const FS: bool>
 where
-    Self: SweepControl,
+    Self: SweepRegs,
 {
-    period_sweep: <Self as SweepControl>::SweepType,
+    period_sweep: <Self as SweepRegs>::SweepType,
     volume_envelope: VolumeEnvelope,
     length_timer: LengthTimer,
     waveform_idx: usize,
     ticks: usize,
-    pub nrx0: <Self as SweepControl>::SweepRegType,
+    pub nrx0: <Self as SweepRegs>::SweepRegType,
     pub nrx1: u8,
     pub nrx2: u8,
     pub nrx3: u8,
@@ -18,7 +20,7 @@ where
 
 impl<const FS: bool> Pulse<FS>
 where
-    Self: SweepControl,
+    Self: SweepRegs,
 {
     const WAVEFORM_SIZE: usize = 8;
     const WAVEFORMS: [[u8; 8]; 4] = [
@@ -30,12 +32,12 @@ where
 
     pub fn new() -> Self {
         Self {
-            period_sweep: <Self as SweepControl>::SweepType::default(),
+            period_sweep: <Self as SweepRegs>::SweepType::default(),
             volume_envelope: VolumeEnvelope::default(),
             length_timer: LengthTimer::default(),
             waveform_idx: 0,
             ticks: 0,
-            nrx0: <Self as SweepControl>::SweepRegType::default(),
+            nrx0: <Self as SweepRegs>::SweepRegType::default(),
             nrx1: 0,
             nrx2: 0,
             nrx3: 0,
@@ -84,7 +86,12 @@ where
             .start(self.length_timer(), self.length_enabled());
         self.volume_envelope
             .start(self.volume(), self.envelope_dir(), self.envelope_pace());
-        self.start_sweep();
+        self.period_sweep.start(
+            0x800 - self.period(),
+            self.sweep_direction(),
+            self.sweep_pace(),
+            self.sweep_step(),
+        )
     }
 
     pub fn sample(&mut self) -> Option<f32> {
@@ -92,7 +99,11 @@ where
             return None;
         }
         let volume = self.volume_envelope.current_volume();
-        self.update_period();
+        match self.period_sweep.current_period() {
+            PeriodSweepResult::Update(neg_period) => self.set_period(neg_period),
+            PeriodSweepResult::Disable => return None,
+            PeriodSweepResult::Nothing => {}
+        }
 
         self.ticks += 1;
         if self.ticks >= self.period() as usize {
@@ -103,41 +114,36 @@ where
     }
 }
 
-pub trait SweepControl {
-    type SweepType: Default;
+pub trait SweepRegs {
+    type SweepType: Default + SweepControl;
     type SweepRegType: Default;
-    fn start_sweep(&mut self);
-    fn update_period(&mut self);
+
+    fn sweep_step(&self) -> u8;
+    fn sweep_direction(&self) -> SweepDir;
+    fn sweep_pace(&self) -> u8;
+    fn set_period(&mut self, period: u16);
 }
 
-impl SweepControl for Pulse<false> {
+impl SweepRegs for Pulse<false> {
     type SweepType = ();
     type SweepRegType = ();
-    fn start_sweep(&mut self) {}
-    fn update_period(&mut self) {}
+
+    fn sweep_step(&self) -> u8 {
+        0
+    }
+    fn sweep_direction(&self) -> SweepDir {
+        SweepDir::Increase
+    }
+    fn sweep_pace(&self) -> u8 {
+        0
+    }
+    fn set_period(&mut self, _period: u16) {}
 }
 
-impl SweepControl for Pulse<true> {
+impl SweepRegs for Pulse<true> {
     type SweepType = PeriodSweep;
     type SweepRegType = u8;
 
-    fn start_sweep(&mut self) {
-        self.period_sweep.start(
-            0x800 - self.period(),
-            self.sweep_direction(),
-            self.sweep_pace(),
-            self.sweep_step(),
-        )
-    }
-
-    fn update_period(&mut self) {
-        if let Some(neg_period) = self.period_sweep.current_period() {
-            self.set_period(neg_period);
-        }
-    }
-}
-
-impl Pulse<true> {
     fn sweep_step(&self) -> u8 {
         self.nrx0 & 0x07
     }
