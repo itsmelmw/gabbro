@@ -74,7 +74,8 @@ fn main() -> Result<(), String> {
     let speaker = AudioSender::new(audio_snd);
 
     thread::spawn(move || {
-        let mut gb = Gameboy::builder(rom)
+        let mut gb = Gameboy::builder()
+            .rom(&rom)
             .lcd(lcd)
             .joypad(joypad)
             .speaker(speaker)
