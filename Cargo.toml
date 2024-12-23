@@ -1,6 +1,6 @@
 [package]
 name = "gabbro"
-version = "0.2.0"
+version = "0.3.0"
 authors = ["Lars de Jong <itsmelmw@gmail.com>"]
 license = "GPL-3.0-or-later"
 description = "A Game Boy emulator written in Rust"
