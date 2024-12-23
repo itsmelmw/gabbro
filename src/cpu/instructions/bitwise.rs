@@ -1,16 +1,16 @@
 use crate::{
-    cpu::instructions::helpers,
-    cpu::Cpu,
-    peripherals::{Joypad, Lcd, Serial},
+    cpu::{instructions::helpers, Cpu},
+    peripherals::{Cable, Joypad, Lcd, Speaker},
 };
 
 pub const BITWISE_PREFIX: u8 = 0xcb;
 
-impl<L, J, S> Cpu<L, J, S>
+impl<L, S, J, C> Cpu<L, S, J, C>
 where
     L: Lcd,
+    S: Speaker,
     J: Joypad,
-    S: Serial,
+    C: Cable,
 {
     pub(in crate::cpu) fn execute_bitwise(&mut self, opcode: u8) {
         match opcode {

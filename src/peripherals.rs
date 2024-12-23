@@ -17,6 +17,12 @@ pub trait Lcd {
 
 impl Lcd for () {}
 
+pub trait Speaker {
+    fn push_sample(&mut self, _left: f32, _right: f32) {}
+}
+
+impl Speaker for () {}
+
 /// Represents the current state of the pressed buttons of the Game Boy.
 /// If a button value is `true`, it is pressed. When it is `false`, it is released.
 #[derive(Clone, Copy)]
@@ -67,11 +73,11 @@ impl Joypad for () {}
 /// A temporary simple implementation of a serial interface.
 /// Serial transfer is currently not implemented properly.
 /// This currently only exists to use for Blargg's Game Boy CPU test ROMs.
-pub trait Serial {
+pub trait Cable {
     /// A function called when a serial transfer should take place.
     /// Serial transfer is currently not implemented properly.
     /// This currently only exists to use for Blargg's Game Boy CPU test ROMs.
     fn transfer(&mut self, _val: u8) {}
 }
 
-impl Serial for () {}
+impl Cable for () {}

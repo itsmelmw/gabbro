@@ -1,11 +1,12 @@
 use std::collections::BinaryHeap;
 
-use crate::peripherals::LcdColor;
-
-use super::{
-    fifo::{FifoEntry, PixelFifo},
-    oam::{Oam, SprPalette, Sprite},
-    vram::{IdxType, TileType, Vram},
+use crate::{
+    peripherals::LcdColor,
+    ppu::{
+        fifo::{FifoEntry, PixelFifo},
+        oam::{Oam, SprPalette, Sprite},
+        vram::{IdxType, TileType, Vram},
+    },
 };
 
 /// The `LCDC` IO register, allowing control of the PPU.
@@ -209,7 +210,7 @@ impl PixelFetcher {
         // Check if we should change the fetching target to the Window
         if self.target == FetchTarget::Bck
             && self.lcdc.win_enabled()
-            && self.drawn_line() as u8 >= self.wx - 7
+            && self.drawn_line() as u8 >= self.wx.saturating_sub(7)
             && self.ly >= self.wy
         {
             self.fifo.clear();

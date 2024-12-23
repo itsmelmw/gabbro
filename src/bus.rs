@@ -3,7 +3,7 @@ use crate::{
     cartridge::Cartridge,
     cpu::interrupts::InterruptControl,
     joypad::JoypadController,
-    peripherals::{Joypad, Lcd, Serial},
+    peripherals::{Cable, Joypad, Lcd, Speaker},
     ppu::Ppu,
     serial::SerialController,
     timer::Timer,
@@ -11,32 +11,34 @@ use crate::{
 
 /// The bus which handles all reads and writes from/to memory.
 /// Also used to access all parts of the Game Boy besides the CPU.
-pub struct Bus<L, J, S>
+pub struct Bus<L, S, J, C>
 where
     L: Lcd,
+    S: Speaker,
     J: Joypad,
-    S: Serial,
+    C: Cable,
 {
     cart: Cartridge,
     ram: [u8; 0x2000],
     hram: [u8; 0x7f],
     joypad: JoypadController<J>,
-    serial: SerialController<S>,
+    serial: SerialController<C>,
     timer: Timer,
-    audio: Apu,
+    apu: Apu<S>,
     ppu: Ppu<L>,
     pub interrupts: InterruptControl,
 }
 
-impl<L, J, S> Bus<L, J, S>
+impl<L, S, J, C> Bus<L, S, J, C>
 where
     L: Lcd,
+    S: Speaker,
     J: Joypad,
-    S: Serial,
+    C: Cable,
 {
     /// Initializes all the emulated hardware and the memory of the Game Boy.
     /// Also prints information contained in the ROM header.
-    pub fn new(rom: Vec<u8>, lcd: L, joypad: J, serial: S) -> Self {
+    pub fn new(rom: Vec<u8>, lcd: L, speaker: S, joypad: J, cable: C) -> Self {
         let cart = Cartridge::new(rom)
             .map_err(|e| log::error!("Failed to parse ROM header: {}", e))
             .unwrap();
@@ -46,9 +48,9 @@ where
             ram: [0; 0x2000],
             hram: [0; 0x7f],
             joypad: JoypadController::new(joypad),
-            serial: SerialController::new(serial),
+            serial: SerialController::new(cable),
             timer: Timer::new(),
-            audio: Apu::new(),
+            apu: Apu::new(speaker),
             ppu: Ppu::new(lcd),
             interrupts: InterruptControl::new(),
         }
@@ -83,7 +85,7 @@ where
             0xff06 => self.timer.tma,
             0xff07 => self.timer.tac.byte(),
             // APU
-            0xff10..=0xff26 => self.audio.mem[addr as usize - 0xff10],
+            0xff10..=0xff3f => self.apu.read(addr),
             // PPU
             0xff40 => self.ppu.fetcher.lcdc.byte(),
             0xff41 => self.ppu.stat.byte(),
@@ -138,7 +140,7 @@ where
             0xff06 => self.timer.tma = val,
             0xff07 => self.timer.tac.set_byte(val),
             // APU
-            0xff10..=0xff3f => self.audio.mem[addr as usize - 0xff10] = val,
+            0xff10..=0xff3f => self.apu.write(addr, val),
             // PPU
             0xff40 => self.ppu.fetcher.lcdc.set_byte(val),
             0xff41 => self.ppu.stat.set_byte(val),
@@ -167,8 +169,9 @@ where
         self.dma_step();
 
         let ints = &mut self.interrupts.flags;
-        self.ppu.step(ints);
         self.joypad.step(ints);
+        self.ppu.step(ints);
+        self.apu.step();
         self.serial.step(ints);
         self.timer.step(ints);
     }

@@ -4,7 +4,7 @@ pub mod registers;
 use crate::{
     bus::Bus,
     cpu::{instructions::bitwise::BITWISE_PREFIX, registers::Regs},
-    peripherals::{Joypad, Lcd, Serial},
+    peripherals::{Cable, Joypad, Lcd, Speaker},
 };
 
 /// State of the Interrupt Master Enable (IME).
@@ -19,28 +19,30 @@ enum ImeState {
 }
 
 /// Emulates the Game Boy CPU.
-pub struct Cpu<L, J, S>
+pub struct Cpu<L, S, J, C>
 where
     L: Lcd,
+    S: Speaker,
     J: Joypad,
-    S: Serial,
+    C: Cable,
 {
-    bus: Bus<L, J, S>,
+    bus: Bus<L, S, J, C>,
     regs: Regs,
     ime: ImeState,
     halted: bool,
 }
 
-impl<L, J, S> Cpu<L, J, S>
+impl<L, S, J, C> Cpu<L, S, J, C>
 where
     L: Lcd,
+    S: Speaker,
     J: Joypad,
-    S: Serial,
+    C: Cable,
 {
     /// Initializes a new CPU.
-    pub(crate) fn new(rom: Vec<u8>, lcd: L, joypad: J, serial: S) -> Self {
+    pub(crate) fn new(rom: Vec<u8>, lcd: L, speaker: S, joypad: J, cable: C) -> Self {
         Self {
-            bus: Bus::new(rom, lcd, joypad, serial),
+            bus: Bus::new(rom, lcd, speaker, joypad, cable),
             regs: Regs::new(),
             ime: ImeState::Enabled,
             halted: false,
@@ -168,7 +170,7 @@ where
     }
 
     #[cfg(feature = "debug")]
-    pub(crate) fn bus(&self) -> &Bus<L, J, S> {
+    pub(crate) fn bus(&self) -> &Bus<L, S, J, C> {
         &self.bus
     }
 }

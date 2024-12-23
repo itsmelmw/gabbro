@@ -1,14 +1,14 @@
 use crate::{
-    cpu::instructions::helpers,
-    cpu::{Cpu, ImeState},
-    peripherals::{Joypad, Lcd, Serial},
+    cpu::{instructions::helpers, Cpu, ImeState},
+    peripherals::{Cable, Joypad, Lcd, Speaker},
 };
 
-impl<L, J, S> Cpu<L, J, S>
+impl<L, S, J, C> Cpu<L, S, J, C>
 where
     L: Lcd,
+    S: Speaker,
     J: Joypad,
-    S: Serial,
+    C: Cable,
 {
     pub(in crate::cpu) fn execute_base(&mut self, opcode: u8) {
         match opcode {

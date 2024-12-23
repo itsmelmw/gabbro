@@ -1,4 +1,4 @@
-use super::{Mbc, Mbc1, NoMbc};
+use crate::cartridge::{Mbc, Mbc1, NoMbc};
 
 /// Reads the title stored in the ROM, or `"Unknown"` if it fails.
 pub fn get_title(rom: &[u8]) -> Result<String, &'static str> {
