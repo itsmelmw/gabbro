@@ -75,30 +75,37 @@ pub trait SaveStorage {
 
 impl SaveStorage for () {}
 
-pub struct SaveFile {
-    filepath: PathBuf,
-}
+impl SaveStorage for &mut [u8] {
+    fn save(&mut self, ram: &[u8]) {
+        self.copy_from_slice(ram);
+    }
 
-impl SaveFile {
-    pub fn new(filepath: PathBuf) -> Self {
-        Self { filepath }
+    fn load(&mut self) -> Option<Vec<u8>> {
+        Some(self.to_vec())
     }
 }
 
-impl SaveStorage for SaveFile {
+impl SaveStorage for Vec<u8> {
     fn save(&mut self, ram: &[u8]) {
-        let mut file = File::create(&self.filepath).expect("Failed to write save file");
+        self.copy_from_slice(ram);
+    }
+
+    fn load(&mut self) -> Option<Vec<u8>> {
+        Some(self.clone())
+    }
+}
+
+impl SaveStorage for PathBuf {
+    fn save(&mut self, ram: &[u8]) {
+        let mut file = File::create(self).expect("Failed to write save file");
         file.write_all(ram).unwrap();
     }
 
     fn load(&mut self) -> Option<Vec<u8>> {
-        let mut file = File::open(&self.filepath).ok()?;
+        let mut file = File::open(self).ok()?;
         let mut ram = Vec::with_capacity(Cartridge::RAM_BANK_SIZE);
         file.read_to_end(&mut ram)
             .expect("Failed to read save file");
         Some(ram)
-        //let mut ram = Vec::with_capacity(Cartridge::RAM_BANK_SIZE);
-        //self.file.read_to_end(&mut ram).ok()?;
-        //Some(ram)
     }
 }

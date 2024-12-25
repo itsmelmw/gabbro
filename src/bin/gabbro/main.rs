@@ -1,6 +1,6 @@
 mod peripherals;
 
-use gabbro::{ButtonState, Cartridge, Gameboy, LcdColor, SaveFile, LCD_HEIGHT, LCD_WIDTH};
+use gabbro::{ButtonState, Cartridge, Gameboy, LcdColor, LCD_HEIGHT, LCD_WIDTH};
 use peripherals::{AudioReceiver, AudioSender, ChannelLcd, LcdMessage, MutexJoypad};
 use sdl2::{audio::AudioSpecDesired, event::Event, keyboard::Scancode, pixels::PixelFormatEnum};
 use std::{
@@ -22,7 +22,7 @@ fn main() -> Result<(), String> {
 
     let rom_file = Path::new(&rom_path);
     let rom = fs::read(rom_file).map_err(|e| e.to_string())?;
-    let save = SaveFile::new(rom_file.with_extension("sav"));
+    let save = rom_file.with_extension("sav");
 
     let sdl = sdl2::init()?;
 
