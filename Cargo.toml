@@ -21,7 +21,7 @@ tui = { version = "0.19", optional = true }
 crossterm = { version = "0.25", optional = true }
 
 [features]
-default = ["logger"]
+default = ["logger", "sdl2"] # REMOVE SDL2
 logger = ["dep:env_logger"]
 sdl2 = ["dep:sdl2"]
 debug = ["dep:tui", "dep:crossterm"]

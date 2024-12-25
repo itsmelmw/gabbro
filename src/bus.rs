@@ -11,14 +11,14 @@ use crate::{
 
 /// The bus which handles all reads and writes from/to memory.
 /// Also used to access all parts of the Game Boy besides the CPU.
-pub struct Bus<L, S, J, C>
+pub struct Bus<'a, L, S, J, C>
 where
     L: Lcd,
     S: Speaker,
     J: Joypad,
     C: Cable,
 {
-    cart: Cartridge,
+    cartridge: Cartridge<'a>,
     ram: [u8; 0x2000],
     hram: [u8; 0x7f],
     joypad: JoypadController<J>,
@@ -29,7 +29,7 @@ where
     pub interrupts: InterruptControl,
 }
 
-impl<L, S, J, C> Bus<L, S, J, C>
+impl<'a, L, S, J, C> Bus<'a, L, S, J, C>
 where
     L: Lcd,
     S: Speaker,
@@ -38,13 +38,9 @@ where
 {
     /// Initializes all the emulated hardware and the memory of the Game Boy.
     /// Also prints information contained in the ROM header.
-    pub fn new(rom: Vec<u8>, lcd: L, speaker: S, joypad: J, cable: C) -> Self {
-        let cart = Cartridge::new(rom)
-            .map_err(|e| log::error!("Failed to parse ROM header: {}", e))
-            .unwrap();
-        cart.log_header();
+    pub fn new(cartridge: Cartridge<'a>, lcd: L, speaker: S, joypad: J, cable: C) -> Self {
         Self {
-            cart,
+            cartridge,
             ram: [0; 0x2000],
             hram: [0; 0x7f],
             joypad: JoypadController::new(joypad),
@@ -60,11 +56,11 @@ where
     pub fn read(&self, addr: u16) -> u8 {
         match addr {
             // ROM
-            0x0000..=0x7fff => self.cart.mbc.read_rom(addr),
+            0x0000..=0x7fff => self.cartridge.mbc.read_rom(addr),
             // Video RAM
             0x8000..=0x9fff => self.ppu.fetcher.vram.read(addr - 0x8000),
             // External Working RAM
-            0xa000..=0xbfff => self.cart.mbc.read_ram(addr - 0xa000),
+            0xa000..=0xbfff => self.cartridge.mbc.read_ram(addr - 0xa000),
             // Working RAM (+ Echo)
             0xc000..=0xdfff => self.ram[addr as usize - 0xc000],
             0xe000..=0xfdff => {
@@ -115,11 +111,11 @@ where
     pub fn write(&mut self, addr: u16, val: u8) {
         match addr {
             // ROM
-            0x0000..=0x7fff => self.cart.mbc.write_rom(addr, val),
+            0x0000..=0x7fff => self.cartridge.mbc.write_rom(addr, val),
             // Video RAM
             0x8000..=0x9fff => self.ppu.fetcher.vram.write(addr - 0x8000, val),
             // External Working RAM
-            0xa000..=0xbfff => self.cart.mbc.write_ram(addr - 0xa000, val),
+            0xa000..=0xbfff => self.cartridge.mbc.write_ram(addr - 0xa000, val),
             // Working RAM (+ Echo)
             0xc000..=0xdfff => self.ram[addr as usize - 0xc000] = val,
             0xe000..=0xfdff => {

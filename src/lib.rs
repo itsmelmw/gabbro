@@ -9,6 +9,10 @@ mod ppu;
 mod serial;
 mod timer;
 pub use apu::APU_SAMPLE_RATE;
+pub use cartridge::{
+    peripherals::{SaveFile, SaveStorage},
+    Cartridge,
+};
 #[cfg(feature = "debug")]
 pub use cpu::{instructions::debug::Mnemonic, registers::Regs};
 pub use gameboy::Gameboy;

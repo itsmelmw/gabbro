@@ -3,7 +3,7 @@ use crate::{
     peripherals::{Cable, Joypad, Lcd, Speaker},
 };
 
-impl<L, S, J, C> Cpu<L, S, J, C>
+impl<L, S, J, C> Cpu<'_, L, S, J, C>
 where
     L: Lcd,
     S: Speaker,

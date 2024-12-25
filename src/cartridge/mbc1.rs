@@ -1,22 +1,35 @@
-use crate::cartridge::Mbc;
-use std::fmt;
+use crate::cartridge::{peripherals::ExternalRam, Cartridge, Mbc};
 
-/// A memory bank controller of type 1.
+/// A memory bank controller of type MBC1.
 /// Stores its registers, as well as ROM and RAM.
-pub struct Mbc1 {
+pub struct Mbc1<'a, RAM>
+where
+    RAM: ExternalRam,
+{
     ram_enable: usize,
     rom_bank: usize,
     ram_bank: usize,
     bank_mode: usize,
 
     addr_mask: usize,
-    rom: Vec<u8>,
-    ram: Vec<u8>,
+    rom: &'a [u8],
+    ram: RAM,
 }
 
-impl Mbc1 {
-    /// Creates a new memory bank controller of type 1.
-    pub fn new(rom: Vec<u8>, rom_banks: usize) -> Self {
+impl<'a> Mbc1<'a, ()> {
+    /// Creates a new memory bank controller of type MBC1.
+    pub fn new(rom: &'a [u8]) -> Self {
+        Self::with_ram(rom, ())
+    }
+}
+
+impl<'a, RAM> Mbc1<'a, RAM>
+where
+    RAM: ExternalRam,
+{
+    /// Creates a new memory bank controller of type MBC1 with RAM.
+    pub fn with_ram(rom: &'a [u8], ram: RAM) -> Self {
+        let rom_banks = rom.len() / Cartridge::ROM_BANK_SIZE;
         Self {
             ram_enable: 0,
             rom_bank: 0,
@@ -24,12 +37,15 @@ impl Mbc1 {
             bank_mode: 0,
             addr_mask: 0x3fff | ((rom_banks - 1) << 14),
             rom,
-            ram: vec![0; 0x2000],
+            ram,
         }
     }
 }
 
-impl Mbc for Mbc1 {
+impl<RAM> Mbc for Mbc1<'_, RAM>
+where
+    RAM: ExternalRam,
+{
     fn read_rom(&self, addr: u16) -> u8 {
         // Bit 00 - 13 decided by address
         let base_addr = addr as usize & 0x3fff;
@@ -48,14 +64,12 @@ impl Mbc for Mbc1 {
     }
 
     fn write_rom(&mut self, addr: u16, val: u8) {
-        if addr <= 0x1fff {
-            self.ram_enable = val as usize & 0x0f;
-        } else if addr <= 0x3fff {
-            self.rom_bank = val as usize & 0x1f;
-        } else if addr <= 0x5fff {
-            self.ram_bank = val as usize & 0x03;
-        } else if addr <= 0x7fff {
-            self.bank_mode = val as usize & 0x01;
+        match addr {
+            0x0000..=0x1fff => self.ram_enable = val as usize & 0x0f,
+            0x2000..=0x3fff => self.rom_bank = val as usize & 0x1f,
+            0x4000..=0x5fff => self.ram_bank = val as usize & 0x03,
+            0x6000..=0x7fff => self.bank_mode = val as usize & 0x01,
+            _ => unreachable!(),
         }
     }
 
@@ -67,7 +81,7 @@ impl Mbc for Mbc1 {
         let base_addr = addr as usize;
         // Bit 13 - 14 decided by ram bank
         let bank_addr = self.ram_bank;
-        self.ram[base_addr | bank_addr << 13]
+        self.ram.read(base_addr | bank_addr << 13)
     }
 
     fn write_ram(&mut self, addr: u16, val: u8) {
@@ -78,12 +92,8 @@ impl Mbc for Mbc1 {
         let base_addr = addr as usize;
         // Bit 13 - 14 decided by ram bank
         let bank_addr = self.ram_bank;
-        self.ram[base_addr | bank_addr << 13] = val;
+        self.ram.write(base_addr | bank_addr << 13, val);
     }
-}
 
-impl fmt::Display for Mbc1 {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "MBC1")
-    }
+    fn shutdown(&self) {}
 }

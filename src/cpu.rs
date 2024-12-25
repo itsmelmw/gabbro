@@ -3,6 +3,7 @@ pub mod interrupts;
 pub mod registers;
 use crate::{
     bus::Bus,
+    cartridge::Cartridge,
     cpu::{instructions::bitwise::BITWISE_PREFIX, registers::Regs},
     peripherals::{Cable, Joypad, Lcd, Speaker},
 };
@@ -19,20 +20,20 @@ enum ImeState {
 }
 
 /// Emulates the Game Boy CPU.
-pub struct Cpu<L, S, J, C>
+pub struct Cpu<'a, L, S, J, C>
 where
     L: Lcd,
     S: Speaker,
     J: Joypad,
     C: Cable,
 {
-    bus: Bus<L, S, J, C>,
+    bus: Bus<'a, L, S, J, C>,
     regs: Regs,
     ime: ImeState,
     halted: bool,
 }
 
-impl<L, S, J, C> Cpu<L, S, J, C>
+impl<'a, L, S, J, C> Cpu<'a, L, S, J, C>
 where
     L: Lcd,
     S: Speaker,
@@ -40,9 +41,9 @@ where
     C: Cable,
 {
     /// Initializes a new CPU.
-    pub(crate) fn new(rom: Vec<u8>, lcd: L, speaker: S, joypad: J, cable: C) -> Self {
+    pub(crate) fn new(cartridge: Cartridge<'a>, lcd: L, speaker: S, joypad: J, cable: C) -> Self {
         Self {
-            bus: Bus::new(rom, lcd, speaker, joypad, cable),
+            bus: Bus::new(cartridge, lcd, speaker, joypad, cable),
             regs: Regs::new(),
             ime: ImeState::Enabled,
             halted: false,

@@ -1,4 +1,5 @@
 use crate::{
+    cartridge::Cartridge,
     cpu::Cpu,
     peripherals::{Cable, Joypad, Lcd, Speaker},
 };
@@ -15,24 +16,24 @@ use crate::cpu::{
 };
 
 /// Represents an emulated Game Boy.
-pub struct Gameboy<L = (), S = (), J = (), C = ()>
+pub struct Gameboy<'a, L = (), S = (), J = (), C = ()>
 where
     L: Lcd,
     S: Speaker,
     J: Joypad,
     C: Cable,
 {
-    cpu: Cpu<L, S, J, C>,
+    cpu: Cpu<'a, L, S, J, C>,
 }
 
-impl Gameboy {
+impl<'a> Gameboy<'a> {
     /// Creates a [`GameboyBuilder`], allowing peripherals for different input and output devices to be attached.
-    pub fn builder<'a>() -> GameboyBuilder<'a, (), (), (), (), false> {
+    pub fn builder() -> GameboyBuilder<'a, (), (), (), (), false> {
         GameboyBuilder::<'a, (), (), (), (), false>::new()
     }
 }
 
-impl<L, S, J, C> Gameboy<L, S, J, C>
+impl<L, S, J, C> Gameboy<'_, L, S, J, C>
 where
     L: Lcd,
     S: Speaker,
@@ -114,7 +115,7 @@ where
     J: Joypad,
     C: Cable,
 {
-    rom: &'a [u8],
+    cartridge: Option<Cartridge<'a>>,
     lcd: L,
     speaker: S,
     joypad: J,
@@ -131,7 +132,7 @@ where
     /// Initializes a new builder for a [`Gameboy`].
     pub fn new() -> GameboyBuilder<'a, (), (), (), (), false> {
         GameboyBuilder {
-            rom: &[0; 0x8000],
+            cartridge: None,
             lcd: (),
             speaker: (),
             joypad: (),
@@ -148,9 +149,9 @@ where
     C: Cable,
 {
     /// Used to insert a ROM into the emulator.
-    pub fn rom(self, rom: &'a [u8]) -> GameboyBuilder<'a, L, S, J, C, true> {
+    pub fn cartridge(self, cartridge: Cartridge<'a>) -> GameboyBuilder<'a, L, S, J, C, true> {
         GameboyBuilder {
-            rom,
+            cartridge: Some(cartridge),
             lcd: self.lcd,
             speaker: self.speaker,
             joypad: self.joypad,
@@ -171,7 +172,7 @@ where
         L: Lcd,
     {
         GameboyBuilder {
-            rom: self.rom,
+            cartridge: self.cartridge,
             lcd,
             speaker: self.speaker,
             joypad: self.joypad,
@@ -192,7 +193,7 @@ where
         S: Speaker,
     {
         GameboyBuilder {
-            rom: self.rom,
+            cartridge: self.cartridge,
             lcd: self.lcd,
             speaker,
             joypad: self.joypad,
@@ -213,7 +214,7 @@ where
         J: Joypad,
     {
         GameboyBuilder {
-            rom: self.rom,
+            cartridge: self.cartridge,
             lcd: self.lcd,
             speaker: self.speaker,
             joypad,
@@ -234,7 +235,7 @@ where
         C: Cable,
     {
         GameboyBuilder {
-            rom: self.rom,
+            cartridge: self.cartridge,
             lcd: self.lcd,
             speaker: self.speaker,
             joypad: self.joypad,
@@ -243,7 +244,7 @@ where
     }
 }
 
-impl<L, S, J, C> GameboyBuilder<'_, L, S, J, C, true>
+impl<'a, L, S, J, C> GameboyBuilder<'a, L, S, J, C, true>
 where
     L: Lcd,
     S: Speaker,
@@ -251,10 +252,10 @@ where
     C: Cable,
 {
     /// Builds a new [`Gameboy`].
-    pub fn build(self) -> Gameboy<L, S, J, C> {
+    pub fn build(self) -> Gameboy<'a, L, S, J, C> {
         Gameboy {
             cpu: Cpu::new(
-                self.rom.to_vec(),
+                self.cartridge.unwrap(),
                 self.lcd,
                 self.speaker,
                 self.joypad,

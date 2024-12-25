@@ -1,10 +1,11 @@
 mod peripherals;
 
-use gabbro::{ButtonState, Gameboy, LcdColor, LCD_HEIGHT, LCD_WIDTH};
+use gabbro::{ButtonState, Cartridge, Gameboy, LcdColor, SaveFile, LCD_HEIGHT, LCD_WIDTH};
 use peripherals::{AudioReceiver, AudioSender, ChannelLcd, LcdMessage, MutexJoypad};
 use sdl2::{audio::AudioSpecDesired, event::Event, keyboard::Scancode, pixels::PixelFormatEnum};
 use std::{
     env, fs,
+    path::Path,
     sync::{mpsc, Arc, Mutex},
     thread,
 };
@@ -18,7 +19,10 @@ fn main() -> Result<(), String> {
     let rom_path = env::args()
         .nth(1)
         .ok_or("Please provide a path to a valid Game Boy ROM.".to_string())?;
-    let rom = fs::read(rom_path).map_err(|e| e.to_string())?;
+
+    let rom_file = Path::new(&rom_path);
+    let rom = fs::read(rom_file).map_err(|e| e.to_string())?;
+    let save = SaveFile::new(rom_file.with_extension("sav"));
 
     let sdl = sdl2::init()?;
 
@@ -74,8 +78,13 @@ fn main() -> Result<(), String> {
     let speaker = AudioSender::new(audio_snd);
 
     thread::spawn(move || {
-        let mut gb = Gameboy::builder()
+        let cartridge = Cartridge::builder()
             .rom(&rom)
+            .save(save)
+            .build()
+            .expect("Invalid ROM");
+        let mut gb = Gameboy::builder()
+            .cartridge(cartridge)
             .lcd(lcd)
             .joypad(joypad)
             .speaker(speaker)
