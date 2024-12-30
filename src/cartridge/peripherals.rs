@@ -1,111 +1,73 @@
-use crate::cartridge::{Cartridge, CartridgeError};
 use std::{
     fs::File,
     io::{Read, Write},
     path::PathBuf,
 };
 
-pub trait ExternalRam {
-    fn read(&self, _addr: usize) -> u8 {
-        0xff
-    }
-    fn write(&mut self, _addr: usize, _val: u8) {}
+// Need these structs to be able to check whether an MBC has a feature or not,
+// since `NoFeat` also needs to implement the features with defaults.
+pub struct NoFeat;
+pub struct Feat<F>(pub F);
+
+pub type NoRam = ();
+pub type Ram = Vec<u8>;
+
+pub trait ExtRam {
+    fn data(&self) -> Option<&[u8]>;
 }
 
-pub struct BatteryBackedRam<CS>
-where
-    CS: SaveStorage,
-{
-    ram: Vec<u8>,
-    storage: CS,
-}
-pub type Ram = BatteryBackedRam<()>;
-
-impl Ram {
-    pub fn new(ram: Vec<u8>) -> Self {
-        Self::with_storage(ram, ()).unwrap()
+impl ExtRam for NoRam {
+    fn data(&self) -> Option<&[u8]> {
+        None
     }
 }
-
-impl<CS> BatteryBackedRam<CS>
-where
-    CS: SaveStorage,
-{
-    pub fn with_storage(mut ram: Vec<u8>, mut storage: CS) -> Result<Self, CartridgeError> {
-        if let Some(saved) = storage.load() {
-            if saved.len() == ram.len() {
-                ram.copy_from_slice(&saved);
-            } else {
-                return Err(CartridgeError::WrongSaveSize);
-            }
-        }
-        Ok(Self { ram, storage })
+impl ExtRam for Ram {
+    fn data(&self) -> Option<&[u8]> {
+        Some(self)
     }
 }
 
-impl<CS> Drop for BatteryBackedRam<CS>
-where
-    CS: SaveStorage,
-{
-    fn drop(&mut self) {
-        self.storage.save(&self.ram);
-    }
-}
-
-impl ExternalRam for () {}
-
-impl<CS> ExternalRam for BatteryBackedRam<CS>
-where
-    CS: SaveStorage,
-{
-    fn read(&self, addr: usize) -> u8 {
-        self.ram[addr]
-    }
-    fn write(&mut self, addr: usize, val: u8) {
-        self.ram[addr] = val;
-    }
-}
-
-pub trait SaveStorage {
-    fn save(&mut self, _ram: &[u8]) {}
-    fn load(&mut self) -> Option<Vec<u8>> {
+pub trait Battery {
+    fn store_data(&mut self, _data: &[u8]) {}
+    fn load_data(&mut self) -> Option<Vec<u8>> {
         None
     }
 }
 
-impl SaveStorage for () {}
+impl Battery for () {}
+impl Battery for NoFeat {}
 
-impl SaveStorage for &mut [u8] {
-    fn save(&mut self, ram: &[u8]) {
-        self.copy_from_slice(ram);
-    }
-
-    fn load(&mut self) -> Option<Vec<u8>> {
-        Some(self.to_vec())
-    }
-}
-
-impl SaveStorage for Vec<u8> {
-    fn save(&mut self, ram: &[u8]) {
-        self.copy_from_slice(ram);
-    }
-
-    fn load(&mut self) -> Option<Vec<u8>> {
-        Some(self.clone())
-    }
-}
-
-impl SaveStorage for PathBuf {
-    fn save(&mut self, ram: &[u8]) {
+impl Battery for PathBuf {
+    fn store_data(&mut self, data: &[u8]) {
         let mut file = File::create(self).expect("Failed to write save file");
-        file.write_all(ram).unwrap();
+        file.write_all(data).unwrap();
     }
 
-    fn load(&mut self) -> Option<Vec<u8>> {
+    fn load_data(&mut self) -> Option<Vec<u8>> {
         let mut file = File::open(self).ok()?;
-        let mut ram = Vec::with_capacity(Cartridge::RAM_BANK_SIZE);
-        file.read_to_end(&mut ram)
+        let mut data = Vec::with_capacity(file.metadata().unwrap().len() as usize);
+        file.read_to_end(&mut data)
             .expect("Failed to read save file");
-        Some(ram)
+        Some(data)
     }
 }
+
+impl<F> Battery for Feat<F>
+where
+    F: Battery,
+{
+    fn store_data(&mut self, data: &[u8]) {
+        self.0.store_data(data);
+    }
+
+    fn load_data(&mut self) -> Option<Vec<u8>> {
+        self.0.load_data()
+    }
+}
+
+pub trait Rtc {}
+
+impl Rtc for () {}
+impl Rtc for NoFeat {}
+
+impl<F> Rtc for Feat<F> where F: Rtc {}

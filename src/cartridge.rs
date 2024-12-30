@@ -1,8 +1,10 @@
 pub mod mbc1;
+pub mod mbc3;
 pub mod peripherals;
 pub mod romonly;
 use mbc1::Mbc1;
-use peripherals::{BatteryBackedRam, Ram, SaveStorage};
+use mbc3::Mbc3;
+use peripherals::{Battery, Ram};
 use romonly::RomOnly;
 use std::str;
 
@@ -18,12 +20,24 @@ pub enum CartridgeError {
     UnsupportedMbc(&'static str),
 }
 
-pub trait Mbc {
+pub trait ReadRom {
     fn read_rom(&self, addr: u16) -> u8;
+}
+
+pub trait WriteRom {
     fn write_rom(&mut self, addr: u16, val: u8);
+}
+
+pub trait ReadRam {
     fn read_ram(&self, addr: u16) -> u8;
+}
+
+pub trait WriteRam {
     fn write_ram(&mut self, addr: u16, val: u8);
-    fn shutdown(&self);
+}
+
+pub trait Mbc: ReadRom + WriteRom + ReadRam + WriteRam {
+    fn name(&self) -> &'static str;
 }
 
 /// Stores some header information of the ROM, as well as the MBC.
@@ -39,9 +53,9 @@ impl<'a> Cartridge<'a> {
     const RAM_BANK_SIZE: usize = 0x2000;
 
     /// Initializes a new cartridge by reading information from the header of the ROM.
-    fn new<CS>(rom: &'a [u8], save: CS) -> Result<Self, CartridgeError>
+    fn new<CB>(rom: &'a [u8], battery: CB) -> Result<Self, CartridgeError>
     where
-        CS: SaveStorage + 'a,
+        CB: Battery + 'a,
     {
         let title = Self::get_title(rom)?;
         let version = Self::get_version(rom);
@@ -49,7 +63,7 @@ impl<'a> Cartridge<'a> {
 
         Self::check_rom_size(rom)?;
         let ram = Self::create_ram(rom)?;
-        let mbc = Self::get_mbc(rom, ram, save)?;
+        let mbc = Self::get_mbc(rom, ram, battery)?;
 
         Ok(Self {
             title,
@@ -110,31 +124,33 @@ impl<'a> Cartridge<'a> {
 
     /// Retrieves the memory bank controller the ROM uses.
     /// Returns an error if the MBC is invalid or unsupported.
-    fn get_mbc<CS>(
+    fn get_mbc<CB>(
         rom: &'a [u8],
-        ram: Vec<u8>,
-        save: CS,
+        ram: Ram,
+        battery: CB,
     ) -> Result<Box<dyn Mbc + 'a>, CartridgeError>
     where
-        CS: SaveStorage + 'a,
+        CB: Battery + 'a,
     {
         match rom[0x0147] {
             0x00 => Ok(Box::new(RomOnly::new(rom))),
-            0x01 => Ok(Box::new(Mbc1::new(rom))),
-            0x02 => {
-                let ram = Ram::new(ram);
-                Ok(Box::new(Mbc1::with_ram(rom, ram)))
-            }
-            0x03 => {
-                let ram = BatteryBackedRam::with_storage(ram, save)?;
-                Ok(Box::new(Mbc1::with_ram(rom, ram)))
-            }
-            //0x01..=0x03 => Ok(Box::new(Mbc1::new(rom, rom_banks))),
+            0x01 => Ok(Box::new(Mbc1::rom_only(rom))),
+            0x02 => Ok(Box::new(Mbc1::with_ram(rom, ram))),
+            0x03 => Ok(Box::new(Mbc1::with_ram_battery(rom, ram, battery))),
             0x08 => Err(CartridgeError::UnsupportedMbc("ROM + RAM")),
             0x09 => Err(CartridgeError::UnsupportedMbc("ROM + RAM + BATTERY")),
             0x05 | 0x06 => Err(CartridgeError::UnsupportedMbc("MBC2")),
             0x0b..=0x0d => Err(CartridgeError::UnsupportedMbc("MMM01")),
-            0x0f..=0x13 => Err(CartridgeError::UnsupportedMbc("MBC3")),
+            // TODO: Timer
+            0x0f => Ok(Box::new(Mbc3::rom_only(rom))),
+            0x10 => Ok(Box::new(Mbc3::with_ram(rom, ram))),
+            //0x0f => Err(CartridgeError::UnsupportedMbc("MBC3 + TIMER + BATTERY")),
+            //0x10 => Err(CartridgeError::UnsupportedMbc(
+            //    "MBC3 + TIMER + RAM + BATTERY",
+            //)),
+            0x11 => Ok(Box::new(Mbc3::rom_only(rom))),
+            0x12 => Ok(Box::new(Mbc3::with_ram(rom, ram))),
+            0x13 => Ok(Box::new(Mbc3::with_ram_battery(rom, ram, battery))),
             0x19..=0x1e => Err(CartridgeError::UnsupportedMbc("MBC5")),
             0x20 => Err(CartridgeError::UnsupportedMbc("MBC6")),
             0x22 => Err(CartridgeError::UnsupportedMbc("MBC7")),
@@ -371,52 +387,55 @@ impl<'a> Cartridge<'a> {
     }
 }
 
-pub struct CartridgeBuilder<'a, CS, const ROM: bool>
+pub struct CartridgeBuilder<'a, CB, const ROM: bool>
 where
-    CS: SaveStorage + 'a,
+    CB: Battery + 'a,
 {
     rom: &'a [u8],
-    save: CS,
+    battery: CB,
 }
 
-impl<'a, CS, const ROM: bool> CartridgeBuilder<'a, CS, ROM>
+impl<'a, CB, const ROM: bool> CartridgeBuilder<'a, CB, ROM>
 where
-    CS: SaveStorage + 'a,
+    CB: Battery + 'a,
 {
     pub fn new() -> CartridgeBuilder<'a, (), false> {
-        CartridgeBuilder { rom: &[], save: () }
+        CartridgeBuilder {
+            rom: &[],
+            battery: (),
+        }
     }
 }
 
-impl<'a, CS> CartridgeBuilder<'a, CS, false>
+impl<'a, CB> CartridgeBuilder<'a, CB, false>
 where
-    CS: SaveStorage + 'a,
+    CB: Battery + 'a,
 {
-    pub fn rom(self, rom: &'a [u8]) -> CartridgeBuilder<'a, CS, true> {
+    pub fn rom(self, rom: &'a [u8]) -> CartridgeBuilder<'a, CB, true> {
         CartridgeBuilder {
             rom,
-            save: self.save,
+            battery: self.battery,
         }
     }
 }
 
 impl<'a, const ROM: bool> CartridgeBuilder<'a, (), ROM> {
-    pub fn save<CS>(self, save: CS) -> CartridgeBuilder<'a, CS, ROM>
+    pub fn battery<CB>(self, battery: CB) -> CartridgeBuilder<'a, CB, ROM>
     where
-        CS: SaveStorage + 'a,
+        CB: Battery + 'a,
     {
         CartridgeBuilder {
             rom: self.rom,
-            save,
+            battery,
         }
     }
 }
 
-impl<'a, CS> CartridgeBuilder<'a, CS, true>
+impl<'a, CB> CartridgeBuilder<'a, CB, true>
 where
-    CS: SaveStorage + 'a,
+    CB: Battery + 'a,
 {
     pub fn build(self) -> Result<Cartridge<'a>, CartridgeError> {
-        Cartridge::new(self.rom, self.save)
+        Cartridge::new(self.rom, self.battery)
     }
 }

@@ -1,15 +1,14 @@
 use crate::cartridge::{
-    peripherals::{Battery, ExtRam, Feat, NoFeat, NoRam, Ram},
+    peripherals::{Battery, ExtRam, Feat, NoFeat, NoRam, Ram, Rtc},
     Cartridge, Mbc, ReadRam, ReadRom, WriteRam, WriteRom,
 };
 use std::io::Write;
 
-/// A memory bank controller of type MBC1.
-/// Stores its registers, as well as ROM and RAM.
-pub struct Mbc1<'a, RAM, BAT>
+pub struct Mbc3<'a, RAM, BAT, RTC>
 where
     RAM: ExtRam,
     BAT: Battery,
+    RTC: Rtc,
 {
     ram_enable: usize,
     rom_bank: usize,
@@ -20,15 +19,16 @@ where
     rom: &'a [u8],
     ram: RAM,
     battery: BAT,
+    rtc: RTC,
 }
 
-impl<'a, RAM, BAT> Mbc1<'a, RAM, BAT>
+impl<'a, RAM, BAT, RTC> Mbc3<'a, RAM, BAT, RTC>
 where
     RAM: ExtRam,
     BAT: Battery,
+    RTC: Rtc,
 {
-    /// Creates a new memory bank controller of type MBC1.
-    pub fn from_parts(rom: &'a [u8], ram: RAM, battery: BAT) -> Self {
+    pub fn from_parts(rom: &'a [u8], ram: RAM, battery: BAT, rtc: RTC) -> Self {
         let rom_banks = rom.len() / Cartridge::ROM_BANK_SIZE;
         Self {
             ram_enable: 0,
@@ -39,40 +39,40 @@ where
             rom,
             ram,
             battery,
+            rtc,
         }
     }
 }
 
-impl<'a> Mbc1<'a, NoRam, NoFeat> {
+impl<'a> Mbc3<'a, NoRam, NoFeat, NoFeat> {
     pub fn rom_only(rom: &'a [u8]) -> Self {
-        Self::from_parts(rom, (), NoFeat)
+        Self::from_parts(rom, (), NoFeat, NoFeat)
     }
 }
 
-impl<'a> Mbc1<'a, Ram, NoFeat> {
-    /// Creates a new memory bank controller of type MBC1 with RAM.
+impl<'a> Mbc3<'a, Ram, NoFeat, NoFeat> {
     pub fn with_ram(rom: &'a [u8], ram: Ram) -> Self {
-        Self::from_parts(rom, ram, NoFeat)
+        Self::from_parts(rom, ram, NoFeat, NoFeat)
     }
 }
 
-impl<'a, BAT> Mbc1<'a, Ram, Feat<BAT>>
+impl<'a, BAT> Mbc3<'a, Ram, Feat<BAT>, NoFeat>
 where
     BAT: Battery,
 {
-    /// Creates a new memory bank controller of type MBC1 with RAM and battery.
     pub fn with_ram_battery(rom: &'a [u8], mut ram: Ram, mut battery: BAT) -> Self {
         if let Some(data) = battery.load_data() {
             ram.write_all(&data).expect("Failed to load save data");
         }
-        Self::from_parts(rom, ram, Feat(battery))
+        Self::from_parts(rom, ram, Feat(battery), NoFeat)
     }
 }
 
-impl<RAM, BAT> ReadRom for Mbc1<'_, RAM, BAT>
+impl<RAM, BAT, RTC> ReadRom for Mbc3<'_, RAM, BAT, RTC>
 where
     RAM: ExtRam,
     BAT: Battery,
+    RTC: Rtc,
 {
     fn read_rom(&self, addr: u16) -> u8 {
         // Bit 00 - 13 decided by address
@@ -92,10 +92,11 @@ where
     }
 }
 
-impl<RAM, BAT> WriteRom for Mbc1<'_, RAM, BAT>
+impl<RAM, BAT, RTC> WriteRom for Mbc3<'_, RAM, BAT, RTC>
 where
     RAM: ExtRam,
     BAT: Battery,
+    RTC: Rtc,
 {
     fn write_rom(&mut self, addr: u16, val: u8) {
         match addr {
@@ -108,25 +109,28 @@ where
     }
 }
 
-impl<BAT> ReadRam for Mbc1<'_, NoRam, BAT>
+impl<BAT, RTC> ReadRam for Mbc3<'_, NoRam, BAT, RTC>
 where
     BAT: Battery,
+    RTC: Rtc,
 {
     fn read_ram(&self, _addr: u16) -> u8 {
         0xff
     }
 }
 
-impl<BAT> WriteRam for Mbc1<'_, NoRam, BAT>
+impl<BAT, RTC> WriteRam for Mbc3<'_, NoRam, BAT, RTC>
 where
     BAT: Battery,
+    RTC: Rtc,
 {
     fn write_ram(&mut self, _addr: u16, _val: u8) {}
 }
 
-impl<BAT> ReadRam for Mbc1<'_, Ram, BAT>
+impl<BAT, RTC> ReadRam for Mbc3<'_, Ram, BAT, RTC>
 where
     BAT: Battery,
+    RTC: Rtc,
 {
     fn read_ram(&self, addr: u16) -> u8 {
         if self.ram_enable != 0x0a {
@@ -140,9 +144,10 @@ where
     }
 }
 
-impl<BAT> WriteRam for Mbc1<'_, Ram, BAT>
+impl<BAT, RTC> WriteRam for Mbc3<'_, Ram, BAT, RTC>
 where
     BAT: Battery,
+    RTC: Rtc,
 {
     fn write_ram(&mut self, addr: u16, val: u8) {
         if self.ram_enable != 0x0a {
@@ -158,10 +163,11 @@ where
 
 // TODO: Fix without `Drop`. Could remove `ExtRam` as well then
 // and just force RAM to be Vec<u8> or ().
-impl<RAM, BAT> Drop for Mbc1<'_, RAM, BAT>
+impl<RAM, BAT, RTC> Drop for Mbc3<'_, RAM, BAT, RTC>
 where
     RAM: ExtRam,
     BAT: Battery,
+    RTC: Rtc,
 {
     fn drop(&mut self) {
         if let Some(data) = self.ram.data() {
@@ -170,23 +176,23 @@ where
     }
 }
 
-impl Mbc for Mbc1<'_, NoRam, NoFeat> {
+impl Mbc for Mbc3<'_, NoRam, NoFeat, NoFeat> {
     fn name(&self) -> &'static str {
-        "MBC1"
+        "MBC3"
     }
 }
 
-impl Mbc for Mbc1<'_, Ram, NoFeat> {
+impl Mbc for Mbc3<'_, Ram, NoFeat, NoFeat> {
     fn name(&self) -> &'static str {
-        "MBC1 + RAM"
+        "MBC3 + RAM"
     }
 }
 
-impl<BAT> Mbc for Mbc1<'_, Ram, Feat<BAT>>
+impl<BAT> Mbc for Mbc3<'_, Ram, Feat<BAT>, NoFeat>
 where
     BAT: Battery,
 {
     fn name(&self) -> &'static str {
-        "MBC1 + RAM + BATTERY"
+        "MBC3 + RAM + BATTERY"
     }
 }

@@ -80,7 +80,7 @@ fn main() -> Result<(), String> {
     thread::spawn(move || {
         let cartridge = Cartridge::builder()
             .rom(&rom)
-            .save(save)
+            .battery(save)
             .build()
             .expect("Invalid ROM");
         let mut gb = Gameboy::builder()
