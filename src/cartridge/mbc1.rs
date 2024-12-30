@@ -2,7 +2,6 @@ use crate::cartridge::{
     peripherals::{Battery, ExtRam, Feat, NoFeat, NoRam, Ram},
     Cartridge, Mbc, ReadRam, ReadRom, WriteRam, WriteRom,
 };
-use std::io::Write;
 
 /// A memory bank controller of type MBC1.
 /// Stores its registers, as well as ROM and RAM.
@@ -63,7 +62,7 @@ where
     /// Creates a new memory bank controller of type MBC1 with RAM and battery.
     pub fn with_ram_battery(rom: &'a [u8], mut ram: Ram, mut battery: BAT) -> Self {
         if let Some(data) = battery.load_data() {
-            ram.write_all(&data).expect("Failed to load save data");
+            ram = data;
         }
         Self::from_parts(rom, ram, Feat(battery))
     }

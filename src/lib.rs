@@ -1,4 +1,3 @@
-#![feature(specialization)]
 mod apu;
 mod bus;
 mod cartridge;

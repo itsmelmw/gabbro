@@ -113,7 +113,7 @@ where
     /// Reads two bytes at `addr` and `addr + 1`. Takes two machine cycles.
     #[allow(dead_code)]
     pub(crate) fn read_word(&mut self, addr: u16) -> u16 {
-        (self.read_byte(addr + 1) as u16) | (self.read_byte(addr) as u16) << 8
+        (self.read_byte(addr + 1) as u16) | ((self.read_byte(addr) as u16) << 8)
     }
 
     /// Writes `val` to `addr`. Takes a machine cycle.
@@ -137,7 +137,7 @@ where
 
     /// Fetches two bytes at `(PC)`, and increments `PC` twice. Takes two machine cycles.
     pub(crate) fn fetch_word(&mut self) -> u16 {
-        (self.fetch_byte() as u16) | (self.fetch_byte() as u16) << 8
+        (self.fetch_byte() as u16) | ((self.fetch_byte() as u16) << 8)
     }
 
     /// Pushes `val` to `(SP)` and `(SP - 1)`, and decrements `SP` twice. Takes two machine cycles.
@@ -148,7 +148,7 @@ where
 
     /// Pops two bytes at `(SP)` and `(SP + 1)`, and increments `SP` twice. Takes two machine cycles.
     pub(crate) fn stack_pop(&mut self) -> u16 {
-        (self.stack_pop_byte() as u16) | (self.stack_pop_byte() as u16) << 8
+        (self.stack_pop_byte() as u16) | ((self.stack_pop_byte() as u16) << 8)
     }
 
     /// Pushes `val` to `(SP)`, and decrements `SP`. Takes a machine cycle.

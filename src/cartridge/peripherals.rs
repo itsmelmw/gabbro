@@ -1,5 +1,5 @@
 use std::{
-    fs::File,
+    fs::OpenOptions,
     io::{Read, Write},
     path::PathBuf,
 };
@@ -39,12 +39,17 @@ impl Battery for NoFeat {}
 
 impl Battery for PathBuf {
     fn store_data(&mut self, data: &[u8]) {
-        let mut file = File::create(self).expect("Failed to write save file");
+        let mut file = OpenOptions::new()
+            .write(true)
+            .create(true)
+            .truncate(true)
+            .open(self)
+            .expect("Failed to open save file");
         file.write_all(data).unwrap();
     }
 
     fn load_data(&mut self) -> Option<Vec<u8>> {
-        let mut file = File::open(self).ok()?;
+        let mut file = OpenOptions::new().read(true).open(self).ok()?;
         let mut data = Vec::with_capacity(file.metadata().unwrap().len() as usize);
         file.read_to_end(&mut data)
             .expect("Failed to read save file");

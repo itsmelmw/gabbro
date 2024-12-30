@@ -2,7 +2,6 @@ use crate::cartridge::{
     peripherals::{Battery, ExtRam, Feat, NoFeat, NoRam, Ram, Rtc},
     Cartridge, Mbc, ReadRam, ReadRom, WriteRam, WriteRom,
 };
-use std::io::Write;
 
 pub struct Mbc3<'a, RAM, BAT, RTC>
 where
@@ -62,7 +61,7 @@ where
 {
     pub fn with_ram_battery(rom: &'a [u8], mut ram: Ram, mut battery: BAT) -> Self {
         if let Some(data) = battery.load_data() {
-            ram.write_all(&data).expect("Failed to load save data");
+            ram = data;
         }
         Self::from_parts(rom, ram, Feat(battery), NoFeat)
     }
