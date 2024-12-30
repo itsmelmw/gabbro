@@ -188,4 +188,8 @@ where
     fn name(&self) -> &'static str {
         "MBC1 + RAM + BATTERY"
     }
+
+    fn shutdown(&mut self) {
+        self.battery.store_data(&self.ram);
+    }
 }

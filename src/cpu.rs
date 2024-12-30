@@ -8,11 +8,16 @@ use crate::{
     peripherals::{Cable, Joypad, Lcd, Speaker},
 };
 
+#[derive(Debug, PartialEq, Clone)]
+pub enum CpuError {
+    InvalidInstruction(u8),
+}
+
 /// State of the Interrupt Master Enable (IME).
 /// - Disabled: All interrupts are disabled.
 /// - Enabling: Interrupts will be enabled next cycle.
 /// - Enabled:  Interrupts are enabled according to the IE register.
-#[derive(PartialEq)]
+#[derive(Debug, PartialEq, Clone)]
 enum ImeState {
     Disabled,
     Enabling,
@@ -51,7 +56,7 @@ where
     }
 
     /// Fetches and executes one instruction, and checks for interrupts.
-    pub(crate) fn step(&mut self) {
+    pub(crate) fn step(&mut self) -> Result<(), CpuError> {
         if self.ime == ImeState::Enabling {
             self.ime = ImeState::Enabled;
         }
@@ -63,7 +68,7 @@ where
                 self.halted = false;
             }
         } else {
-            self.execute_next();
+            self.execute_next()?;
         }
 
         if self.ime == ImeState::Enabled {
@@ -72,15 +77,16 @@ where
                 self.handle_interrupt(addr);
             }
         }
+        Ok(())
     }
 
     /// Executes the instruction currently at `(PC)`.
-    fn execute_next(&mut self) {
+    fn execute_next(&mut self) -> Result<(), CpuError> {
         let opcode = self.fetch_byte();
         match opcode {
             BITWISE_PREFIX => {
                 let opcode = self.fetch_byte();
-                self.execute_bitwise(opcode);
+                self.execute_bitwise(opcode)
             }
             _ => self.execute_base(opcode),
         }
@@ -170,8 +176,7 @@ where
         &self.regs
     }
 
-    #[cfg(feature = "debug")]
-    pub(crate) fn bus(&self) -> &Bus<L, S, J, C> {
-        &self.bus
+    pub(crate) fn shutdown(&mut self) {
+        self.bus.shutdown();
     }
 }

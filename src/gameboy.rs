@@ -1,6 +1,6 @@
 use crate::{
     cartridge::Cartridge,
-    cpu::Cpu,
+    cpu::{Cpu, CpuError},
     peripherals::{Cable, Joypad, Lcd, Speaker},
 };
 
@@ -14,6 +14,11 @@ use crate::cpu::{
     },
     registers::Regs,
 };
+
+#[derive(Debug, PartialEq, Clone)]
+pub enum GameboyError {
+    Cpu(CpuError),
+}
 
 /// Represents an emulated Game Boy.
 pub struct Gameboy<'a, L = (), S = (), J = (), C = ()>
@@ -41,9 +46,15 @@ where
     C: Cable,
 {
     /// Runs the Game Boy emulator in an infinite loop.
-    pub fn run(&mut self) {
+    pub fn run(&mut self) -> Result<(), GameboyError> {
         loop {
-            self.cpu.step();
+            match self.cpu.step() {
+                Ok(()) => {}
+                Err(err) => {
+                    self.cpu.shutdown();
+                    return Err(GameboyError::Cpu(err));
+                }
+            }
         }
     }
 

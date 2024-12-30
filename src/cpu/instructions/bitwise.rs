@@ -1,5 +1,5 @@
 use crate::{
-    cpu::{instructions::helpers, Cpu},
+    cpu::{instructions::helpers, Cpu, CpuError},
     peripherals::{Cable, Joypad, Lcd, Speaker},
 };
 
@@ -12,7 +12,7 @@ where
     J: Joypad,
     C: Cable,
 {
-    pub(in crate::cpu) fn execute_bitwise(&mut self, opcode: u8) {
+    pub(in crate::cpu) fn execute_bitwise(&mut self, opcode: u8) -> Result<(), CpuError> {
         match opcode {
             0x0 => {
                 let res = helpers::rlc(self, self.regs.b());
@@ -879,5 +879,6 @@ where
                 self.regs.set_a(helpers::set(7, self.regs.a()));
             }
         }
+        Ok(())
     }
 }

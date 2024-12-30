@@ -38,6 +38,7 @@ pub trait WriteRam {
 
 pub trait Mbc: ReadRom + WriteRom + ReadRam + WriteRam {
     fn name(&self) -> &'static str;
+    fn shutdown(&mut self) {}
 }
 
 /// Stores some header information of the ROM, as well as the MBC.
@@ -71,6 +72,10 @@ impl<'a> Cartridge<'a> {
             licensee,
             mbc,
         })
+    }
+
+    pub fn shutdown(&mut self) {
+        self.mbc.shutdown();
     }
 
     pub fn builder() -> CartridgeBuilder<'a, (), false> {

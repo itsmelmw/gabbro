@@ -1,5 +1,5 @@
 use crate::{
-    cpu::{instructions::helpers, Cpu, ImeState},
+    cpu::{instructions::helpers, Cpu, CpuError, ImeState},
     peripherals::{Cable, Joypad, Lcd, Speaker},
 };
 
@@ -10,7 +10,7 @@ where
     J: Joypad,
     C: Cable,
 {
-    pub(in crate::cpu) fn execute_base(&mut self, opcode: u8) {
+    pub(in crate::cpu) fn execute_base(&mut self, opcode: u8) -> Result<(), CpuError> {
         match opcode {
             0x0 => {}
             0x1 => {
@@ -729,9 +729,6 @@ where
                     helpers::jp(self, val);
                 }
             }
-            0xcb => {
-                helpers::invalid();
-            }
             0xcc => {
                 let val = self.fetch_word();
                 if self.regs.flags().z() {
@@ -769,9 +766,6 @@ where
                     self.cycle();
                     helpers::jp(self, val);
                 }
-            }
-            0xd3 => {
-                helpers::invalid();
             }
             0xd4 => {
                 let val = self.fetch_word();
@@ -811,18 +805,12 @@ where
                     helpers::jp(self, val);
                 }
             }
-            0xdb => {
-                helpers::invalid();
-            }
             0xdc => {
                 let val = self.fetch_word();
                 if self.regs.flags().c() {
                     self.cycle();
                     helpers::call(self, val);
                 }
-            }
-            0xdd => {
-                helpers::invalid();
             }
             0xde => {
                 let val = self.fetch_byte();
@@ -842,12 +830,6 @@ where
             }
             0xe2 => {
                 self.write_byte(0xff00 + self.regs.c() as u16, self.regs.a());
-            }
-            0xe3 => {
-                helpers::invalid();
-            }
-            0xe4 => {
-                helpers::invalid();
             }
             0xe5 => {
                 self.cycle();
@@ -875,15 +857,6 @@ where
                 let addr = self.fetch_word();
                 self.write_byte(addr, self.regs.a());
             }
-            0xeb => {
-                helpers::invalid();
-            }
-            0xec => {
-                helpers::invalid();
-            }
-            0xed => {
-                helpers::invalid();
-            }
             0xee => {
                 let val = self.fetch_byte();
                 helpers::xor(self, val);
@@ -907,9 +880,6 @@ where
             }
             0xf3 => {
                 self.ime = ImeState::Disabled;
-            }
-            0xf4 => {
-                helpers::invalid();
             }
             0xf5 => {
                 self.cycle();
@@ -942,12 +912,6 @@ where
                 log::debug!("CPU: Enabling IME");
                 self.ime = ImeState::Enabling;
             }
-            0xfc => {
-                helpers::invalid();
-            }
-            0xfd => {
-                helpers::invalid();
-            }
             0xfe => {
                 let val = self.fetch_byte();
                 helpers::cp(self, val);
@@ -956,6 +920,8 @@ where
                 self.cycle();
                 helpers::call(self, 0x0038);
             }
+            _ => return Err(CpuError::InvalidInstruction(opcode)),
         }
+        Ok(())
     }
 }

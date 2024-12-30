@@ -23,19 +23,19 @@ impl Flags {
     }
     /// Writes `val as u8` to the Carry flag `C`.
     pub fn set_c(&mut self, val: bool) {
-        self.byte = (self.byte & !(1 << 4)) | (val as u8) << 4
+        self.byte = (self.byte & !(1 << 4)) | ((val as u8) << 4)
     }
     /// Writes `val as u8` to the Half Carry flag `H`.
     pub fn set_h(&mut self, val: bool) {
-        self.byte = (self.byte & !(1 << 5)) | (val as u8) << 5
+        self.byte = (self.byte & !(1 << 5)) | ((val as u8) << 5)
     }
     /// Writes `val as u8` to the Subtract flag `N`.
     pub fn set_n(&mut self, val: bool) {
-        self.byte = (self.byte & !(1 << 6)) | (val as u8) << 6
+        self.byte = (self.byte & !(1 << 6)) | ((val as u8) << 6)
     }
     /// Writes `val as u8` to the Zero flag `Z`.
     pub fn set_z(&mut self, val: bool) {
-        self.byte = (self.byte & !(1 << 7)) | (val as u8) << 7
+        self.byte = (self.byte & !(1 << 7)) | ((val as u8) << 7)
     }
 }
 

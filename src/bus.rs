@@ -180,4 +180,8 @@ where
             self.ppu.dma.step();
         }
     }
+
+    pub fn shutdown(&mut self) {
+        self.cartridge.shutdown();
+    }
 }

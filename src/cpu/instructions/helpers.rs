@@ -3,12 +3,6 @@ use crate::{
     peripherals::{Cable, Joypad, Lcd, Speaker},
 };
 
-/// For invalid instructions.
-pub fn invalid() {
-    log::error!("Encountered an invalid instruction.");
-    panic!("Aborting");
-}
-
 /// Jump to address `addr`.
 pub fn jp<L, S, J, C>(cpu: &mut Cpu<L, S, J, C>, addr: u16)
 where
