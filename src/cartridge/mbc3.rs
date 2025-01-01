@@ -1,11 +1,10 @@
 use crate::cartridge::{
-    peripherals::{Battery, ExtRam, Feat, NoFeat, NoRam, Ram, Rtc},
-    Cartridge, Mbc, ReadRam, ReadRom, WriteRam, WriteRom,
+    peripherals::{Battery, Feat, NoFeat, NoRam, Ram, Rtc},
+    Cartridge, CartridgeError, Mbc, ReadRam, ReadRom, Shutdown, WriteRam, WriteRom,
 };
 
 pub struct Mbc3<'a, RAM, BAT, RTC>
 where
-    RAM: ExtRam,
     BAT: Battery,
     RTC: Rtc,
 {
@@ -23,7 +22,6 @@ where
 
 impl<'a, RAM, BAT, RTC> Mbc3<'a, RAM, BAT, RTC>
 where
-    RAM: ExtRam,
     BAT: Battery,
     RTC: Rtc,
 {
@@ -59,17 +57,21 @@ impl<'a, BAT> Mbc3<'a, Ram, Feat<BAT>, NoFeat>
 where
     BAT: Battery,
 {
-    pub fn with_ram_battery(rom: &'a [u8], mut ram: Ram, mut battery: BAT) -> Self {
-        if let Some(data) = battery.load_data() {
-            ram = data;
+    pub fn with_ram_battery(
+        rom: &'a [u8],
+        ram: Ram,
+        mut battery: BAT,
+    ) -> Result<Self, CartridgeError<BAT>> {
+        match battery.load_data() {
+            Ok(Some(data)) => Ok(Self::from_parts(rom, data, Feat(battery), NoFeat)),
+            Ok(None) => Ok(Self::from_parts(rom, ram, Feat(battery), NoFeat)),
+            Err(err) => Err(CartridgeError::BatteryError(err)),
         }
-        Self::from_parts(rom, ram, Feat(battery), NoFeat)
     }
 }
 
 impl<RAM, BAT, RTC> ReadRom for Mbc3<'_, RAM, BAT, RTC>
 where
-    RAM: ExtRam,
     BAT: Battery,
     RTC: Rtc,
 {
@@ -93,7 +95,6 @@ where
 
 impl<RAM, BAT, RTC> WriteRom for Mbc3<'_, RAM, BAT, RTC>
 where
-    RAM: ExtRam,
     BAT: Battery,
     RTC: Rtc,
 {
@@ -160,18 +161,20 @@ where
     }
 }
 
-// TODO: Fix without `Drop`. Could remove `ExtRam` as well then
-// and just force RAM to be Vec<u8> or ().
-impl<RAM, BAT, RTC> Drop for Mbc3<'_, RAM, BAT, RTC>
+impl<RAM, RTC> Shutdown for Mbc3<'_, RAM, NoFeat, RTC>
 where
-    RAM: ExtRam,
+    RTC: Rtc,
+{
+    fn shutdown(&mut self) {}
+}
+
+impl<BAT, RTC> Shutdown for Mbc3<'_, Ram, Feat<BAT>, RTC>
+where
     BAT: Battery,
     RTC: Rtc,
 {
-    fn drop(&mut self) {
-        if let Some(data) = self.ram.data() {
-            self.battery.store_data(data);
-        }
+    fn shutdown(&mut self) {
+        self.battery.store_data(&self.ram);
     }
 }
 
@@ -193,9 +196,5 @@ where
 {
     fn name(&self) -> &'static str {
         "MBC3 + RAM + BATTERY"
-    }
-
-    fn shutdown(&mut self) {
-        self.battery.store_data(&self.ram);
     }
 }

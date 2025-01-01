@@ -9,7 +9,10 @@ use romonly::RomOnly;
 use std::str;
 
 #[derive(Debug)]
-pub enum CartridgeError {
+pub enum CartridgeError<CB>
+where
+    CB: Battery,
+{
     InvalidTitle,
     InvalidRomSize,
     WrongRomSize,
@@ -18,6 +21,7 @@ pub enum CartridgeError {
     InvalidLicensee,
     InvalidMbc,
     UnsupportedMbc(&'static str),
+    BatteryError(CB::Error),
 }
 
 pub trait ReadRom {
@@ -36,9 +40,12 @@ pub trait WriteRam {
     fn write_ram(&mut self, addr: u16, val: u8);
 }
 
-pub trait Mbc: ReadRom + WriteRom + ReadRam + WriteRam {
+pub trait Shutdown {
+    fn shutdown(&mut self);
+}
+
+pub trait Mbc: ReadRom + WriteRom + ReadRam + WriteRam + Shutdown {
     fn name(&self) -> &'static str;
-    fn shutdown(&mut self) {}
 }
 
 /// Stores some header information of the ROM, as well as the MBC.
@@ -54,7 +61,7 @@ impl<'a> Cartridge<'a> {
     const RAM_BANK_SIZE: usize = 0x2000;
 
     /// Initializes a new cartridge by reading information from the header of the ROM.
-    fn new<CB>(rom: &'a [u8], battery: CB) -> Result<Self, CartridgeError>
+    fn new<CB>(rom: &'a [u8], battery: CB) -> Result<Self, CartridgeError<CB>>
     where
         CB: Battery + 'a,
     {
@@ -83,7 +90,10 @@ impl<'a> Cartridge<'a> {
     }
 
     /// Reads the title stored in the ROM. Returns an error if it encounters invalid UTF-8.
-    fn get_title(rom: &[u8]) -> Result<&str, CartridgeError> {
+    fn get_title<CB>(rom: &[u8]) -> Result<&str, CartridgeError<CB>>
+    where
+        CB: Battery,
+    {
         str::from_utf8(&rom[0x0134..0x0143]).map_err(|_| CartridgeError::InvalidTitle)
     }
 
@@ -94,7 +104,10 @@ impl<'a> Cartridge<'a> {
 
     /// Reads the number of ROM banks the ROM uses.
     /// Returns an error if it is not a valid value or the ROM size is wrong.
-    fn check_rom_size(rom: &[u8]) -> Result<(), CartridgeError> {
+    fn check_rom_size<CB>(rom: &[u8]) -> Result<(), CartridgeError<CB>>
+    where
+        CB: Battery,
+    {
         let rom_banks = match rom[0x0148] {
             0x00 => 2,
             0x01 => 4,
@@ -115,7 +128,10 @@ impl<'a> Cartridge<'a> {
 
     /// Reads the number of RAM banks the ROM uses.
     /// Returns an error if it is not a valid value.
-    fn create_ram(rom: &[u8]) -> Result<Vec<u8>, CartridgeError> {
+    fn create_ram<CB>(rom: &[u8]) -> Result<Vec<u8>, CartridgeError<CB>>
+    where
+        CB: Battery,
+    {
         let rom_banks = match rom[0x0149] {
             0x00 => 0,
             0x02 => 1,
@@ -133,7 +149,7 @@ impl<'a> Cartridge<'a> {
         rom: &'a [u8],
         ram: Ram,
         battery: CB,
-    ) -> Result<Box<dyn Mbc + 'a>, CartridgeError>
+    ) -> Result<Box<dyn Mbc + 'a>, CartridgeError<CB>>
     where
         CB: Battery + 'a,
     {
@@ -141,7 +157,7 @@ impl<'a> Cartridge<'a> {
             0x00 => Ok(Box::new(RomOnly::new(rom))),
             0x01 => Ok(Box::new(Mbc1::rom_only(rom))),
             0x02 => Ok(Box::new(Mbc1::with_ram(rom, ram))),
-            0x03 => Ok(Box::new(Mbc1::with_ram_battery(rom, ram, battery))),
+            0x03 => Ok(Box::new(Mbc1::with_ram_battery(rom, ram, battery)?)),
             0x08 => Err(CartridgeError::UnsupportedMbc("ROM + RAM")),
             0x09 => Err(CartridgeError::UnsupportedMbc("ROM + RAM + BATTERY")),
             0x05 | 0x06 => Err(CartridgeError::UnsupportedMbc("MBC2")),
@@ -155,7 +171,7 @@ impl<'a> Cartridge<'a> {
             //)),
             0x11 => Ok(Box::new(Mbc3::rom_only(rom))),
             0x12 => Ok(Box::new(Mbc3::with_ram(rom, ram))),
-            0x13 => Ok(Box::new(Mbc3::with_ram_battery(rom, ram, battery))),
+            0x13 => Ok(Box::new(Mbc3::with_ram_battery(rom, ram, battery)?)),
             0x19..=0x1e => Err(CartridgeError::UnsupportedMbc("MBC5")),
             0x20 => Err(CartridgeError::UnsupportedMbc("MBC6")),
             0x22 => Err(CartridgeError::UnsupportedMbc("MBC7")),
@@ -170,7 +186,10 @@ impl<'a> Cartridge<'a> {
     /// Reads the name of the licensee from the ROM.
     /// Checks for both the old and the new format.
     /// Returns an error if the licensee is invalid.
-    fn get_licensee(rom: &[u8]) -> Result<&'static str, CartridgeError> {
+    fn get_licensee<CB>(rom: &[u8]) -> Result<&'static str, CartridgeError<CB>>
+    where
+        CB: Battery,
+    {
         match rom[0x014b] {
             0x00 => Ok("None"),
             0x01 => Ok("Nintendo"),
@@ -324,7 +343,10 @@ impl<'a> Cartridge<'a> {
     }
 
     /// Reads the name of the licensee from the ROM in the new format.
-    fn get_licensee_new(rom: &[u8]) -> Result<&'static str, CartridgeError> {
+    fn get_licensee_new<CB>(rom: &[u8]) -> Result<&'static str, CartridgeError<CB>>
+    where
+        CB: Battery,
+    {
         match (rom[0x0144] as char, rom[0x0145] as char) {
             ('0', '0') => Ok("None"),
             ('0', '1') => Ok("Nintendo R&D1"),
@@ -440,7 +462,7 @@ impl<'a, CB> CartridgeBuilder<'a, CB, true>
 where
     CB: Battery + 'a,
 {
-    pub fn build(self) -> Result<Cartridge<'a>, CartridgeError> {
+    pub fn build(self) -> Result<Cartridge<'a>, CartridgeError<CB>> {
         Cartridge::new(self.rom, self.battery)
     }
 }
