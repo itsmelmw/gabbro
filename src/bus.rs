@@ -2,6 +2,7 @@ use crate::{
     apu::Apu,
     cartridge::Cartridge,
     cpu::interrupts::InterruptControl,
+    gameboy::GameboyError,
     joypad::JoypadController,
     peripherals::{Cable, Joypad, Lcd, Speaker},
     ppu::Ppu,
@@ -161,15 +162,16 @@ where
 
     /// Emulates a machine cycle for all parts of the Game Boy that are stored in the [`Bus`].
     /// This does not include the CPU.
-    pub fn io_step(&mut self) {
+    pub fn io_step(&mut self) -> Result<(), GameboyError<L, S, J>> {
         self.dma_step();
 
-        let ints = &mut self.interrupts.flags;
-        self.joypad.step(ints);
-        self.ppu.step(ints);
-        self.apu.step();
-        self.serial.step(ints);
-        self.timer.step(ints);
+        let i = &mut self.interrupts.flags;
+        self.joypad.step(i).map_err(|e| GameboyError::Joypad(e))?;
+        self.ppu.step(i).map_err(|e| GameboyError::Lcd(e))?;
+        self.apu.step().map_err(|e| GameboyError::Speaker(e))?;
+        self.serial.step(i);
+        self.timer.step(i);
+        Ok(())
     }
 
     /// Performs a step of the Direct Memory Access feature of the PPU when active.

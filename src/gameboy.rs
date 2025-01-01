@@ -16,8 +16,16 @@ use crate::cpu::{
 };
 
 #[derive(Debug, PartialEq, Clone)]
-pub enum GameboyError {
+pub enum GameboyError<L, S, J>
+where
+    L: Lcd,
+    S: Speaker,
+    J: Joypad,
+{
     Cpu(CpuError),
+    Lcd(L::Error),
+    Speaker(S::Error),
+    Joypad(J::Error),
 }
 
 /// Represents an emulated Game Boy.
@@ -46,13 +54,13 @@ where
     C: Cable,
 {
     /// Runs the Game Boy emulator in an infinite loop.
-    pub fn run(&mut self) -> Result<(), GameboyError> {
+    pub fn run(&mut self) -> Result<(), GameboyError<L, S, J>> {
         loop {
             match self.cpu.step() {
                 Ok(()) => {}
                 Err(err) => {
                     self.cpu.shutdown();
-                    return Err(GameboyError::Cpu(err));
+                    return Err(err);
                 }
             }
         }

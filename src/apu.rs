@@ -37,7 +37,7 @@ where
         }
     }
 
-    pub fn step(&mut self) {
+    pub fn step(&mut self) -> Result<(), S::Error> {
         let (mut left_sample, mut right_sample) = (0., 0.);
 
         if self.master.apu_enabled() {
@@ -65,7 +65,8 @@ where
             right_sample *= self.master.right_volume() as f32 / 8.;
         }
 
-        self.speaker.push_sample(left_sample, right_sample);
+        self.speaker.push_sample(left_sample, right_sample)?;
+        Ok(())
     }
 
     pub fn read(&self, addr: u16) -> u8 {

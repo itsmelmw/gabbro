@@ -86,8 +86,8 @@ where
     /// Emulates a machine cycle of the joypad.
     /// Updates `P1` according to the pressed buttons given by the joypad interface.
     /// May request the JOYPAD interrupt.
-    pub fn step(&mut self, ints: &mut IntReg) {
-        let state = self.joypad.get_button_state();
+    pub fn step(&mut self, ints: &mut IntReg) -> Result<(), J::Error> {
+        let state = self.joypad.get_button_state()?;
         let old = self.p1.buttons();
         self.p1.clear_buttons();
         if self.p1.action_enabled() {
@@ -105,5 +105,6 @@ where
         if old != self.p1.buttons() {
             ints.irq_joypad();
         }
+        Ok(())
     }
 }

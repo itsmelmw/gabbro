@@ -1,5 +1,6 @@
 use crate::{
-    cpu::{instructions::helpers, Cpu, CpuError},
+    cpu::{instructions::helpers, Cpu},
+    gameboy::GameboyError,
     peripherals::{Cable, Joypad, Lcd, Speaker},
 };
 
@@ -12,7 +13,10 @@ where
     J: Joypad,
     C: Cable,
 {
-    pub(in crate::cpu) fn execute_bitwise(&mut self, opcode: u8) -> Result<(), CpuError> {
+    pub(in crate::cpu) fn execute_bitwise(
+        &mut self,
+        opcode: u8,
+    ) -> Result<(), GameboyError<L, S, J>> {
         match opcode {
             0x0 => {
                 let res = helpers::rlc(self, self.regs.b());
@@ -39,9 +43,9 @@ where
                 self.regs.set_l(res);
             }
             0x6 => {
-                let val = self.read_byte(self.regs.hl());
+                let val = self.read_byte(self.regs.hl())?;
                 let res = helpers::rlc(self, val);
-                self.write_byte(self.regs.hl(), res);
+                self.write_byte(self.regs.hl(), res)?;
             }
             0x7 => {
                 let res = helpers::rlc(self, self.regs.a());
@@ -72,9 +76,9 @@ where
                 self.regs.set_l(res);
             }
             0xe => {
-                let val = self.read_byte(self.regs.hl());
+                let val = self.read_byte(self.regs.hl())?;
                 let res = helpers::rrc(self, val);
-                self.write_byte(self.regs.hl(), res);
+                self.write_byte(self.regs.hl(), res)?;
             }
             0xf => {
                 let res = helpers::rrc(self, self.regs.a());
@@ -105,9 +109,9 @@ where
                 self.regs.set_l(res);
             }
             0x16 => {
-                let val = self.read_byte(self.regs.hl());
+                let val = self.read_byte(self.regs.hl())?;
                 let res = helpers::rl(self, val);
-                self.write_byte(self.regs.hl(), res);
+                self.write_byte(self.regs.hl(), res)?;
             }
             0x17 => {
                 let res = helpers::rl(self, self.regs.a());
@@ -138,9 +142,9 @@ where
                 self.regs.set_l(res);
             }
             0x1e => {
-                let val = self.read_byte(self.regs.hl());
+                let val = self.read_byte(self.regs.hl())?;
                 let res = helpers::rr(self, val);
-                self.write_byte(self.regs.hl(), res);
+                self.write_byte(self.regs.hl(), res)?;
             }
             0x1f => {
                 let res = helpers::rr(self, self.regs.a());
@@ -171,9 +175,9 @@ where
                 self.regs.set_l(res);
             }
             0x26 => {
-                let val = self.read_byte(self.regs.hl());
+                let val = self.read_byte(self.regs.hl())?;
                 let res = helpers::sla(self, val);
-                self.write_byte(self.regs.hl(), res);
+                self.write_byte(self.regs.hl(), res)?;
             }
             0x27 => {
                 let res = helpers::sla(self, self.regs.a());
@@ -204,9 +208,9 @@ where
                 self.regs.set_l(res);
             }
             0x2e => {
-                let val = self.read_byte(self.regs.hl());
+                let val = self.read_byte(self.regs.hl())?;
                 let res = helpers::sra(self, val);
-                self.write_byte(self.regs.hl(), res);
+                self.write_byte(self.regs.hl(), res)?;
             }
             0x2f => {
                 let res = helpers::sra(self, self.regs.a());
@@ -237,9 +241,9 @@ where
                 self.regs.set_l(res);
             }
             0x36 => {
-                let val = self.read_byte(self.regs.hl());
+                let val = self.read_byte(self.regs.hl())?;
                 let res = helpers::swap(self, val);
-                self.write_byte(self.regs.hl(), res);
+                self.write_byte(self.regs.hl(), res)?;
             }
             0x37 => {
                 let res = helpers::swap(self, self.regs.a());
@@ -270,9 +274,9 @@ where
                 self.regs.set_l(res);
             }
             0x3e => {
-                let val = self.read_byte(self.regs.hl());
+                let val = self.read_byte(self.regs.hl())?;
                 let res = helpers::srl(self, val);
-                self.write_byte(self.regs.hl(), res);
+                self.write_byte(self.regs.hl(), res)?;
             }
             0x3f => {
                 let res = helpers::srl(self, self.regs.a());
@@ -297,7 +301,7 @@ where
                 helpers::bit(self, 0, self.regs.l());
             }
             0x46 => {
-                let val = self.read_byte(self.regs.hl());
+                let val = self.read_byte(self.regs.hl())?;
                 helpers::bit(self, 0, val);
             }
             0x47 => {
@@ -322,7 +326,7 @@ where
                 helpers::bit(self, 1, self.regs.l());
             }
             0x4e => {
-                let val = self.read_byte(self.regs.hl());
+                let val = self.read_byte(self.regs.hl())?;
                 helpers::bit(self, 1, val);
             }
             0x4f => {
@@ -347,7 +351,7 @@ where
                 helpers::bit(self, 2, self.regs.l());
             }
             0x56 => {
-                let val = self.read_byte(self.regs.hl());
+                let val = self.read_byte(self.regs.hl())?;
                 helpers::bit(self, 2, val);
             }
             0x57 => {
@@ -372,7 +376,7 @@ where
                 helpers::bit(self, 3, self.regs.l());
             }
             0x5e => {
-                let val = self.read_byte(self.regs.hl());
+                let val = self.read_byte(self.regs.hl())?;
                 helpers::bit(self, 3, val);
             }
             0x5f => {
@@ -397,7 +401,7 @@ where
                 helpers::bit(self, 4, self.regs.l());
             }
             0x66 => {
-                let val = self.read_byte(self.regs.hl());
+                let val = self.read_byte(self.regs.hl())?;
                 helpers::bit(self, 4, val);
             }
             0x67 => {
@@ -422,7 +426,7 @@ where
                 helpers::bit(self, 5, self.regs.l());
             }
             0x6e => {
-                let val = self.read_byte(self.regs.hl());
+                let val = self.read_byte(self.regs.hl())?;
                 helpers::bit(self, 5, val);
             }
             0x6f => {
@@ -447,7 +451,7 @@ where
                 helpers::bit(self, 6, self.regs.l());
             }
             0x76 => {
-                let val = self.read_byte(self.regs.hl());
+                let val = self.read_byte(self.regs.hl())?;
                 helpers::bit(self, 6, val);
             }
             0x77 => {
@@ -472,7 +476,7 @@ where
                 helpers::bit(self, 7, self.regs.l());
             }
             0x7e => {
-                let val = self.read_byte(self.regs.hl());
+                let val = self.read_byte(self.regs.hl())?;
                 helpers::bit(self, 7, val);
             }
             0x7f => {
@@ -497,8 +501,8 @@ where
                 self.regs.set_l(helpers::res(0, self.regs.l()));
             }
             0x86 => {
-                let val = self.read_byte(self.regs.hl());
-                self.write_byte(self.regs.hl(), helpers::res(0, val));
+                let val = self.read_byte(self.regs.hl())?;
+                self.write_byte(self.regs.hl(), helpers::res(0, val))?;
             }
             0x87 => {
                 self.regs.set_a(helpers::res(0, self.regs.a()));
@@ -522,8 +526,8 @@ where
                 self.regs.set_l(helpers::res(1, self.regs.l()));
             }
             0x8e => {
-                let val = self.read_byte(self.regs.hl());
-                self.write_byte(self.regs.hl(), helpers::res(1, val));
+                let val = self.read_byte(self.regs.hl())?;
+                self.write_byte(self.regs.hl(), helpers::res(1, val))?;
             }
             0x8f => {
                 self.regs.set_a(helpers::res(1, self.regs.a()));
@@ -547,8 +551,8 @@ where
                 self.regs.set_l(helpers::res(2, self.regs.l()));
             }
             0x96 => {
-                let val = self.read_byte(self.regs.hl());
-                self.write_byte(self.regs.hl(), helpers::res(2, val));
+                let val = self.read_byte(self.regs.hl())?;
+                self.write_byte(self.regs.hl(), helpers::res(2, val))?;
             }
             0x97 => {
                 self.regs.set_a(helpers::res(2, self.regs.a()));
@@ -572,8 +576,8 @@ where
                 self.regs.set_l(helpers::res(3, self.regs.l()));
             }
             0x9e => {
-                let val = self.read_byte(self.regs.hl());
-                self.write_byte(self.regs.hl(), helpers::res(3, val));
+                let val = self.read_byte(self.regs.hl())?;
+                self.write_byte(self.regs.hl(), helpers::res(3, val))?;
             }
             0x9f => {
                 self.regs.set_a(helpers::res(3, self.regs.a()));
@@ -597,8 +601,8 @@ where
                 self.regs.set_l(helpers::res(4, self.regs.l()));
             }
             0xa6 => {
-                let val = self.read_byte(self.regs.hl());
-                self.write_byte(self.regs.hl(), helpers::res(4, val));
+                let val = self.read_byte(self.regs.hl())?;
+                self.write_byte(self.regs.hl(), helpers::res(4, val))?;
             }
             0xa7 => {
                 self.regs.set_a(helpers::res(4, self.regs.a()));
@@ -622,8 +626,8 @@ where
                 self.regs.set_l(helpers::res(5, self.regs.l()));
             }
             0xae => {
-                let val = self.read_byte(self.regs.hl());
-                self.write_byte(self.regs.hl(), helpers::res(5, val));
+                let val = self.read_byte(self.regs.hl())?;
+                self.write_byte(self.regs.hl(), helpers::res(5, val))?;
             }
             0xaf => {
                 self.regs.set_a(helpers::res(5, self.regs.a()));
@@ -647,8 +651,8 @@ where
                 self.regs.set_l(helpers::res(6, self.regs.l()));
             }
             0xb6 => {
-                let val = self.read_byte(self.regs.hl());
-                self.write_byte(self.regs.hl(), helpers::res(6, val));
+                let val = self.read_byte(self.regs.hl())?;
+                self.write_byte(self.regs.hl(), helpers::res(6, val))?;
             }
             0xb7 => {
                 self.regs.set_a(helpers::res(6, self.regs.a()));
@@ -672,8 +676,8 @@ where
                 self.regs.set_l(helpers::res(7, self.regs.l()));
             }
             0xbe => {
-                let val = self.read_byte(self.regs.hl());
-                self.write_byte(self.regs.hl(), helpers::res(7, val));
+                let val = self.read_byte(self.regs.hl())?;
+                self.write_byte(self.regs.hl(), helpers::res(7, val))?;
             }
             0xbf => {
                 self.regs.set_a(helpers::res(7, self.regs.a()));
@@ -697,8 +701,8 @@ where
                 self.regs.set_l(helpers::set(0, self.regs.l()));
             }
             0xc6 => {
-                let val = self.read_byte(self.regs.hl());
-                self.write_byte(self.regs.hl(), helpers::set(0, val));
+                let val = self.read_byte(self.regs.hl())?;
+                self.write_byte(self.regs.hl(), helpers::set(0, val))?;
             }
             0xc7 => {
                 self.regs.set_a(helpers::set(0, self.regs.a()));
@@ -722,8 +726,8 @@ where
                 self.regs.set_l(helpers::set(1, self.regs.l()));
             }
             0xce => {
-                let val = self.read_byte(self.regs.hl());
-                self.write_byte(self.regs.hl(), helpers::set(1, val));
+                let val = self.read_byte(self.regs.hl())?;
+                self.write_byte(self.regs.hl(), helpers::set(1, val))?;
             }
             0xcf => {
                 self.regs.set_a(helpers::set(1, self.regs.a()));
@@ -747,8 +751,8 @@ where
                 self.regs.set_l(helpers::set(2, self.regs.l()));
             }
             0xd6 => {
-                let val = self.read_byte(self.regs.hl());
-                self.write_byte(self.regs.hl(), helpers::set(2, val));
+                let val = self.read_byte(self.regs.hl())?;
+                self.write_byte(self.regs.hl(), helpers::set(2, val))?;
             }
             0xd7 => {
                 self.regs.set_a(helpers::set(2, self.regs.a()));
@@ -772,8 +776,8 @@ where
                 self.regs.set_l(helpers::set(3, self.regs.l()));
             }
             0xde => {
-                let val = self.read_byte(self.regs.hl());
-                self.write_byte(self.regs.hl(), helpers::set(3, val));
+                let val = self.read_byte(self.regs.hl())?;
+                self.write_byte(self.regs.hl(), helpers::set(3, val))?;
             }
             0xdf => {
                 self.regs.set_a(helpers::set(3, self.regs.a()));
@@ -797,8 +801,8 @@ where
                 self.regs.set_l(helpers::set(4, self.regs.l()));
             }
             0xe6 => {
-                let val = self.read_byte(self.regs.hl());
-                self.write_byte(self.regs.hl(), helpers::set(4, val));
+                let val = self.read_byte(self.regs.hl())?;
+                self.write_byte(self.regs.hl(), helpers::set(4, val))?;
             }
             0xe7 => {
                 self.regs.set_a(helpers::set(4, self.regs.a()));
@@ -822,8 +826,8 @@ where
                 self.regs.set_l(helpers::set(5, self.regs.l()));
             }
             0xee => {
-                let val = self.read_byte(self.regs.hl());
-                self.write_byte(self.regs.hl(), helpers::set(5, val));
+                let val = self.read_byte(self.regs.hl())?;
+                self.write_byte(self.regs.hl(), helpers::set(5, val))?;
             }
             0xef => {
                 self.regs.set_a(helpers::set(5, self.regs.a()));
@@ -847,8 +851,8 @@ where
                 self.regs.set_l(helpers::set(6, self.regs.l()));
             }
             0xf6 => {
-                let val = self.read_byte(self.regs.hl());
-                self.write_byte(self.regs.hl(), helpers::set(6, val));
+                let val = self.read_byte(self.regs.hl())?;
+                self.write_byte(self.regs.hl(), helpers::set(6, val))?;
             }
             0xf7 => {
                 self.regs.set_a(helpers::set(6, self.regs.a()));
@@ -872,8 +876,8 @@ where
                 self.regs.set_l(helpers::set(7, self.regs.l()));
             }
             0xfe => {
-                let val = self.read_byte(self.regs.hl());
-                self.write_byte(self.regs.hl(), helpers::set(7, val));
+                let val = self.read_byte(self.regs.hl())?;
+                self.write_byte(self.regs.hl(), helpers::set(7, val))?;
             }
             0xff => {
                 self.regs.set_a(helpers::set(7, self.regs.a()));

@@ -12,6 +12,10 @@ use sdl2::audio::AudioCallback;
 
 use crate::AUDIO_SAMPLE_RATE;
 
+#[derive(Debug, PartialEq, Clone)]
+pub struct ThreadError;
+
+#[derive(Debug)]
 pub struct MutexJoypad {
     state: Arc<Mutex<ButtonState>>,
 }
@@ -23,8 +27,9 @@ impl MutexJoypad {
 }
 
 impl Joypad for MutexJoypad {
-    fn get_button_state(&mut self) -> ButtonState {
-        *self.state.lock().unwrap()
+    type Error = ThreadError;
+    fn get_button_state(&mut self) -> Result<ButtonState, Self::Error> {
+        Ok(*self.state.lock().map_err(|_| ThreadError)?)
     }
 }
 
@@ -33,6 +38,7 @@ pub enum LcdMessage {
     Draw,
 }
 
+#[derive(Debug)]
 pub struct ChannelLcd {
     pixel_snd: Sender<LcdMessage>,
     prev_time: Instant,
@@ -48,19 +54,26 @@ impl ChannelLcd {
 }
 
 impl Lcd for ChannelLcd {
-    fn frame_ready(&mut self) {
-        self.pixel_snd.send(LcdMessage::Draw).unwrap();
+    type Error = ThreadError;
+    fn frame_ready(&mut self) -> Result<(), Self::Error> {
+        self.pixel_snd
+            .send(LcdMessage::Draw)
+            .map_err(|_| ThreadError)?;
         let elapsed = self.prev_time.elapsed();
         if elapsed.as_millis() < 17 {
             thread::sleep(Duration::from_millis(17) - elapsed);
         }
         self.prev_time = Instant::now();
+        Ok(())
     }
-    fn push_pixel(&mut self, color: LcdColor) {
-        self.pixel_snd.send(LcdMessage::Pixel(color)).unwrap();
+    fn push_pixel(&mut self, color: LcdColor) -> Result<(), Self::Error> {
+        self.pixel_snd
+            .send(LcdMessage::Pixel(color))
+            .map_err(|_| ThreadError)
     }
 }
 
+#[derive(Debug)]
 pub struct AudioReceiver {
     audio_rcv: Receiver<(f32, f32)>,
     volume: f32,
@@ -77,13 +90,14 @@ impl AudioCallback for AudioReceiver {
 
     fn callback(&mut self, out: &mut [f32]) {
         for i in 0..out.len() / 2 {
-            let (left, right) = self.audio_rcv.recv().unwrap();
+            let (left, right) = self.audio_rcv.recv().expect("Audio receive error");
             out[i * 2] = left * self.volume;
             out[i * 2 + 1] = right * self.volume;
         }
     }
 }
 
+#[derive(Debug)]
 pub struct AudioSender {
     sample_sum: (f32, f32),
     sample_count: usize,
@@ -102,16 +116,20 @@ impl AudioSender {
 }
 
 impl Speaker for AudioSender {
-    fn push_sample(&mut self, left: f32, right: f32) {
+    type Error = ThreadError;
+    fn push_sample(&mut self, left: f32, right: f32) -> Result<(), Self::Error> {
         self.sample_sum.0 += left;
         self.sample_sum.1 += right;
         self.sample_count += 1;
         if self.sample_count >= Self::SAMPLE_RATE {
             let left_sample = self.sample_sum.0 / Self::SAMPLE_RATE as f32;
             let right_sample = self.sample_sum.1 / Self::SAMPLE_RATE as f32;
-            self.audio_snd.send((left_sample, right_sample)).unwrap();
+            self.audio_snd
+                .send((left_sample, right_sample))
+                .map_err(|_| ThreadError)?;
             self.sample_count = 0;
             self.sample_sum = (0., 0.);
         }
+        Ok(())
     }
 }

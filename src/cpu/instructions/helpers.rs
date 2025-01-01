@@ -1,5 +1,6 @@
 use crate::{
     cpu::Cpu,
+    gameboy::GameboyError,
     peripherals::{Cable, Joypad, Lcd, Speaker},
 };
 
@@ -26,27 +27,29 @@ where
 }
 
 /// Push `PC` to the stack, and jump to address `addr`. Takes two machine cycles.
-pub fn call<L, S, J, C>(cpu: &mut Cpu<L, S, J, C>, addr: u16)
+pub fn call<L, S, J, C>(cpu: &mut Cpu<L, S, J, C>, addr: u16) -> Result<(), GameboyError<L, S, J>>
 where
     L: Lcd,
     S: Speaker,
     J: Joypad,
     C: Cable,
 {
-    cpu.stack_push(cpu.regs.pc());
+    cpu.stack_push(cpu.regs.pc())?;
     jp(cpu, addr);
+    Ok(())
 }
 
 /// Pop a value from the stack and jump to it. Takes two machine cycles.
-pub fn ret<L, S, J, C>(cpu: &mut Cpu<L, S, J, C>)
+pub fn ret<L, S, J, C>(cpu: &mut Cpu<L, S, J, C>) -> Result<(), GameboyError<L, S, J>>
 where
     L: Lcd,
     S: Speaker,
     J: Joypad,
     C: Cable,
 {
-    let addr = cpu.stack_pop();
+    let addr = cpu.stack_pop()?;
     jp(cpu, addr);
+    Ok(())
 }
 
 /// Calculates the binary-coded decimal of `A` right after an addition or subtraction.
@@ -504,7 +507,7 @@ where
     J: Joypad,
     C: Cable,
 {
-    let res = (val << 4) | (val >> 4);
+    let res = val.rotate_right(4);
 
     cpu.regs.flags_mut().set_z(res == 0);
     cpu.regs.flags_mut().set_n(false);

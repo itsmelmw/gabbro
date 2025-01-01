@@ -122,16 +122,17 @@ where
 
     /// Emulates a machine cycle of the PPU. Implemented using a state machine.
     /// May request the VBLANK and/or LCDSTAT interrupt.
-    pub fn step(&mut self, ints: &mut IntReg) {
+    pub fn step(&mut self, ints: &mut IntReg) -> Result<(), L::Error> {
         for _ in 0..4 {
             self.line_dots += 1;
             match self.stat.mode() {
                 PpuMode::Oam => self.mode_oam(),
-                PpuMode::Draw => self.mode_draw(ints),
-                PpuMode::Hblank => self.mode_hblank(ints),
+                PpuMode::Draw => self.mode_draw(ints)?,
+                PpuMode::Hblank => self.mode_hblank(ints)?,
                 PpuMode::Vblank => self.mode_vblank(ints),
             };
         }
+        Ok(())
     }
 
     /// Emulates a machine cycle of the PPU when it is in OAM mode.
@@ -147,8 +148,8 @@ where
     /// Emulates a machine cycle of the PPU when it is in DRAW mode.
     /// Pushes pixels to the LCD to draw.
     /// May request the HBLANK LCDSTAT interrupt.
-    fn mode_draw(&mut self, ints: &mut IntReg) {
-        self.fifo_step();
+    fn mode_draw(&mut self, ints: &mut IntReg) -> Result<(), L::Error> {
+        self.fifo_step()?;
         if self.fetcher.drawn_line() >= LCD_WIDTH {
             if let FetchTarget::Win = self.fetcher.target {
                 self.fetcher.window_line += 1;
@@ -158,21 +159,22 @@ where
                 ints.irq_lcdstat();
             }
         }
+        Ok(())
     }
 
     /// Emulates a machine cycle of the PPU when it is in HBLANK mode.
     /// May request the OAM or VBLANK LCDSTAT interrupt.
-    fn mode_hblank(&mut self, ints: &mut IntReg) {
+    fn mode_hblank(&mut self, ints: &mut IntReg) -> Result<(), L::Error> {
         if self.line_dots >= LINE_DOTS {
             self.line_dots = 0;
             self.inc_ly(ints);
             if self.fetcher.ly >= LCD_HEIGHT as u8 {
-                self.lcd.frame_ready();
+                self.lcd.frame_ready()?;
                 self.fetcher.end_frame();
                 ints.irq_vblank();
                 self.stat.set_mode(PpuMode::Vblank);
                 if self.stat.vblank_enabled() {
-                    ints.irq_lcdstat()
+                    ints.irq_lcdstat();
                 }
             } else {
                 self.fetcher.end_line();
@@ -182,6 +184,7 @@ where
                 }
             }
         }
+        Ok(())
     }
 
     /// Emulates a machine cycle of the PPU when it is in VBLANK mode.
@@ -215,17 +218,19 @@ where
     }
 
     /// Emulates a step of the pixel fifo during DRAW mode.
-    fn fifo_step(&mut self) {
+    fn fifo_step(&mut self) -> Result<(), L::Error> {
         // Advance the state of the fetcher
         self.fetcher.step(self.line_dots);
         // Push a pixel to the LCD
-        self.draw_pixel();
+        self.draw_pixel()?;
+        Ok(())
     }
 
     /// Pushes a pixel to the LCD if available.
-    fn draw_pixel(&mut self) {
+    fn draw_pixel(&mut self) -> Result<(), L::Error> {
         if let Some(lcdcolor) = self.fetcher.pop_pixel() {
-            self.lcd.push_pixel(lcdcolor);
+            self.lcd.push_pixel(lcdcolor)?;
         }
+        Ok(())
     }
 }

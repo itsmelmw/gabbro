@@ -83,13 +83,15 @@ fn main() -> Result<(), String> {
             .battery(save)
             .build()
             .expect("Invalid ROM");
+
         let mut gb = Gameboy::builder()
             .cartridge(cartridge)
             .lcd(lcd)
             .joypad(joypad)
             .speaker(speaker)
             .build();
-        gb.run();
+
+        gb.run().expect("Emulator error");
     });
 
     'main: loop {
@@ -104,7 +106,7 @@ fn main() -> Result<(), String> {
                     scancode: Some(button),
                     ..
                 } => {
-                    let mut state = joypad_state.lock().unwrap();
+                    let mut state = joypad_state.lock().expect("Joypad lock error");
                     match button {
                         Scancode::Right => state.right = true,
                         Scancode::Left => state.left = true,
@@ -121,7 +123,7 @@ fn main() -> Result<(), String> {
                     scancode: Some(button),
                     ..
                 } => {
-                    let mut state = joypad_state.lock().unwrap();
+                    let mut state = joypad_state.lock().expect("Joypad lock error");
                     match button {
                         Scancode::Right => state.right = false,
                         Scancode::Left => state.left = false,
