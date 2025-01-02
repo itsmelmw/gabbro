@@ -1,38 +1,45 @@
 use crate::{
+    cartridge::peripherals::Battery,
     cpu::Cpu,
     gameboy::GameboyError,
     peripherals::{Cable, Joypad, Lcd, Speaker},
 };
 
 /// Jump to address `addr`.
-pub fn jp<L, S, J, C>(cpu: &mut Cpu<L, S, J, C>, addr: u16)
+pub fn jp<L, S, J, C, CB>(cpu: &mut Cpu<L, S, J, C, CB>, addr: u16)
 where
     L: Lcd,
     S: Speaker,
     J: Joypad,
     C: Cable,
+    CB: Battery,
 {
     cpu.regs.set_pc(addr);
 }
 
 /// Jump to relative address `PC + val`.
-pub fn jr<L, S, J, C>(cpu: &mut Cpu<L, S, J, C>, val: i8)
+pub fn jr<L, S, J, C, CB>(cpu: &mut Cpu<L, S, J, C, CB>, val: i8)
 where
     L: Lcd,
     S: Speaker,
     J: Joypad,
     C: Cable,
+    CB: Battery,
 {
     cpu.regs.set_pc(cpu.regs.pc().wrapping_add(val as u16));
 }
 
 /// Push `PC` to the stack, and jump to address `addr`. Takes two machine cycles.
-pub fn call<L, S, J, C>(cpu: &mut Cpu<L, S, J, C>, addr: u16) -> Result<(), GameboyError<L, S, J>>
+pub fn call<L, S, J, C, CB>(
+    cpu: &mut Cpu<L, S, J, C, CB>,
+    addr: u16,
+) -> Result<(), GameboyError<L, S, J, CB>>
 where
     L: Lcd,
     S: Speaker,
     J: Joypad,
     C: Cable,
+    CB: Battery,
 {
     cpu.stack_push(cpu.regs.pc())?;
     jp(cpu, addr);
@@ -40,12 +47,13 @@ where
 }
 
 /// Pop a value from the stack and jump to it. Takes two machine cycles.
-pub fn ret<L, S, J, C>(cpu: &mut Cpu<L, S, J, C>) -> Result<(), GameboyError<L, S, J>>
+pub fn ret<L, S, J, C, CB>(cpu: &mut Cpu<L, S, J, C, CB>) -> Result<(), GameboyError<L, S, J, CB>>
 where
     L: Lcd,
     S: Speaker,
     J: Joypad,
     C: Cable,
+    CB: Battery,
 {
     let addr = cpu.stack_pop()?;
     jp(cpu, addr);
@@ -54,12 +62,13 @@ where
 
 /// Calculates the binary-coded decimal of `A` right after an addition or subtraction.
 /// Flags: `Z-0C`.
-pub fn daa<L, S, J, C>(cpu: &mut Cpu<L, S, J, C>)
+pub fn daa<L, S, J, C, CB>(cpu: &mut Cpu<L, S, J, C, CB>)
 where
     L: Lcd,
     S: Speaker,
     J: Joypad,
     C: Cable,
+    CB: Battery,
 {
     let mut res = cpu.regs.a() as u16;
     if !cpu.regs.flags().n() {
@@ -87,12 +96,13 @@ where
 
 /// Flips the bits of `A`.
 /// Flags: `-11-`.
-pub fn cpl<L, S, J, C>(cpu: &mut Cpu<L, S, J, C>)
+pub fn cpl<L, S, J, C, CB>(cpu: &mut Cpu<L, S, J, C, CB>)
 where
     L: Lcd,
     S: Speaker,
     J: Joypad,
     C: Cable,
+    CB: Battery,
 {
     cpu.regs.flags_mut().set_n(true);
     cpu.regs.flags_mut().set_h(true);
@@ -102,12 +112,13 @@ where
 
 /// Sets the carry flag
 /// Flags: `-001`.
-pub fn scf<L, S, J, C>(cpu: &mut Cpu<L, S, J, C>)
+pub fn scf<L, S, J, C, CB>(cpu: &mut Cpu<L, S, J, C, CB>)
 where
     L: Lcd,
     S: Speaker,
     J: Joypad,
     C: Cable,
+    CB: Battery,
 {
     cpu.regs.flags_mut().set_n(false);
     cpu.regs.flags_mut().set_h(false);
@@ -116,12 +127,13 @@ where
 
 /// Flips the carry flag
 /// Flags: `-00C`.
-pub fn ccf<L, S, J, C>(cpu: &mut Cpu<L, S, J, C>)
+pub fn ccf<L, S, J, C, CB>(cpu: &mut Cpu<L, S, J, C, CB>)
 where
     L: Lcd,
     S: Speaker,
     J: Joypad,
     C: Cable,
+    CB: Battery,
 {
     let c = cpu.regs.flags().c();
 
@@ -132,12 +144,13 @@ where
 
 /// Returns `val + 1`.
 /// Flags: `Z0H-`.
-pub fn inc<L, S, J, C>(cpu: &mut Cpu<L, S, J, C>, val: u8) -> u8
+pub fn inc<L, S, J, C, CB>(cpu: &mut Cpu<L, S, J, C, CB>, val: u8) -> u8
 where
     L: Lcd,
     S: Speaker,
     J: Joypad,
     C: Cable,
+    CB: Battery,
 {
     let res = val.wrapping_add(1);
 
@@ -150,12 +163,13 @@ where
 
 /// Returns `val - 1`.
 /// Flags: `Z1H-`.
-pub fn dec<L, S, J, C>(cpu: &mut Cpu<L, S, J, C>, val: u8) -> u8
+pub fn dec<L, S, J, C, CB>(cpu: &mut Cpu<L, S, J, C, CB>, val: u8) -> u8
 where
     L: Lcd,
     S: Speaker,
     J: Joypad,
     C: Cable,
+    CB: Battery,
 {
     let res = val.wrapping_sub(1);
 
@@ -168,12 +182,13 @@ where
 
 /// Adds `val` to `A`.
 /// Flags: `Z0HC`.
-pub fn add<L, S, J, C>(cpu: &mut Cpu<L, S, J, C>, val: u8)
+pub fn add<L, S, J, C, CB>(cpu: &mut Cpu<L, S, J, C, CB>, val: u8)
 where
     L: Lcd,
     S: Speaker,
     J: Joypad,
     C: Cable,
+    CB: Battery,
 {
     let a = cpu.regs.a();
     let res = a as u16 + val as u16;
@@ -188,12 +203,13 @@ where
 
 /// Adds `val` to `HL`.
 /// Flags: `-0HC`.
-pub fn add_hl<L, S, J, C>(cpu: &mut Cpu<L, S, J, C>, val: u16)
+pub fn add_hl<L, S, J, C, CB>(cpu: &mut Cpu<L, S, J, C, CB>, val: u16)
 where
     L: Lcd,
     S: Speaker,
     J: Joypad,
     C: Cable,
+    CB: Battery,
 {
     let hl = cpu.regs.hl();
     let res = hl as u32 + val as u32;
@@ -209,12 +225,13 @@ where
 
 /// Returns `SP + val`.
 /// Flags: `00HC`.
-pub fn add_sp<L, S, J, C>(cpu: &mut Cpu<L, S, J, C>, val: i8) -> u16
+pub fn add_sp<L, S, J, C, CB>(cpu: &mut Cpu<L, S, J, C, CB>, val: i8) -> u16
 where
     L: Lcd,
     S: Speaker,
     J: Joypad,
     C: Cable,
+    CB: Battery,
 {
     let uval = val as u16;
     let sp = cpu.regs.sp();
@@ -234,12 +251,13 @@ where
 
 /// Adds `val` and the carry flag to `A`.
 /// Flags: `Z0HC`.
-pub fn adc<L, S, J, C>(cpu: &mut Cpu<L, S, J, C>, val: u8)
+pub fn adc<L, S, J, C, CB>(cpu: &mut Cpu<L, S, J, C, CB>, val: u8)
 where
     L: Lcd,
     S: Speaker,
     J: Joypad,
     C: Cable,
+    CB: Battery,
 {
     let a = cpu.regs.a();
     let c = cpu.regs.flags().c() as u8;
@@ -257,12 +275,13 @@ where
 
 /// Subtracts `val` from `A`.
 /// Flags: `Z1HC`.
-pub fn sub<L, S, J, C>(cpu: &mut Cpu<L, S, J, C>, val: u8)
+pub fn sub<L, S, J, C, CB>(cpu: &mut Cpu<L, S, J, C, CB>, val: u8)
 where
     L: Lcd,
     S: Speaker,
     J: Joypad,
     C: Cable,
+    CB: Battery,
 {
     let a = cpu.regs.a();
     let res = a.wrapping_sub(val);
@@ -277,12 +296,13 @@ where
 
 /// Subtracts `val` and the carry flag from `A`.
 /// Flags: `Z1HC`.
-pub fn sbc<L, S, J, C>(cpu: &mut Cpu<L, S, J, C>, val: u8)
+pub fn sbc<L, S, J, C, CB>(cpu: &mut Cpu<L, S, J, C, CB>, val: u8)
 where
     L: Lcd,
     S: Speaker,
     J: Joypad,
     C: Cable,
+    CB: Battery,
 {
     let a = cpu.regs.a();
     let c = cpu.regs.flags().c() as u8;
@@ -298,12 +318,13 @@ where
 
 /// Sets `A` to the bitwise AND of `A` and `val`.
 /// Flags: `Z010`.
-pub fn and<L, S, J, C>(cpu: &mut Cpu<L, S, J, C>, val: u8)
+pub fn and<L, S, J, C, CB>(cpu: &mut Cpu<L, S, J, C, CB>, val: u8)
 where
     L: Lcd,
     S: Speaker,
     J: Joypad,
     C: Cable,
+    CB: Battery,
 {
     let a = cpu.regs.a();
     let res = a & val;
@@ -318,12 +339,13 @@ where
 
 /// Sets `A` to the bitwise XOR of `A` and `val`.
 /// Flags: `Z000`.
-pub fn xor<L, S, J, C>(cpu: &mut Cpu<L, S, J, C>, val: u8)
+pub fn xor<L, S, J, C, CB>(cpu: &mut Cpu<L, S, J, C, CB>, val: u8)
 where
     L: Lcd,
     S: Speaker,
     J: Joypad,
     C: Cable,
+    CB: Battery,
 {
     let a = cpu.regs.a();
     let res = a ^ val;
@@ -338,12 +360,13 @@ where
 
 /// Sets `A` to the bitwise OR of `A` and `val`.
 /// Flags: `Z000`.
-pub fn or<L, S, J, C>(cpu: &mut Cpu<L, S, J, C>, val: u8)
+pub fn or<L, S, J, C, CB>(cpu: &mut Cpu<L, S, J, C, CB>, val: u8)
 where
     L: Lcd,
     S: Speaker,
     J: Joypad,
     C: Cable,
+    CB: Battery,
 {
     let a = cpu.regs.a();
     let res = a | val;
@@ -359,12 +382,13 @@ where
 /// Compares `A` and `val`, and sets flags accordingly.
 /// Flags are set as if `val` is subtracted from `A`.
 /// Flags: `Z1HC`.
-pub fn cp<L, S, J, C>(cpu: &mut Cpu<L, S, J, C>, val: u8)
+pub fn cp<L, S, J, C, CB>(cpu: &mut Cpu<L, S, J, C, CB>, val: u8)
 where
     L: Lcd,
     S: Speaker,
     J: Joypad,
     C: Cable,
+    CB: Battery,
 {
     let a = cpu.regs.a();
 
@@ -376,12 +400,13 @@ where
 
 /// Rotate `val` to the left once.
 /// Flags: `Z00C`.
-pub fn rlc<L, S, J, C>(cpu: &mut Cpu<L, S, J, C>, val: u8) -> u8
+pub fn rlc<L, S, J, C, CB>(cpu: &mut Cpu<L, S, J, C, CB>, val: u8) -> u8
 where
     L: Lcd,
     S: Speaker,
     J: Joypad,
     C: Cable,
+    CB: Battery,
 {
     let bit = val >> 7;
     let res = (val << 1) | bit;
@@ -396,12 +421,13 @@ where
 
 /// Rotate `val` to the right once.
 /// Flags: `Z00C`.
-pub fn rrc<L, S, J, C>(cpu: &mut Cpu<L, S, J, C>, val: u8) -> u8
+pub fn rrc<L, S, J, C, CB>(cpu: &mut Cpu<L, S, J, C, CB>, val: u8) -> u8
 where
     L: Lcd,
     S: Speaker,
     J: Joypad,
     C: Cable,
+    CB: Battery,
 {
     let bit = val & 0x01;
     let res = (val >> 1) | (bit << 7);
@@ -416,12 +442,13 @@ where
 
 /// Rotate `val` to the left once, through the carry flag.
 /// Flags: `Z00C`.
-pub fn rl<L, S, J, C>(cpu: &mut Cpu<L, S, J, C>, val: u8) -> u8
+pub fn rl<L, S, J, C, CB>(cpu: &mut Cpu<L, S, J, C, CB>, val: u8) -> u8
 where
     L: Lcd,
     S: Speaker,
     J: Joypad,
     C: Cable,
+    CB: Battery,
 {
     let c = cpu.regs.flags().c() as u8;
     let bit = val >> 7;
@@ -437,12 +464,13 @@ where
 
 /// Rotate `val` to the right once, through the carry flag.
 /// Flags: `Z00C`.
-pub fn rr<L, S, J, C>(cpu: &mut Cpu<L, S, J, C>, val: u8) -> u8
+pub fn rr<L, S, J, C, CB>(cpu: &mut Cpu<L, S, J, C, CB>, val: u8) -> u8
 where
     L: Lcd,
     S: Speaker,
     J: Joypad,
     C: Cable,
+    CB: Battery,
 {
     let c = cpu.regs.flags().c() as u8;
     let bit = val & 0x01;
@@ -459,12 +487,13 @@ where
 /// Shift `val` to the left once, into the carry flag.
 /// Least significant bit is set to 0.
 /// Flags: `Z00C`.
-pub fn sla<L, S, J, C>(cpu: &mut Cpu<L, S, J, C>, val: u8) -> u8
+pub fn sla<L, S, J, C, CB>(cpu: &mut Cpu<L, S, J, C, CB>, val: u8) -> u8
 where
     L: Lcd,
     S: Speaker,
     J: Joypad,
     C: Cable,
+    CB: Battery,
 {
     let bit = val >> 7;
     let res = val << 1;
@@ -480,12 +509,13 @@ where
 /// Shift `val` to the right once, into the carry flag.
 /// Most significant bit does not change.
 /// Flags: `Z00C`.
-pub fn sra<L, S, J, C>(cpu: &mut Cpu<L, S, J, C>, val: u8) -> u8
+pub fn sra<L, S, J, C, CB>(cpu: &mut Cpu<L, S, J, C, CB>, val: u8) -> u8
 where
     L: Lcd,
     S: Speaker,
     J: Joypad,
     C: Cable,
+    CB: Battery,
 {
     let bit = val & 0x01;
     let res = (val & 0x80) | (val >> 1);
@@ -500,12 +530,13 @@ where
 
 /// Swaps the upper and lower nibble of `val`.
 /// Flags: `Z000`.
-pub fn swap<L, S, J, C>(cpu: &mut Cpu<L, S, J, C>, val: u8) -> u8
+pub fn swap<L, S, J, C, CB>(cpu: &mut Cpu<L, S, J, C, CB>, val: u8) -> u8
 where
     L: Lcd,
     S: Speaker,
     J: Joypad,
     C: Cable,
+    CB: Battery,
 {
     let res = val.rotate_right(4);
 
@@ -520,12 +551,14 @@ where
 /// Shift `val` to the right once, into the carry flag.
 /// Most significant bit is set to 0.
 /// Flags: `Z00C`.
-pub fn srl<L, S, J, C>(cpu: &mut Cpu<L, S, J, C>, val: u8) -> u8
+pub fn srl<L, S, J, C, CB>(cpu: &mut Cpu<L, S, J, C, CB>, val: u8) -> u8
 where
     L: Lcd,
     S: Speaker,
     J: Joypad,
     C: Cable,
+    CB: Battery,
+    CB: Battery,
 {
     let bit = val & 0x01;
     let res = val >> 1;
@@ -541,12 +574,14 @@ where
 /// Checks if the `bit`th bit of `val` is set,
 /// and sets the zero flag accordingly.
 /// Flags: `Z01-`.
-pub fn bit<L, S, J, C>(cpu: &mut Cpu<L, S, J, C>, bit: u8, val: u8)
+pub fn bit<L, S, J, C, CB>(cpu: &mut Cpu<L, S, J, C, CB>, bit: u8, val: u8)
 where
     L: Lcd,
     S: Speaker,
     J: Joypad,
     C: Cable,
+    CB: Battery,
+    CB: Battery,
 {
     cpu.regs.flags_mut().set_z((val & (1 << bit)) == 0);
     cpu.regs.flags_mut().set_n(false);

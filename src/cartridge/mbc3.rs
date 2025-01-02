@@ -1,6 +1,6 @@
 use crate::cartridge::{
     peripherals::{Battery, Feat, NoFeat, NoRam, Ram, Rtc},
-    Cartridge, CartridgeError, Mbc, ReadRam, ReadRom, Shutdown, WriteRam, WriteRom,
+    Cartridge, CartridgeError, Mbc, ReadRam, ReadRom, Shutdown, ShutdownError, WriteRam, WriteRom,
 };
 
 pub struct Mbc3<'a, RAM, BAT, RTC>
@@ -26,7 +26,7 @@ where
     RTC: Rtc,
 {
     pub fn from_parts(rom: &'a [u8], ram: RAM, battery: BAT, rtc: RTC) -> Self {
-        let rom_banks = rom.len() / Cartridge::ROM_BANK_SIZE;
+        let rom_banks = rom.len() / Cartridge::<BAT>::ROM_BANK_SIZE;
         Self {
             ram_enable: 0,
             rom_bank: 0,
@@ -161,36 +161,47 @@ where
     }
 }
 
-impl<RAM, RTC> Shutdown for Mbc3<'_, RAM, NoFeat, RTC>
-where
-    RTC: Rtc,
-{
-    fn shutdown(&mut self) {}
-}
-
-impl<BAT, RTC> Shutdown for Mbc3<'_, Ram, Feat<BAT>, RTC>
+impl<RAM, BAT, RTC> Shutdown<BAT> for Mbc3<'_, RAM, NoFeat, RTC>
 where
     BAT: Battery,
     RTC: Rtc,
 {
-    fn shutdown(&mut self) {
-        self.battery.store_data(&self.ram);
+    fn shutdown(&mut self) -> Result<(), ShutdownError<BAT>> {
+        Ok(())
     }
 }
 
-impl Mbc for Mbc3<'_, NoRam, NoFeat, NoFeat> {
+impl<BAT, RTC> Shutdown<BAT> for Mbc3<'_, Ram, Feat<BAT>, RTC>
+where
+    BAT: Battery,
+    RTC: Rtc,
+{
+    fn shutdown(&mut self) -> Result<(), ShutdownError<BAT>> {
+        self.battery
+            .store_data(&self.ram)
+            .map_err(|err| ShutdownError::BatteryError(err))
+    }
+}
+
+impl<BAT> Mbc<BAT> for Mbc3<'_, NoRam, NoFeat, NoFeat>
+where
+    BAT: Battery,
+{
     fn name(&self) -> &'static str {
         "MBC3"
     }
 }
 
-impl Mbc for Mbc3<'_, Ram, NoFeat, NoFeat> {
+impl<BAT> Mbc<BAT> for Mbc3<'_, Ram, NoFeat, NoFeat>
+where
+    BAT: Battery,
+{
     fn name(&self) -> &'static str {
         "MBC3 + RAM"
     }
 }
 
-impl<BAT> Mbc for Mbc3<'_, Ram, Feat<BAT>, NoFeat>
+impl<BAT> Mbc<BAT> for Mbc3<'_, Ram, Feat<BAT>, NoFeat>
 where
     BAT: Battery,
 {

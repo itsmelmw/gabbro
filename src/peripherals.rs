@@ -1,9 +1,11 @@
+use std::fmt::Debug;
+
 /// Type used for when a peripheral cannot return any errors.
-#[derive(Clone, Copy, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct NoError;
 
 /// An enum representing the color of a pixel on the Game Boy LCD.
-#[derive(Clone, Copy, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 pub enum LcdColor {
     White = 0,
     LightGray = 1,
@@ -14,7 +16,7 @@ pub enum LcdColor {
 /// A trait with functions that the Game Boy PPU calls when updating the LCD.
 pub trait Lcd {
     /// Type for errors that can occur while handling the LCD callbacks.
-    type Error;
+    type Error: Debug;
     /// Gets called when a new pixel is pushed to the LCD.
     fn push_pixel(&mut self, _color: LcdColor) -> Result<(), Self::Error> {
         Ok(())
@@ -32,7 +34,7 @@ impl Lcd for () {
 /// A trait with a function the Game Boy APU calls when pushing new audio samples.
 pub trait Speaker {
     /// Type for errors that can occur while handling the audio callbacks.
-    type Error;
+    type Error: Debug;
     /// Gets called when a new audio sample is pushed to the speaker.
     fn push_sample(&mut self, _left: f32, _right: f32) -> Result<(), Self::Error> {
         Ok(())
@@ -82,7 +84,7 @@ impl Default for ButtonState {
 /// A trait the Game Boy uses to retrieve the current button state.
 pub trait Joypad {
     /// Type for errors that can occur while retrieving the current button state.
-    type Error;
+    type Error: Debug;
     /// Should return the current state of the buttons.
     /// If a button is pressed, its value should be `true`. If it is released, it should be `false`.
     fn get_button_state(&mut self) -> Result<ButtonState, Self::Error> {

@@ -1,5 +1,5 @@
 use crate::{
-    cartridge::Cartridge,
+    cartridge::{peripherals::Battery, Cartridge, ShutdownError},
     cpu::{Cpu, CpuError},
     peripherals::{Cable, Joypad, Lcd, Speaker},
 };
@@ -15,51 +15,57 @@ use crate::cpu::{
     registers::Regs,
 };
 
-#[derive(Debug, PartialEq, Clone)]
-pub enum GameboyError<L, S, J>
+#[derive(Debug)]
+pub enum GameboyError<L, S, J, CB>
 where
     L: Lcd,
     S: Speaker,
     J: Joypad,
+    CB: Battery,
 {
     Cpu(CpuError),
     Lcd(L::Error),
     Speaker(S::Error),
     Joypad(J::Error),
+    Shutdown(ShutdownError<CB>),
 }
 
 /// Represents an emulated Game Boy.
-pub struct Gameboy<'a, L = (), S = (), J = (), C = ()>
+pub struct Gameboy<'a, L = (), S = (), J = (), C = (), CB = ()>
 where
     L: Lcd,
     S: Speaker,
     J: Joypad,
     C: Cable,
+    CB: Battery,
 {
-    cpu: Cpu<'a, L, S, J, C>,
+    cpu: Cpu<'a, L, S, J, C, CB>,
 }
 
 impl<'a> Gameboy<'a> {
     /// Creates a [`GameboyBuilder`], allowing peripherals for different input and output devices to be attached.
-    pub fn builder() -> GameboyBuilder<'a, (), (), (), (), false> {
-        GameboyBuilder::<'a, (), (), (), (), false>::new()
+    pub fn builder() -> GameboyBuilder<'a, (), (), (), (), (), false> {
+        GameboyBuilder::<'a, (), (), (), (), (), false>::new()
     }
 }
 
-impl<L, S, J, C> Gameboy<'_, L, S, J, C>
+impl<L, S, J, C, CB> Gameboy<'_, L, S, J, C, CB>
 where
     L: Lcd,
     S: Speaker,
     J: Joypad,
     C: Cable,
+    CB: Battery,
 {
     /// Runs the Game Boy emulator in an infinite loop.
-    pub fn run(&mut self) -> Result<(), GameboyError<L, S, J>> {
+    pub fn run(&mut self) -> Result<(), GameboyError<L, S, J, CB>> {
         loop {
             match self.cpu.step() {
                 Ok(()) => {}
                 Err(err) => {
-                    self.cpu.shutdown();
+                    self.cpu
+                        .shutdown()
+                        .map_err(|err| GameboyError::Shutdown(err))?;
                     return Err(err);
                 }
             }
@@ -127,29 +133,31 @@ where
 }
 
 /// A builder for a [`Gameboy`], allowing peripherals for different input and output devices to be attached.
-pub struct GameboyBuilder<'a, L, S, J, C, const ROM: bool>
+pub struct GameboyBuilder<'a, L, S, J, C, CB, const ROM: bool>
 where
     L: Lcd,
     S: Speaker,
     J: Joypad,
     C: Cable,
+    CB: Battery,
 {
-    cartridge: Option<Cartridge<'a>>,
+    cartridge: Option<Cartridge<'a, CB>>,
     lcd: L,
     speaker: S,
     joypad: J,
     cable: C,
 }
 
-impl<'a, L, S, J, C, const ROM: bool> GameboyBuilder<'a, L, S, J, C, ROM>
+impl<'a, L, S, J, C, CB, const ROM: bool> GameboyBuilder<'a, L, S, J, C, CB, ROM>
 where
     L: Lcd,
     S: Speaker,
     J: Joypad,
     C: Cable,
+    CB: Battery,
 {
     /// Initializes a new builder for a [`Gameboy`].
-    pub fn new() -> GameboyBuilder<'a, (), (), (), (), false> {
+    pub fn new() -> GameboyBuilder<'a, (), (), (), (), (), false> {
         GameboyBuilder {
             cartridge: None,
             lcd: (),
@@ -160,7 +168,7 @@ where
     }
 }
 
-impl<'a, L, S, J, C> GameboyBuilder<'a, L, S, J, C, false>
+impl<'a, L, S, J, C> GameboyBuilder<'a, L, S, J, C, (), false>
 where
     L: Lcd,
     S: Speaker,
@@ -168,7 +176,13 @@ where
     C: Cable,
 {
     /// Used to insert a ROM into the emulator.
-    pub fn cartridge(self, cartridge: Cartridge<'a>) -> GameboyBuilder<'a, L, S, J, C, true> {
+    pub fn cartridge<CB>(
+        self,
+        cartridge: Cartridge<'a, CB>,
+    ) -> GameboyBuilder<'a, L, S, J, C, CB, true>
+    where
+        CB: Battery,
+    {
         GameboyBuilder {
             cartridge: Some(cartridge),
             lcd: self.lcd,
@@ -179,14 +193,15 @@ where
     }
 }
 
-impl<'a, S, J, C, const ROM: bool> GameboyBuilder<'a, (), S, J, C, ROM>
+impl<'a, S, J, C, CB, const ROM: bool> GameboyBuilder<'a, (), S, J, C, CB, ROM>
 where
     S: Speaker,
     J: Joypad,
     C: Cable,
+    CB: Battery,
 {
     /// Used to attach an [`Lcd`], which defines how pixels pushed to the LCD should be handled.
-    pub fn lcd<L>(self, lcd: L) -> GameboyBuilder<'a, L, S, J, C, ROM>
+    pub fn lcd<L>(self, lcd: L) -> GameboyBuilder<'a, L, S, J, C, CB, ROM>
     where
         L: Lcd,
     {
@@ -200,14 +215,15 @@ where
     }
 }
 
-impl<'a, L, J, C, const ROM: bool> GameboyBuilder<'a, L, (), J, C, ROM>
+impl<'a, L, J, C, CB, const ROM: bool> GameboyBuilder<'a, L, (), J, C, CB, ROM>
 where
     L: Lcd,
     J: Joypad,
     C: Cable,
+    CB: Battery,
 {
     /// Used to attach a [`Speaker`], which defines how audio samples should be processed.
-    pub fn speaker<S>(self, speaker: S) -> GameboyBuilder<'a, L, S, J, C, ROM>
+    pub fn speaker<S>(self, speaker: S) -> GameboyBuilder<'a, L, S, J, C, CB, ROM>
     where
         S: Speaker,
     {
@@ -221,14 +237,15 @@ where
     }
 }
 
-impl<'a, L, S, C, const ROM: bool> GameboyBuilder<'a, L, S, (), C, ROM>
+impl<'a, L, S, C, CB, const ROM: bool> GameboyBuilder<'a, L, S, (), C, CB, ROM>
 where
     L: Lcd,
     S: Speaker,
     C: Cable,
+    CB: Battery,
 {
     /// Used to attach a [`Joypad`], which defines when buttons are considered pressed or released.
-    pub fn joypad<J>(self, joypad: J) -> GameboyBuilder<'a, L, S, J, C, ROM>
+    pub fn joypad<J>(self, joypad: J) -> GameboyBuilder<'a, L, S, J, C, CB, ROM>
     where
         J: Joypad,
     {
@@ -242,14 +259,15 @@ where
     }
 }
 
-impl<'a, L, S, J, const ROM: bool> GameboyBuilder<'a, L, S, J, (), ROM>
+impl<'a, L, S, J, CB, const ROM: bool> GameboyBuilder<'a, L, S, J, (), CB, ROM>
 where
     L: Lcd,
     S: Speaker,
     J: Joypad,
+    CB: Battery,
 {
     /// Used to attach a [`Cable`], which defines how a serial transfer should be handled.
-    pub fn cable<C>(self, cable: C) -> GameboyBuilder<'a, L, S, J, C, ROM>
+    pub fn cable<C>(self, cable: C) -> GameboyBuilder<'a, L, S, J, C, CB, ROM>
     where
         C: Cable,
     {
@@ -263,15 +281,16 @@ where
     }
 }
 
-impl<'a, L, S, J, C> GameboyBuilder<'a, L, S, J, C, true>
+impl<'a, L, S, J, C, CB> GameboyBuilder<'a, L, S, J, C, CB, true>
 where
     L: Lcd,
     S: Speaker,
     J: Joypad,
     C: Cable,
+    CB: Battery,
 {
     /// Builds a new [`Gameboy`].
-    pub fn build(self) -> Gameboy<'a, L, S, J, C> {
+    pub fn build(self) -> Gameboy<'a, L, S, J, C, CB> {
         Gameboy {
             cpu: Cpu::new(
                 self.cartridge.unwrap(),

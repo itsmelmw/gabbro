@@ -3,7 +3,7 @@ pub mod interrupts;
 pub mod registers;
 use crate::{
     bus::Bus,
-    cartridge::Cartridge,
+    cartridge::{peripherals::Battery, Cartridge, ShutdownError},
     cpu::{instructions::bitwise::BITWISE_PREFIX, registers::Regs},
     gameboy::GameboyError,
     peripherals::{Cable, Joypad, Lcd, Speaker},
@@ -26,28 +26,36 @@ enum ImeState {
 }
 
 /// Emulates the Game Boy CPU.
-pub struct Cpu<'a, L, S, J, C>
+pub struct Cpu<'a, L, S, J, C, CB>
 where
     L: Lcd,
     S: Speaker,
     J: Joypad,
     C: Cable,
+    CB: Battery,
 {
-    bus: Bus<'a, L, S, J, C>,
+    bus: Bus<'a, L, S, J, C, CB>,
     regs: Regs,
     ime: ImeState,
     halted: bool,
 }
 
-impl<'a, L, S, J, C> Cpu<'a, L, S, J, C>
+impl<'a, L, S, J, C, CB> Cpu<'a, L, S, J, C, CB>
 where
     L: Lcd,
     S: Speaker,
     J: Joypad,
     C: Cable,
+    CB: Battery,
 {
     /// Initializes a new CPU.
-    pub(crate) fn new(cartridge: Cartridge<'a>, lcd: L, speaker: S, joypad: J, cable: C) -> Self {
+    pub(crate) fn new(
+        cartridge: Cartridge<'a, CB>,
+        lcd: L,
+        speaker: S,
+        joypad: J,
+        cable: C,
+    ) -> Self {
         Self {
             bus: Bus::new(cartridge, lcd, speaker, joypad, cable),
             regs: Regs::new(),
@@ -57,7 +65,7 @@ where
     }
 
     /// Fetches and executes one instruction, and checks for interrupts.
-    pub(crate) fn step(&mut self) -> Result<(), GameboyError<L, S, J>> {
+    pub(crate) fn step(&mut self) -> Result<(), GameboyError<L, S, J, CB>> {
         if self.ime == ImeState::Enabling {
             self.ime = ImeState::Enabled;
         }
@@ -82,7 +90,7 @@ where
     }
 
     /// Executes the instruction currently at `(PC)`.
-    fn execute_next(&mut self) -> Result<(), GameboyError<L, S, J>> {
+    fn execute_next(&mut self) -> Result<(), GameboyError<L, S, J, CB>> {
         let opcode = self.fetch_byte()?;
         match opcode {
             BITWISE_PREFIX => {
@@ -94,7 +102,7 @@ where
     }
 
     /// Handles an interrupt. Takes 5 machine cycles.
-    fn handle_interrupt(&mut self, addr: u16) -> Result<(), GameboyError<L, S, J>> {
+    fn handle_interrupt(&mut self, addr: u16) -> Result<(), GameboyError<L, S, J, CB>> {
         self.ime = ImeState::Disabled;
         self.cycle()?;
         self.cycle()?;
@@ -108,76 +116,84 @@ where
     /// Called every time the CPU reads/writes a byte from/to memory.
     /// Also called during some instructions if they take an extra internal cycle,
     /// like for branch instructions and 16-bit arithmetic.
-    pub(crate) fn cycle(&mut self) -> Result<(), GameboyError<L, S, J>> {
+    pub(crate) fn cycle(&mut self) -> Result<(), GameboyError<L, S, J, CB>> {
         self.bus.io_step()
     }
 
     /// Reads the byte at `addr`. Takes a machine cycle.
-    pub(crate) fn read_byte(&mut self, addr: u16) -> Result<u8, GameboyError<L, S, J>> {
+    pub(crate) fn read_byte(&mut self, addr: u16) -> Result<u8, GameboyError<L, S, J, CB>> {
         self.cycle()?;
         Ok(self.bus.read(addr))
     }
 
     /// Reads two bytes at `addr` and `addr + 1`. Takes two machine cycles.
     #[allow(dead_code)]
-    pub(crate) fn read_word(&mut self, addr: u16) -> Result<u16, GameboyError<L, S, J>> {
+    pub(crate) fn read_word(&mut self, addr: u16) -> Result<u16, GameboyError<L, S, J, CB>> {
         Ok((self.read_byte(addr + 1)? as u16) | ((self.read_byte(addr)? as u16) << 8))
     }
 
     /// Writes `val` to `addr`. Takes a machine cycle.
-    pub(crate) fn write_byte(&mut self, addr: u16, val: u8) -> Result<(), GameboyError<L, S, J>> {
+    pub(crate) fn write_byte(
+        &mut self,
+        addr: u16,
+        val: u8,
+    ) -> Result<(), GameboyError<L, S, J, CB>> {
         self.cycle()?;
         self.bus.write(addr, val);
         Ok(())
     }
 
     /// Writes `val` to `addr` and `addr + 1`. Takes two machine cycles.
-    pub(crate) fn write_word(&mut self, addr: u16, val: u16) -> Result<(), GameboyError<L, S, J>> {
+    pub(crate) fn write_word(
+        &mut self,
+        addr: u16,
+        val: u16,
+    ) -> Result<(), GameboyError<L, S, J, CB>> {
         self.write_byte(addr, (val & 0x00ff) as u8)?;
         self.write_byte(addr + 1, (val >> 8) as u8)?;
         Ok(())
     }
 
     /// Fetches the byte at `(PC)`, and increments `PC`. Takes a machine cycle.
-    pub(crate) fn fetch_byte(&mut self) -> Result<u8, GameboyError<L, S, J>> {
+    pub(crate) fn fetch_byte(&mut self) -> Result<u8, GameboyError<L, S, J, CB>> {
         let addr = self.regs.pc();
         self.regs.inc_pc();
         self.read_byte(addr)
     }
 
     /// Fetches two bytes at `(PC)`, and increments `PC` twice. Takes two machine cycles.
-    pub(crate) fn fetch_word(&mut self) -> Result<u16, GameboyError<L, S, J>> {
+    pub(crate) fn fetch_word(&mut self) -> Result<u16, GameboyError<L, S, J, CB>> {
         Ok((self.fetch_byte()? as u16) | ((self.fetch_byte()? as u16) << 8))
     }
 
     /// Pushes `val` to `(SP)` and `(SP - 1)`, and decrements `SP` twice. Takes two machine cycles.
-    pub(crate) fn stack_push(&mut self, val: u16) -> Result<(), GameboyError<L, S, J>> {
+    pub(crate) fn stack_push(&mut self, val: u16) -> Result<(), GameboyError<L, S, J, CB>> {
         self.stack_push_byte((val >> 8) as u8)?;
         self.stack_push_byte((val & 0xff) as u8)?;
         Ok(())
     }
 
     /// Pops two bytes at `(SP)` and `(SP + 1)`, and increments `SP` twice. Takes two machine cycles.
-    pub(crate) fn stack_pop(&mut self) -> Result<u16, GameboyError<L, S, J>> {
+    pub(crate) fn stack_pop(&mut self) -> Result<u16, GameboyError<L, S, J, CB>> {
         Ok((self.stack_pop_byte()? as u16) | ((self.stack_pop_byte()? as u16) << 8))
     }
 
     /// Pushes `val` to `(SP)`, and decrements `SP`. Takes a machine cycle.
-    fn stack_push_byte(&mut self, val: u8) -> Result<(), GameboyError<L, S, J>> {
+    fn stack_push_byte(&mut self, val: u8) -> Result<(), GameboyError<L, S, J, CB>> {
         self.regs.dec_sp();
         let addr = self.regs.sp();
         self.write_byte(addr, val)
     }
 
     /// Pops a byte at `(SP)`, and increments `SP`. Takes a machine cycle.
-    fn stack_pop_byte(&mut self) -> Result<u8, GameboyError<L, S, J>> {
+    fn stack_pop_byte(&mut self) -> Result<u8, GameboyError<L, S, J, CB>> {
         let addr = self.regs.sp();
         self.regs.inc_sp();
         self.read_byte(addr)
     }
 
-    pub(crate) fn shutdown(&mut self) {
-        self.bus.shutdown();
+    pub(crate) fn shutdown(&mut self) -> Result<(), ShutdownError<CB>> {
+        self.bus.shutdown()
     }
 
     #[cfg(feature = "debug")]

@@ -1,6 +1,6 @@
 use crate::cartridge::{
     peripherals::{Battery, Feat, NoFeat, NoRam, Ram},
-    Cartridge, CartridgeError, Mbc, ReadRam, ReadRom, Shutdown, WriteRam, WriteRom,
+    Cartridge, CartridgeError, Mbc, ReadRam, ReadRom, Shutdown, ShutdownError, WriteRam, WriteRom,
 };
 
 /// A memory bank controller of type MBC1.
@@ -26,7 +26,7 @@ where
 {
     /// Creates a new memory bank controller of type MBC1.
     pub fn from_parts(rom: &'a [u8], ram: RAM, battery: BAT) -> Self {
-        let rom_banks = rom.len() / Cartridge::ROM_BANK_SIZE;
+        let rom_banks = rom.len() / Cartridge::<BAT>::ROM_BANK_SIZE;
         Self {
             ram_enable: 0,
             rom_bank: 0,
@@ -156,32 +156,45 @@ where
     }
 }
 
-impl<RAM> Shutdown for Mbc1<'_, RAM, NoFeat> {
-    fn shutdown(&mut self) {}
-}
-
-impl<BAT> Shutdown for Mbc1<'_, Ram, Feat<BAT>>
+impl<RAM, BAT> Shutdown<BAT> for Mbc1<'_, RAM, NoFeat>
 where
     BAT: Battery,
 {
-    fn shutdown(&mut self) {
-        self.battery.store_data(&self.ram);
+    fn shutdown(&mut self) -> Result<(), ShutdownError<BAT>> {
+        Ok(())
     }
 }
 
-impl Mbc for Mbc1<'_, NoRam, NoFeat> {
+impl<BAT> Shutdown<BAT> for Mbc1<'_, Ram, Feat<BAT>>
+where
+    BAT: Battery,
+{
+    fn shutdown(&mut self) -> Result<(), ShutdownError<BAT>> {
+        self.battery
+            .store_data(&self.ram)
+            .map_err(|err| ShutdownError::BatteryError(err))
+    }
+}
+
+impl<BAT> Mbc<BAT> for Mbc1<'_, NoRam, NoFeat>
+where
+    BAT: Battery,
+{
     fn name(&self) -> &'static str {
         "MBC1"
     }
 }
 
-impl Mbc for Mbc1<'_, Ram, NoFeat> {
+impl<BAT> Mbc<BAT> for Mbc1<'_, Ram, NoFeat>
+where
+    BAT: Battery,
+{
     fn name(&self) -> &'static str {
         "MBC1 + RAM"
     }
 }
 
-impl<BAT> Mbc for Mbc1<'_, Ram, Feat<BAT>>
+impl<BAT> Mbc<BAT> for Mbc1<'_, Ram, Feat<BAT>>
 where
     BAT: Battery,
 {

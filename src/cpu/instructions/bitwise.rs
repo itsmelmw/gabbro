@@ -1,4 +1,5 @@
 use crate::{
+    cartridge::peripherals::Battery,
     cpu::{instructions::helpers, Cpu},
     gameboy::GameboyError,
     peripherals::{Cable, Joypad, Lcd, Speaker},
@@ -6,17 +7,18 @@ use crate::{
 
 pub const BITWISE_PREFIX: u8 = 0xcb;
 
-impl<L, S, J, C> Cpu<'_, L, S, J, C>
+impl<L, S, J, C, CB> Cpu<'_, L, S, J, C, CB>
 where
     L: Lcd,
     S: Speaker,
     J: Joypad,
     C: Cable,
+    CB: Battery,
 {
     pub(in crate::cpu) fn execute_bitwise(
         &mut self,
         opcode: u8,
-    ) -> Result<(), GameboyError<L, S, J>> {
+    ) -> Result<(), GameboyError<L, S, J, CB>> {
         match opcode {
             0x0 => {
                 let res = helpers::rlc(self, self.regs.b());

@@ -1,5 +1,6 @@
 use crate::peripherals::NoError;
 use std::{
+    fmt::Debug,
     fs::OpenOptions,
     io::{Error as IoError, Read, Write},
     path::PathBuf,
@@ -14,7 +15,7 @@ pub type NoRam = ();
 pub type Ram = Vec<u8>;
 
 pub trait Battery {
-    type Error;
+    type Error: Debug;
     fn store_data(&mut self, _data: &[u8]) -> Result<(), Self::Error> {
         Ok(())
     }

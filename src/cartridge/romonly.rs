@@ -1,4 +1,6 @@
-use crate::cartridge::{Mbc, ReadRam, ReadRom, Shutdown, WriteRam, WriteRom};
+use crate::cartridge::{
+    Battery, Mbc, ReadRam, ReadRom, Shutdown, ShutdownError, WriteRam, WriteRom,
+};
 
 pub struct RomOnly<'a> {
     rom: &'a [u8],
@@ -30,11 +32,19 @@ impl WriteRam for RomOnly<'_> {
     fn write_ram(&mut self, _addr: u16, _val: u8) {}
 }
 
-impl Shutdown for RomOnly<'_> {
-    fn shutdown(&mut self) {}
+impl<BAT> Shutdown<BAT> for RomOnly<'_>
+where
+    BAT: Battery,
+{
+    fn shutdown(&mut self) -> Result<(), ShutdownError<BAT>> {
+        Ok(())
+    }
 }
 
-impl Mbc for RomOnly<'_> {
+impl<BAT> Mbc<BAT> for RomOnly<'_>
+where
+    BAT: Battery,
+{
     fn name(&self) -> &'static str {
         "ROM ONLY"
     }

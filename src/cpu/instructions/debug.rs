@@ -4,14 +4,14 @@ pub mod bitwise;
 use std::fmt::{Display, Formatter, Result};
 
 /// The size of the parameter expected by an instruction.
-#[derive(Clone, Copy)]
+#[derive(Clone)]
 pub enum ParamType {
     None,
     Byte,
     Word,
 }
 
-#[derive(Clone, Copy)]
+#[derive(Clone)]
 pub enum Cycles {
     Normal(usize),
     Branch(usize, usize),
@@ -50,7 +50,7 @@ pub trait HasImmediate {
 // to use for generalizing instruction operations. Will mean
 // rewriting all instructions and part of the cpu though.
 /// The visual representation of an instruction.
-#[derive(Clone, Copy)]
+#[derive(Clone)]
 pub enum Mnemonic {
     // Misc
     /// `NOP`
@@ -248,7 +248,7 @@ pub enum Mnemonic {
     Invalid,
 }
 
-#[derive(Clone, Copy)]
+#[derive(Clone)]
 pub enum Addr {
     /// `(FF00+u8)`
     Imm8(Imm<u8>),
@@ -264,7 +264,7 @@ pub enum Addr {
     Reg16Dec(Reg16),
 }
 
-#[derive(Clone, Copy)]
+#[derive(Clone)]
 pub enum Reg8 {
     A,
     B,
@@ -275,7 +275,7 @@ pub enum Reg8 {
     L,
 }
 
-#[derive(Clone, Copy)]
+#[derive(Clone)]
 pub enum Reg16 {
     AF,
     BC,
@@ -284,7 +284,7 @@ pub enum Reg16 {
     SP,
 }
 
-#[derive(Clone, Copy)]
+#[derive(Clone)]
 pub enum Cond {
     /// Condition that is satisfied if the Zero flag is set.
     Z,
@@ -296,7 +296,7 @@ pub enum Cond {
     NC,
 }
 
-#[derive(Clone, Copy)]
+#[derive(Clone)]
 pub enum Imm<T> {
     Known(T),
     Unknown,

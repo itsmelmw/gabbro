@@ -1,6 +1,6 @@
 use crate::{
     apu::Apu,
-    cartridge::Cartridge,
+    cartridge::{peripherals::Battery, Cartridge, ShutdownError},
     cpu::interrupts::InterruptControl,
     gameboy::GameboyError,
     joypad::JoypadController,
@@ -12,14 +12,15 @@ use crate::{
 
 /// The bus which handles all reads and writes from/to memory.
 /// Also used to access all parts of the Game Boy besides the CPU.
-pub struct Bus<'a, L, S, J, C>
+pub struct Bus<'a, L, S, J, C, CB>
 where
     L: Lcd,
     S: Speaker,
     J: Joypad,
     C: Cable,
+    CB: Battery,
 {
-    cartridge: Cartridge<'a>,
+    cartridge: Cartridge<'a, CB>,
     ram: [u8; 0x2000],
     hram: [u8; 0x7f],
     joypad: JoypadController<J>,
@@ -30,16 +31,17 @@ where
     pub interrupts: InterruptControl,
 }
 
-impl<'a, L, S, J, C> Bus<'a, L, S, J, C>
+impl<'a, L, S, J, C, CB> Bus<'a, L, S, J, C, CB>
 where
     L: Lcd,
     S: Speaker,
     J: Joypad,
     C: Cable,
+    CB: Battery,
 {
     /// Initializes all the emulated hardware and the memory of the Game Boy.
     /// Also prints information contained in the ROM header.
-    pub fn new(cartridge: Cartridge<'a>, lcd: L, speaker: S, joypad: J, cable: C) -> Self {
+    pub fn new(cartridge: Cartridge<'a, CB>, lcd: L, speaker: S, joypad: J, cable: C) -> Self {
         Self {
             cartridge,
             ram: [0; 0x2000],
@@ -162,7 +164,7 @@ where
 
     /// Emulates a machine cycle for all parts of the Game Boy that are stored in the [`Bus`].
     /// This does not include the CPU.
-    pub fn io_step(&mut self) -> Result<(), GameboyError<L, S, J>> {
+    pub fn io_step(&mut self) -> Result<(), GameboyError<L, S, J, CB>> {
         self.dma_step();
 
         let i = &mut self.interrupts.flags;
@@ -183,7 +185,7 @@ where
         }
     }
 
-    pub fn shutdown(&mut self) {
-        self.cartridge.shutdown();
+    pub fn shutdown(&mut self) -> Result<(), ShutdownError<CB>> {
+        self.cartridge.shutdown()
     }
 }
