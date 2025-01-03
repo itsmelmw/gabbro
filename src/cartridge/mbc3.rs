@@ -1,6 +1,7 @@
 use crate::cartridge::{
     peripherals::{Battery, Feat, NoFeat, NoRam, Ram, Rtc},
-    Cartridge, CartridgeError, Mbc, ReadRam, ReadRom, Shutdown, ShutdownError, WriteRam, WriteRom,
+    Cartridge, CartridgeError, GetRom, Mbc, ReadRam, ReadRom, Shutdown, ShutdownError, WriteRam,
+    WriteRom,
 };
 
 pub struct Mbc3<'a, RAM, BAT, RTC>
@@ -67,6 +68,16 @@ where
             Ok(None) => Ok(Self::from_parts(rom, ram, Feat(battery), NoFeat)),
             Err(err) => Err(CartridgeError::BatteryError(err)),
         }
+    }
+}
+
+impl<RAM, BAT, RTC> GetRom for Mbc3<'_, RAM, BAT, RTC>
+where
+    BAT: Battery,
+    RTC: Rtc,
+{
+    fn rom(&self) -> &[u8] {
+        self.rom
     }
 }
 
@@ -187,7 +198,7 @@ impl<BAT> Mbc<BAT> for Mbc3<'_, NoRam, NoFeat, NoFeat>
 where
     BAT: Battery,
 {
-    fn name(&self) -> &'static str {
+    fn cart_type(&self) -> &'static str {
         "MBC3"
     }
 }
@@ -196,7 +207,7 @@ impl<BAT> Mbc<BAT> for Mbc3<'_, Ram, NoFeat, NoFeat>
 where
     BAT: Battery,
 {
-    fn name(&self) -> &'static str {
+    fn cart_type(&self) -> &'static str {
         "MBC3 + RAM"
     }
 }
@@ -205,7 +216,7 @@ impl<BAT> Mbc<BAT> for Mbc3<'_, Ram, Feat<BAT>, NoFeat>
 where
     BAT: Battery,
 {
-    fn name(&self) -> &'static str {
+    fn cart_type(&self) -> &'static str {
         "MBC3 + RAM + BATTERY"
     }
 }

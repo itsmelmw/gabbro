@@ -1,6 +1,7 @@
 use crate::cartridge::{
     peripherals::{Battery, Feat, NoFeat, NoRam, Ram},
-    Cartridge, CartridgeError, Mbc, ReadRam, ReadRom, Shutdown, ShutdownError, WriteRam, WriteRom,
+    Cartridge, CartridgeError, GetRom, Mbc, ReadRam, ReadRom, Shutdown, ShutdownError, WriteRam,
+    WriteRom,
 };
 
 /// A memory bank controller of type MBC1.
@@ -68,6 +69,15 @@ where
             Ok(None) => Ok(Self::from_parts(rom, ram, Feat(battery))),
             Err(err) => Err(CartridgeError::BatteryError(err)),
         }
+    }
+}
+
+impl<RAM, BAT> GetRom for Mbc1<'_, RAM, BAT>
+where
+    BAT: Battery,
+{
+    fn rom(&self) -> &[u8] {
+        self.rom
     }
 }
 
@@ -180,7 +190,7 @@ impl<BAT> Mbc<BAT> for Mbc1<'_, NoRam, NoFeat>
 where
     BAT: Battery,
 {
-    fn name(&self) -> &'static str {
+    fn cart_type(&self) -> &'static str {
         "MBC1"
     }
 }
@@ -189,7 +199,7 @@ impl<BAT> Mbc<BAT> for Mbc1<'_, Ram, NoFeat>
 where
     BAT: Battery,
 {
-    fn name(&self) -> &'static str {
+    fn cart_type(&self) -> &'static str {
         "MBC1 + RAM"
     }
 }
@@ -198,7 +208,7 @@ impl<BAT> Mbc<BAT> for Mbc1<'_, Ram, Feat<BAT>>
 where
     BAT: Battery,
 {
-    fn name(&self) -> &'static str {
+    fn cart_type(&self) -> &'static str {
         "MBC1 + RAM + BATTERY"
     }
 }

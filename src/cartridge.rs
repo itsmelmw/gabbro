@@ -32,6 +32,10 @@ where
     BatteryError(CB::Error),
 }
 
+pub trait GetRom {
+    fn rom(&self) -> &[u8];
+}
+
 pub trait ReadRom {
     fn read_rom(&self, addr: u16) -> u8;
 }
@@ -55,11 +59,11 @@ where
     fn shutdown(&mut self) -> Result<(), ShutdownError<CB>>;
 }
 
-pub trait Mbc<CB>: ReadRom + WriteRom + ReadRam + WriteRam + Shutdown<CB>
+pub trait Mbc<CB>: GetRom + ReadRom + WriteRom + ReadRam + WriteRam + Shutdown<CB>
 where
     CB: Battery,
 {
-    fn name(&self) -> &'static str;
+    fn cart_type(&self) -> &'static str;
 }
 
 /// Stores some header information of the ROM, as well as the MBC.
@@ -67,9 +71,6 @@ pub struct Cartridge<'a, CB = ()>
 where
     CB: Battery + 'a,
 {
-    title: &'a str,
-    version: u8,
-    licensee: &'static str,
     pub mbc: Box<dyn Mbc<CB> + 'a>,
 }
 
@@ -88,34 +89,15 @@ where
 
     /// Initializes a new cartridge by reading information from the header of the ROM.
     fn new(rom: &'a [u8], battery: CB) -> Result<Self, CartridgeError<CB>> {
-        let title = Self::get_title(rom)?;
-        let version = Self::get_version(rom);
-        let licensee = Self::get_licensee(rom)?;
-
         Self::check_rom_size(rom)?;
         let ram = Self::create_ram(rom)?;
         let mbc = Self::get_mbc(rom, ram, battery)?;
 
-        Ok(Self {
-            title,
-            version,
-            licensee,
-            mbc,
-        })
+        Ok(Self { mbc })
     }
 
     pub fn shutdown(&mut self) -> Result<(), ShutdownError<CB>> {
         self.mbc.shutdown()
-    }
-
-    /// Reads the title stored in the ROM. Returns an error if it encounters invalid UTF-8.
-    fn get_title(rom: &[u8]) -> Result<&str, CartridgeError<CB>> {
-        str::from_utf8(&rom[0x0134..0x0143]).map_err(|_| CartridgeError::InvalidTitle)
-    }
-
-    /// Reads the version of the ROM.
-    fn get_version(rom: &[u8]) -> u8 {
-        rom[0x014c]
     }
 
     /// Reads the number of ROM banks the ROM uses.
@@ -190,11 +172,26 @@ where
         }
     }
 
+    /// Reads the title stored in the ROM. Returns an error if it encounters invalid UTF-8.
+    pub fn title(&self) -> Result<&str, CartridgeError<CB>> {
+        str::from_utf8(&self.mbc.rom()[0x0134..0x0143]).map_err(|_| CartridgeError::InvalidTitle)
+    }
+
+    /// Reads the version of the ROM.
+    pub fn version(&self) -> u8 {
+        self.mbc.rom()[0x014c]
+    }
+
+    /// Get the cartridge type of the ROM.
+    pub fn cart_type(&self) -> &'static str {
+        self.mbc.cart_type()
+    }
+
     /// Reads the name of the licensee from the ROM.
     /// Checks for both the old and the new format.
     /// Returns an error if the licensee is invalid.
-    fn get_licensee(rom: &[u8]) -> Result<&'static str, CartridgeError<CB>> {
-        match rom[0x014b] {
+    pub fn licensee(&self) -> Result<&'static str, CartridgeError<CB>> {
+        match self.mbc.rom()[0x014b] {
             0x00 => Ok("None"),
             0x01 => Ok("Nintendo"),
             0x08 => Ok("Capcom"),
@@ -215,7 +212,7 @@ where
             0x30 => Ok("Infogrames"),
             0x31 => Ok("Nintendo"),
             0x32 => Ok("Bandai"),
-            0x33 => Self::get_licensee_new(rom),
+            0x33 => self.licensee_new(),
             0x34 => Ok("Konami"),
             0x35 => Ok("HectorSoft"),
             0x38 => Ok("Capcom"),
@@ -347,8 +344,11 @@ where
     }
 
     /// Reads the name of the licensee from the ROM in the new format.
-    fn get_licensee_new(rom: &[u8]) -> Result<&'static str, CartridgeError<CB>> {
-        match (rom[0x0144] as char, rom[0x0145] as char) {
+    fn licensee_new(&self) -> Result<&'static str, CartridgeError<CB>> {
+        match (
+            self.mbc.rom()[0x0144] as char,
+            self.mbc.rom()[0x0145] as char,
+        ) {
             ('0', '0') => Ok("None"),
             ('0', '1') => Ok("Nintendo R&D1"),
             ('0', '8') => Ok("Capcom"),

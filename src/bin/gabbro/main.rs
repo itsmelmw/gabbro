@@ -83,6 +83,20 @@ fn main() -> Result<(), String> {
             .battery(save)
             .build()
             .expect("Invalid ROM");
+        println!("----------------------------------------");
+        println!(
+            " {:-12}{:.26}",
+            "Title: ",
+            cartridge.title().unwrap_or("Unknown")
+        );
+        println!(" {:-12}{:.26}", "Version: ", cartridge.version());
+        println!(
+            " {:-12}{:.26}",
+            "Licensee: ",
+            cartridge.licensee().unwrap_or("Unknown")
+        );
+        println!(" {:-12}{:.26}", "Cart Type: ", cartridge.cart_type());
+        println!("----------------------------------------");
 
         let mut gb = Gameboy::builder()
             .cartridge(cartridge)

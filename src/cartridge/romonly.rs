@@ -1,5 +1,5 @@
 use crate::cartridge::{
-    Battery, Mbc, ReadRam, ReadRom, Shutdown, ShutdownError, WriteRam, WriteRom,
+    Battery, GetRom, Mbc, ReadRam, ReadRom, Shutdown, ShutdownError, WriteRam, WriteRom,
 };
 
 pub struct RomOnly<'a> {
@@ -9,6 +9,12 @@ pub struct RomOnly<'a> {
 impl<'a> RomOnly<'a> {
     pub fn new(rom: &'a [u8]) -> Self {
         Self { rom }
+    }
+}
+
+impl GetRom for RomOnly<'_> {
+    fn rom(&self) -> &[u8] {
+        self.rom
     }
 }
 
@@ -45,7 +51,7 @@ impl<BAT> Mbc<BAT> for RomOnly<'_>
 where
     BAT: Battery,
 {
-    fn name(&self) -> &'static str {
+    fn cart_type(&self) -> &'static str {
         "ROM ONLY"
     }
 }
