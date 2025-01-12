@@ -83,7 +83,7 @@ impl Noise {
         let bit = !((self.lfsr & 0x01) ^ ((self.lfsr >> 1) & 0x01));
         self.lfsr |= bit << 15;
         if let LfsrWidth::B7 = self.lfsr_width() {
-            self.lfsr = (self.lfsr & 0xff7f) | bit << 7;
+            self.lfsr = (self.lfsr & 0xff7f) | (bit << 7);
         }
         self.lfsr >>= 1;
     }

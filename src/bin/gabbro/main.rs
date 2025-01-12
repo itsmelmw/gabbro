@@ -108,7 +108,7 @@ fn main() -> Result<(), String> {
         );
         println!(
             " {:-12}{:.26}",
-            "RAM size: ",
+            "RAM banks: ",
             format!(
                 "{} ({} B)",
                 cartridge.ram_banks().unwrap_or(0),
