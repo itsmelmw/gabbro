@@ -149,7 +149,6 @@ where
     where
         CC: Clock + 'a,
     {
-        println!("rom[0x0147]: {:#04x}", rom[0x0147]);
         match rom[0x0147] {
             0x00 => Ok(Box::new(RomOnly::new(rom))),
             0x01 => Ok(Box::new(Mbc1::rom_only(rom))),
