@@ -159,17 +159,10 @@ where
             0x09 => Err(CartridgeError::UnsupportedMbc("ROM + RAM + BATTERY")),
             0x05 | 0x06 => Err(CartridgeError::UnsupportedMbc("MBC2")),
             0x0b..=0x0d => Err(CartridgeError::UnsupportedMbc("MMM01")),
-            // TODO: Timer
             0x0f => Ok(Box::new(Mbc3::with_battery_clock(rom, battery, clock)?)),
             0x10 => Ok(Box::new(Mbc3::with_ram_battery_clock(
                 rom, ram, battery, clock,
             )?)),
-            //0x0f => Ok(Box::new(Mbc3::rom_only(rom))),
-            //0x10 => Ok(Box::new(Mbc3::with_ram(rom, ram))),
-            //0x0f => Err(CartridgeError::UnsupportedMbc("MBC3 + TIMER + BATTERY")),
-            //0x10 => Err(CartridgeError::UnsupportedMbc(
-            //    "MBC3 + TIMER + RAM + BATTERY",
-            //)),
             0x11 => Ok(Box::new(Mbc3::rom_only(rom))),
             0x12 => Ok(Box::new(Mbc3::with_ram(rom, ram))),
             0x13 => Ok(Box::new(Mbc3::with_ram_battery(rom, ram, battery)?)),
@@ -184,14 +177,52 @@ where
         }
     }
 
-    /// Reads the title stored in the ROM. Returns an error if it encounters invalid UTF-8.
+    /// Reads the title of the cartridge. Returns an error if it encounters invalid UTF-8.
     pub fn title(&self) -> Result<&str, CartridgeError<CB>> {
         str::from_utf8(&self.mbc.rom()[0x0134..0x0143]).map_err(|_| CartridgeError::InvalidTitle)
     }
 
-    /// Reads the version of the ROM.
-    pub fn version(&self) -> u8 {
-        self.mbc.rom()[0x014c]
+    /// Reads the version of the cartridge.
+    pub fn version(&self) -> usize {
+        self.mbc.rom()[0x014c] as usize
+    }
+
+    /// Reads the number of ROM banks of the cartridge. Returns an error if it's invalid.
+    pub fn rom_banks(&self) -> Result<usize, CartridgeError<CB>> {
+        match self.mbc.rom()[0x0148] {
+            0x00 => Ok(2),
+            0x01 => Ok(4),
+            0x02 => Ok(8),
+            0x03 => Ok(16),
+            0x04 => Ok(32),
+            0x05 => Ok(64),
+            0x06 => Ok(128),
+            0x07 => Ok(256),
+            0x08 => Ok(512),
+            _ => Err(CartridgeError::InvalidRomSize),
+        }
+    }
+
+    /// Reads the size of the ROM.
+    pub fn rom_size(&self) -> Result<usize, CartridgeError<CB>> {
+        Ok(self.rom_banks()? * Self::ROM_BANK_SIZE)
+    }
+
+    /// Reads the number of RAM banks of the cartridge.
+    pub fn ram_banks(&self) -> Result<usize, CartridgeError<CB>> {
+        match self.mbc.rom()[0x0149] {
+            0x00 => Ok(0),
+            0x02 => Ok(1),
+            0x03 => Ok(4),
+            0x04 => Ok(16),
+            0x05 => Ok(8),
+            _ => Err(CartridgeError::InvalidRamSize),
+        }
+    }
+
+    /// Reads the number of RAM banks of the cartridge.
+    pub fn ram_size(&self) -> Result<usize, CartridgeError<CB>> {
+        Ok(self.ram_banks()? * Self::RAM_BANK_SIZE)
     }
 
     /// Get the cartridge type of the ROM.

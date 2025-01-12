@@ -97,6 +97,24 @@ fn main() -> Result<(), String> {
             "Licensee: ",
             cartridge.licensee().unwrap_or("Unknown")
         );
+        println!(
+            " {:-12}{:.26}",
+            "ROM banks: ",
+            format!(
+                "{} ({} B)",
+                cartridge.rom_banks().unwrap_or(0),
+                cartridge.rom_size().unwrap_or(0),
+            )
+        );
+        println!(
+            " {:-12}{:.26}",
+            "RAM size: ",
+            format!(
+                "{} ({} B)",
+                cartridge.ram_banks().unwrap_or(0),
+                cartridge.ram_size().unwrap_or(0),
+            )
+        );
         println!(" {:-12}{:.26}", "Cart Type: ", cartridge.cart_type());
         println!("----------------------------------------");
 
