@@ -8,6 +8,7 @@ use std::{
     path::Path,
     sync::{mpsc, Arc, Mutex},
     thread,
+    time::Instant,
 };
 
 const WINDOW_SCALE: usize = 4;
@@ -81,6 +82,7 @@ fn main() -> Result<(), String> {
         let cartridge = Cartridge::builder()
             .rom(&rom)
             .battery(save)
+            .clock(Instant::now())
             .build()
             .expect("Invalid ROM");
         println!("----------------------------------------");

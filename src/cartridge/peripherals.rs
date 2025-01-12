@@ -4,6 +4,7 @@ use std::{
     fs::OpenOptions,
     io::{Error as IoError, Read, Write},
     path::PathBuf,
+    time::Instant,
 };
 
 // Need these structs to be able to check whether an MBC has a feature or not,
@@ -69,9 +70,30 @@ where
     }
 }
 
-pub trait Rtc {}
+pub trait Clock {
+    /// Returns the number of seconds passed since the last time this function was called,
+    /// or since the emulator started if no calls were made yet.
+    fn seconds_passed(&mut self) -> usize {
+        0
+    }
+}
 
-impl Rtc for () {}
-impl Rtc for NoFeat {}
+impl Clock for () {}
+impl Clock for NoFeat {}
 
-impl<F> Rtc for Feat<F> where F: Rtc {}
+impl Clock for Instant {
+    fn seconds_passed(&mut self) -> usize {
+        let passed = self.elapsed().as_secs() as usize;
+        *self = Instant::now();
+        passed
+    }
+}
+
+impl<F> Clock for Feat<F>
+where
+    F: Clock,
+{
+    fn seconds_passed(&mut self) -> usize {
+        self.0.seconds_passed()
+    }
+}

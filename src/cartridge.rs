@@ -4,7 +4,7 @@ pub mod peripherals;
 pub mod romonly;
 use mbc1::Mbc1;
 use mbc3::Mbc3;
-use peripherals::{Battery, Ram};
+use peripherals::{Battery, Clock, Ram};
 use romonly::RomOnly;
 use std::str;
 
@@ -75,8 +75,8 @@ where
 }
 
 impl<'a> Cartridge<'a> {
-    pub fn builder() -> CartridgeBuilder<'a, (), false> {
-        CartridgeBuilder::<'a, (), false>::new()
+    pub fn builder() -> CartridgeBuilder<'a, (), (), false> {
+        CartridgeBuilder::<'a, (), (), false>::new()
     }
 }
 
@@ -88,10 +88,13 @@ where
     const RAM_BANK_SIZE: usize = 0x2000;
 
     /// Initializes a new cartridge by reading information from the header of the ROM.
-    fn new(rom: &'a [u8], battery: CB) -> Result<Self, CartridgeError<CB>> {
+    fn new<CC>(rom: &'a [u8], battery: CB, clock: CC) -> Result<Self, CartridgeError<CB>>
+    where
+        CC: Clock + 'a,
+    {
         Self::check_rom_size(rom)?;
         let ram = Self::create_ram(rom)?;
-        let mbc = Self::get_mbc(rom, ram, battery)?;
+        let mbc = Self::get_mbc(rom, ram, battery, clock)?;
 
         Ok(Self { mbc })
     }
@@ -137,11 +140,16 @@ where
 
     /// Retrieves the memory bank controller the ROM uses.
     /// Returns an error if the MBC is invalid or unsupported.
-    fn get_mbc(
+    fn get_mbc<CC>(
         rom: &'a [u8],
         ram: Ram,
         battery: CB,
-    ) -> Result<Box<dyn Mbc<CB> + 'a>, CartridgeError<CB>> {
+        clock: CC,
+    ) -> Result<Box<dyn Mbc<CB> + 'a>, CartridgeError<CB>>
+    where
+        CC: Clock + 'a,
+    {
+        println!("rom[0x0147]: {:#04x}", rom[0x0147]);
         match rom[0x0147] {
             0x00 => Ok(Box::new(RomOnly::new(rom))),
             0x01 => Ok(Box::new(Mbc1::rom_only(rom))),
@@ -152,8 +160,12 @@ where
             0x05 | 0x06 => Err(CartridgeError::UnsupportedMbc("MBC2")),
             0x0b..=0x0d => Err(CartridgeError::UnsupportedMbc("MMM01")),
             // TODO: Timer
-            0x0f => Ok(Box::new(Mbc3::rom_only(rom))),
-            0x10 => Ok(Box::new(Mbc3::with_ram(rom, ram))),
+            0x0f => Ok(Box::new(Mbc3::with_battery_clock(rom, battery, clock)?)),
+            0x10 => Ok(Box::new(Mbc3::with_ram_battery_clock(
+                rom, ram, battery, clock,
+            )?)),
+            //0x0f => Ok(Box::new(Mbc3::rom_only(rom))),
+            //0x10 => Ok(Box::new(Mbc3::with_ram(rom, ram))),
             //0x0f => Err(CartridgeError::UnsupportedMbc("MBC3 + TIMER + BATTERY")),
             //0x10 => Err(CartridgeError::UnsupportedMbc(
             //    "MBC3 + TIMER + RAM + BATTERY",
@@ -415,58 +427,85 @@ where
     }
 }
 
-pub struct CartridgeBuilder<'a, CB, const ROM: bool>
+pub struct CartridgeBuilder<'a, CB, CC, const ROM: bool>
 where
     CB: Battery + 'a,
+    CC: Clock + 'a,
 {
     rom: &'a [u8],
     battery: CB,
+    clock: CC,
 }
 
-impl<'a, CB, const ROM: bool> CartridgeBuilder<'a, CB, ROM>
+impl<'a, CB, CC, const ROM: bool> CartridgeBuilder<'a, CB, CC, ROM>
 where
     CB: Battery + 'a,
+    CC: Clock + 'a,
 {
-    pub fn new() -> CartridgeBuilder<'a, (), false> {
+    pub fn new() -> CartridgeBuilder<'a, (), (), false> {
         CartridgeBuilder {
             rom: &[],
             battery: (),
+            clock: (),
         }
     }
 }
 
-impl<'a, CB> CartridgeBuilder<'a, CB, false>
+impl<'a, CB, CC> CartridgeBuilder<'a, CB, CC, false>
 where
     CB: Battery + 'a,
+    CC: Clock + 'a,
 {
-    pub fn rom(self, rom: &'a [u8]) -> CartridgeBuilder<'a, CB, true> {
+    pub fn rom(self, rom: &'a [u8]) -> CartridgeBuilder<'a, CB, CC, true> {
         CartridgeBuilder {
             rom,
             battery: self.battery,
+            clock: self.clock,
         }
     }
 }
 
-impl<'a, const ROM: bool> CartridgeBuilder<'a, (), ROM> {
-    pub fn battery<CB>(self, battery: CB) -> CartridgeBuilder<'a, CB, ROM>
+impl<'a, CC, const ROM: bool> CartridgeBuilder<'a, (), CC, ROM>
+where
+    CC: Clock + 'a,
+{
+    pub fn battery<CB>(self, battery: CB) -> CartridgeBuilder<'a, CB, CC, ROM>
     where
         CB: Battery + 'a,
     {
         CartridgeBuilder {
             rom: self.rom,
             battery,
+            clock: self.clock,
         }
     }
 }
 
-impl<'a, CB> CartridgeBuilder<'a, CB, true>
+impl<'a, CB, const ROM: bool> CartridgeBuilder<'a, CB, (), ROM>
 where
     CB: Battery + 'a,
+{
+    pub fn clock<CC>(self, clock: CC) -> CartridgeBuilder<'a, CB, CC, ROM>
+    where
+        CC: Clock + 'a,
+    {
+        CartridgeBuilder {
+            rom: self.rom,
+            battery: self.battery,
+            clock,
+        }
+    }
+}
+
+impl<'a, CB, CC> CartridgeBuilder<'a, CB, CC, true>
+where
+    CB: Battery + 'a,
+    CC: Clock + 'a,
 {
     pub fn build(self) -> Result<Cartridge<'a, CB>, CartridgeError<CB>>
     where
         CB: Battery,
     {
-        Cartridge::new(self.rom, self.battery)
+        Cartridge::new(self.rom, self.battery, self.clock)
     }
 }
